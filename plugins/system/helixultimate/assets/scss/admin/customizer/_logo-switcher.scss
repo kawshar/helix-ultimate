@@ -1,0 +1,58 @@
+// Tab switcher (logo Image / Text)
+
+/* Tab switcher (logo Image / Text): full width, equal halves, flush with the fields below. */
+#helix-ultimate .hu-switcher-style-tab,
+#helix-ultimate .hu-switcher-style-tab.hu-align-center {
+	text-align: left;
+}
+
+#helix-ultimate .hu-switcher-style-tab .hu-action-group,
+#helix-ultimate .hu-switcher-style-tab.hu-align-center .hu-action-group {
+	display: grid;
+	grid-auto-columns: minmax(0, 1fr);
+	grid-auto-flow: column;
+	gap: 2px;
+	width: 100%;
+	margin: 0;
+	padding: 3px;
+	border: 0;
+	border-radius: calc(var(--sp-radius) + 2px);
+	background: var(--sp-input);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-switcher-style-tab .hu-switcher-action {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	margin: 0;
+	padding: 0 12px;
+	border-radius: var(--sp-radius);
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-switcher-style-tab .hu-switcher-action-content:empty {
+	display: none;
+}
+
+#helix-ultimate .hu-switcher-style-tab .hu-switcher-label {
+	margin: 0;
+	color: inherit;
+	font-size: 13px;
+	line-height: 1;
+}
+
+#helix-ultimate .hu-switcher-style-tab .hu-switcher-action.active {
+	font-weight: 600;
+}
+
+/* The tab switcher heads its group: a little space before the fields it controls. */
+#helix-ultimate .hu-field-list > [class*="group-style"]:first-child:has(.hu-switcher-style-tab) {
+	margin-bottom: 4px;
+	padding-top: 4px;
+}
+
+#helix-ultimate .hu-field-list > [class*="group-style"]:has(.hu-switcher-style-tab) .control-group {
+	margin-bottom: 12px;
+}

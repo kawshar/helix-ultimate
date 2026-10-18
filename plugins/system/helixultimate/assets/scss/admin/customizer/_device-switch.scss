@@ -1,0 +1,73 @@
+// Preview device switches on the settings that have a value per device
+
+/* ------------------------------------------------------------------ */
+/* Device switch: on a setting's label row (desktop / tablet / mobile) */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .control-label.has-device-switch {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+#helix-ultimate .hu-device-switch {
+	display: inline-flex;
+	flex: 0 0 auto;
+	gap: 1px;
+	padding: 2px;
+	border-radius: 7px;
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-device-switch .hu-device {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 20px;
+	padding: 0;
+	border: 0;
+	border-radius: 5px;
+	color: var(--sp-muted);
+	background: transparent;
+	box-shadow: none;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-device-switch .hu-device:hover {
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-device-switch .hu-device.active {
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+}
+
+/* Typography size: one button showing the current device, next to "Size". */
+#helix-ultimate .hu-webfont-size > label {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+#helix-ultimate .hu-device-cycle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	border: 0;
+	border-radius: 4px;
+	color: var(--sp-muted);
+	background: transparent;
+	cursor: pointer;
+	pointer-events: auto;
+}
+
+#helix-ultimate .hu-device-cycle:hover {
+	color: var(--sp-blue);
+	background: var(--sp-input);
+}

@@ -1,0 +1,167 @@
+// Mega menu / item settings as a panel step
+
+/* ------------------------------------------------------------------ */
+/* Mega menu / item settings as a panel step                           */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-edit-panel {
+	transition: width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* A root item with the mega menu switched off only needs the settings column. */
+#helix-ultimate .hu-edit-panel.is-wide:has(.hu-subpanel-megamenu:last-of-type .hu-mega-menu-builder.collapsed) {
+	--hu-panel-width: 272px !important;
+}
+
+#helix-ultimate .hu-megamenu-step,
+#helix-ultimate .hu-megamenu-step .hu-modal-megamenu-container {
+	width: auto;
+	height: auto;
+	background: transparent;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-container {
+	display: flex !important;
+	align-items: flex-start;
+	gap: 16px;
+	height: auto;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-sidebar {
+	position: sticky;
+	top: 0;
+	flex: 0 0 220px;
+	width: 220px;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+/* Settings only (child items, or the mega menu switched off): full width. */
+#helix-ultimate .hu-subpanel-menu-settings .hu-megamenu-sidebar,
+#helix-ultimate .hu-megamenu-step.collapsed .hu-megamenu-sidebar {
+	flex: 1 1 auto;
+	width: 100%;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-grid {
+	flex: 1 1 auto;
+	min-width: 0;
+	width: auto;
+	max-height: none;
+	padding: 0;
+	overflow: visible;
+}
+
+/* Cells: type badge above the item name, remove on hover. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	min-width: 0;
+	padding: 5px 6px;
+	font-size: 12px;
+	line-height: 1.3;
+	overflow-wrap: anywhere;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-badge {
+	position: static;
+	order: -1;
+	padding: 1px 4px;
+	font-size: 9.5px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove {
+	top: 3px;
+	right: 3px;
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell:hover .hu-megamenu-cell-remove,
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell:focus-within .hu-megamenu-cell-remove {
+	opacity: 1;
+}
+
+@media (hover: none) {
+	#helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove {
+		opacity: 1;
+	}
+}
+
+/* Step header actions */
+#helix-ultimate .hu-subpanel-actions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: auto;
+}
+
+#helix-ultimate .hu-subpanel-header .hu-subpanel-title {
+	flex: 1 1 auto;
+}
+
+#helix-ultimate .hu-subpanel-action {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 28px;
+	padding: 0 10px;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+	background: transparent;
+	font-size: 12.5px;
+	font-weight: 500;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-subpanel-action:hover {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-subpanel-action[aria-pressed='true'] {
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+}
+
+#helix-ultimate .hu-subpanel-action:focus-visible {
+	outline: 2px solid var(--sp-blue);
+	outline-offset: 1px;
+}
+
+/* Mega menu off: no columns to make room for. */
+#helix-ultimate .hu-subpanel-megamenu:has(.hu-mega-menu-builder.collapsed) .hu-megamenu-settings-toggle {
+	display: none;
+}
+
+/* Slide the settings column away so the columns get the full width. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-sidebar {
+	overflow: hidden;
+	transition: flex-basis 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), margin 0.24s ease, opacity 0.18s ease;
+}
+
+#helix-ultimate .hu-megamenu-step.is-settings-hidden:not(.collapsed) .hu-megamenu-sidebar {
+	flex-basis: 0;
+	width: 0;
+	margin-right: -16px; /* cancels the gap */
+	opacity: 0;
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#helix-ultimate .hu-megamenu-step .hu-megamenu-sidebar {
+		transition: none;
+	}
+}

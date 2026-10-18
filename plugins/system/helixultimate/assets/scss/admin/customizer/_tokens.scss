@@ -1,0 +1,64 @@
+// Design tokens, page base and the focus rule
+
+/**
+ * @package Helix Ultimate Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright Copyright (c) 2010 - 2025 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
+*/
+
+/*
+ * Customizer theme, aligned with the SP Page Builder editor colour guide:
+ * cool blue-gray chrome, one blue accent, WCAG 2.1 AA.
+ *
+ * Rules: text >= 4.5:1 with no faint tier; 11px minimum, 12px for inputs;
+ * interactive edges >= 3:1; blue only for selection, focus, primary action
+ * and variables; status never by colour alone; 2px blue focus ring.
+ * Loaded after helix-ultimate.css.
+ */
+
+:root {
+	/* Surfaces */
+	--sp-panel: #ffffff;
+	--sp-input: #f2f5fa;
+	--sp-canvas: #ecf0f6;
+	--sp-divider: #e3e8f1;
+	--sp-stone: #e0e5ef;
+	--sp-handle: #c9d1df;
+	--sp-handle-interactive: #7f8ca3;
+
+	/* Text and icons */
+	--sp-text: #111827;
+	--sp-muted: #5b6980;
+	--sp-icon: #2e3a4f;
+
+	/* Accent */
+	--sp-blue: #1f3bff;
+	--sp-blue-dark: #1629b8;
+	--sp-chip: #eef1ff;
+	--sp-chip-text: #1b2fb8;
+
+	/* Status */
+	--sp-published: #1e8e5a;
+	--sp-published-text: #167a4c;
+	--sp-draft: #7f8ca3;
+	--sp-danger: #c2311e;
+
+	--sp-radius: 8px;
+	/* Height of the header line shared by the rail (back button) and the panel title. */
+	--sp-header-height: 44px;
+	--sp-font: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+#helix-ultimate {
+	background: var(--sp-canvas);
+	color: var(--sp-text);
+	font-family: var(--sp-font);
+}
+
+/* Focus: a 1px blue ring tight to the control (fields turn their own border blue instead). Never removed. */
+#helix-ultimate :is(a, button, input, select, textarea, [tabindex], .hu-fieldset-header, .hu-group-header-box):focus-visible {
+	outline: 1px solid var(--sp-blue) !important;
+	outline-offset: 0;
+	box-shadow: none;
+}

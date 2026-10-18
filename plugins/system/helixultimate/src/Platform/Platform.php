@@ -285,6 +285,10 @@ class Platform
 	private static function registerLanguageScripts()
 	{
 		Text::script('HELIX_ULTIMATE_SELECT_ICON_LABEL');
+		Text::script('HELIX_ULTIMATE_DEVICE_DESKTOP');
+		Text::script('HELIX_ULTIMATE_DEVICE_TABLET');
+		Text::script('HELIX_ULTIMATE_DEVICE_MOBILE');
+		Text::script('HELIX_ULTIMATE_PREVIEW_DEVICE');
 		Text::script('HELIX_ULTIMATE_MEGAMENU_ADD_COLUMN');
 		Text::script('HELIX_ULTIMATE_MEGAMENU_REMOVE_COLUMN');
 		Text::script('HELIX_ULTIMATE_MEGAMENU_REMOVE_COLUMN_CONFIRM');

@@ -1,0 +1,36 @@
+// Menu tree grip
+
+/* Menu tree: the grip takes no space. It shows on hover / focus just outside the
+   row, over the end of the connector line (or in the margin for top-level items). */
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler {
+	position: relative;
+	padding-left: 8px;
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
+	position: absolute;
+	top: 50%;
+	left: -12px;
+	padding: 2px 2px;
+	background: var(--sp-panel);
+	opacity: 0;
+	transform: translateY(-50%);
+	transition: opacity 0.12s ease;
+	pointer-events: none;
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler:is(:hover, :focus-within) .hu-branch-icon,
+#helix-ultimate #hu-menu-tree .hu-menu-tree-branch.dragging .hu-branch-icon,
+#helix-ultimate #hu-menu-tree .hu-menu-tree-branch.ui-sortable-helper .hu-branch-icon {
+	opacity: 1;
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler {
+	cursor: grab;
+}
+
+@media (hover: none) {
+	#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
+		opacity: 1;
+	}
+}

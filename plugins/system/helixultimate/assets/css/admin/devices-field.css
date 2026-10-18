@@ -1,35 +1,36 @@
+/* Generated from assets/scss/admin by `gulp css`. Edit the .scss source, not this file. */
 .helix-devices {
-    text-align: right;
+  text-align: right;
 }
 
 .helix-devices .device-btn {
-    border: none;
-    background: transparent;
-    outline: none;
-    width: 25px;
-    height: 25px;
-    padding: 3px;
-    cursor: pointer;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 1s ease;
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 25px;
+  height: 25px;
+  padding: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 1s ease;
 }
 
 .helix-devices .device-btn:hover {
-    background: #b9d8fa;
-    border-radius: 100%;
+  background: #b9d8fa;
+  border-radius: 100%;
 }
 
 .helix-devices .device-btn:hover path {
-    fill: #2a98ff;
+  fill: #2a98ff;
 }
 
 .helix-devices .device-btn.active {
-    background: #b9d8fa;
-    border-radius: 100%;
+  background: #b9d8fa;
+  border-radius: 100%;
 }
 
 .helix-devices .device-btn.active path {
-    fill: #2a98ff;
+  fill: #2a98ff;
 }

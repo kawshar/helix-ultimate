@@ -1,6 +1,8 @@
 const path = require('path');
-const { series, parallel, src, dest, relo } = require('gulp');
+const { spawn } = require('child_process');
+const { series, parallel, src, dest, watch } = require('gulp');
 const del = require('del');
+const sass = require('gulp-sass')(require('sass'));
 const zip = require('gulp-zip');
 const minifyCss = require('gulp-clean-css');
 const uglify = require('gulp-uglify-es').default;
@@ -38,6 +40,57 @@ const config = {
         dirMode: 0755,
     },
 };
+
+/* ------------------------------------------------------------------ */
+/* Admin assets: SCSS -> CSS, TypeScript -> JS                         */
+/* ------------------------------------------------------------------ */
+
+/*
+ * plugins/system/helixultimate/assets/scss/admin/<name>.scss
+ *   -> plugins/system/helixultimate/assets/css/admin/<name>.css
+ *
+ * Partials (_name.scss, e.g. scss/admin/customizer/) are only compiled
+ * through the file that @uses them. The output stays readable (expanded) and
+ * is committed, like the compiled scripts: installing needs no build step.
+ */
+const adminAssets = path.resolve(__dirname, './plugins/system/helixultimate/assets');
+
+const CSS_BANNER = '/* Generated from assets/scss/admin by `gulp css`. Edit the .scss source, not this file. */\n';
+
+function css() {
+    return src(`${adminAssets}/scss/admin/*.scss`)
+        .pipe(sass({ style: 'expanded' }).on('error', sass.logError))
+        .on('data', file => {
+            // After @charset, which has to stay the very first thing in the file.
+            const text = file.contents.toString();
+            const charset = text.match(/^@charset "[^"]+";\n/);
+            const head = charset ? charset[0] : '';
+
+            file.contents = Buffer.from(head + CSS_BANNER + text.slice(head.length));
+        })
+        .pipe(dest(`${adminAssets}/css/admin`));
+}
+
+/** Run an npm script (the TypeScript build lives in scripts/build-admin.mjs). */
+function npmScript(name) {
+    const task = () =>
+        spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', name], { stdio: 'inherit', shell: process.platform === 'win32' });
+
+    task.displayName = `npm run ${name}`;
+    return task;
+}
+
+const js = npmScript('build:admin');
+
+/** Rebuild on change: SCSS here, TypeScript through esbuild's own watcher. */
+function watchCss() {
+    watch(`${adminAssets}/scss/admin/**/*.scss`, { ignoreInitial: false }, css);
+}
+
+exports.css = css;
+exports.js = js;
+exports.build = parallel(css, js);
+exports.watch = parallel(watchCss, npmScript('watch:admin'));
 
 function exportSqlDump(done) {
     mysqldump({
@@ -97,6 +150,9 @@ function pluginStreamTask() {
     return src([
         pluginPath + '/**/*.{' + config.parseExtensions('pluginFileExtensions') + '}',
         '!' + pluginPath + '/tests/**',
+        // Sources; the package ships the compiled css/admin and js/admin.
+        '!' + pluginPath + '/assets/scss/**',
+        '!' + pluginPath + '/assets/ts/**',
     ]).pipe(dest(path.resolve(config.buildPath, './plugins/system/'), config.destOptions));
 }
 
@@ -208,6 +264,7 @@ function packTheQS() {
 }
 
 exports.default = series(
+    exports.build,
     clean,
     parallel(
         manifestStreamTask,

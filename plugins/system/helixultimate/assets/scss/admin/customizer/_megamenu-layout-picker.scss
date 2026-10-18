@@ -1,0 +1,90 @@
+// Column layout picker
+
+/* ------------------------------------------------------------------ */
+/* Column layout picker (row columns / new row)                        */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-slots, .hu-megamenu-add-slots) {
+	width: 320px;
+	max-width: calc(100vw - 32px);
+	height: auto;
+	padding: 12px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 10px;
+	background: var(--sp-panel);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-slots {
+	top: 32px;
+	right: 0;
+	z-index: 5;
+	text-align: left;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-slots {
+	z-index: 5;
+	margin: 8px auto 0;
+}
+
+#helix-ultimate .hu-megamenu-layout-options {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 6px;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 4px;
+	margin: 0;
+	padding: 6px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 8px;
+	color: var(--sp-muted);
+	background: var(--sp-panel);
+	text-decoration: none;
+	transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout:hover {
+	border-color: var(--sp-handle-interactive);
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout.active {
+	border-color: var(--sp-blue);
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+}
+
+/* Bars in a 12-column grid, one per column. */
+#helix-ultimate .hu-layout-preview {
+	display: flex;
+	gap: 2px;
+	height: 14px;
+}
+
+#helix-ultimate .hu-layout-preview i {
+	display: block;
+	min-width: 0;
+	border-radius: 3px;
+	background: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout:hover .hu-layout-preview i {
+	background: var(--sp-icon);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout.active .hu-layout-preview i {
+	background: var(--sp-blue);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout-name {
+	margin: 0;
+	color: inherit;
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+}

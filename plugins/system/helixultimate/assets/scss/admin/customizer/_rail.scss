@@ -1,0 +1,106 @@
+// Rail
+
+/* ------------------------------------------------------------------ */
+/* Rail                                                                */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-sidebar {
+	background: var(--sp-panel);
+	box-shadow: inset -1px 0 0 var(--sp-divider);
+}
+
+#helix-ultimate .hu-sidebar-brand,
+#helix-ultimate .hu-sidebar-footer {
+	border-color: var(--sp-divider);
+}
+
+
+#helix-ultimate .hu-sidebar-nav {
+	padding: 8px 0;
+}
+
+#helix-ultimate #hu-options > div > .hu-fieldset-header::after {
+	display: none;
+}
+
+#helix-ultimate .hu-fieldset-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	margin: 2px auto;
+	padding: 0;
+	border-radius: var(--sp-radius);
+	background: transparent;
+	box-shadow: none;
+	color: var(--sp-icon);
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+#helix-ultimate .hu-fieldset-header-inner {
+	display: flex;
+	margin: 0;
+}
+
+#helix-ultimate .hu-option-icon {
+	display: block;
+	width: 18px;
+	height: 18px;
+	background-color: currentColor;
+	filter: none;
+	-webkit-mask: var(--hu-icon) center / contain no-repeat;
+	mask: var(--hu-icon) center / contain no-repeat;
+}
+
+#helix-ultimate .hu-fieldset-header:hover:not(.active) {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-fieldset-header.active {
+	background: var(--sp-input);
+	box-shadow: none;
+	color: var(--sp-text);
+}
+
+/* Draft status: icon plus text for assistive tech, colour never alone */
+#helix-ultimate .hu-sidebar .hu-response {
+	color: var(--sp-muted);
+}
+
+#helix-ultimate .hu-sidebar .hu-done-msg .fa-check-circle {
+	color: var(--sp-published);
+}
+
+#helix-ultimate .hu-sidebar .action-reset-drafts {
+	width: 28px;
+	height: 28px;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+	background: var(--sp-input);
+}
+
+/* Top: back to the template style, on the same line as the panel header. */
+#helix-ultimate .hu-sidebar-brand {
+	box-sizing: border-box;
+	justify-content: center;
+	height: var(--sp-header-height);
+	padding: 0;
+}
+
+#helix-ultimate .hu-sidebar-back {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+	text-decoration: none;
+}
+
+#helix-ultimate .hu-sidebar-back:hover,
+#helix-ultimate .hu-sidebar-back:focus-visible {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}

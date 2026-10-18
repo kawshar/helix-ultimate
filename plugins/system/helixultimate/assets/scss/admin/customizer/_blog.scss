@@ -1,0 +1,302 @@
+// Blog panel
+
+/* ------------------------------------------------------------------ */
+/* Blog panel                                                          */
+/* ------------------------------------------------------------------ */
+
+/* Spacing, not divider lines, between the fields. */
+#helix-ultimate .blog-panel .hu-field-list .hu-field-separator {
+	margin-bottom: 4px;
+	padding-bottom: 12px;
+	border-bottom: 0;
+}
+
+/* Switches end on the same edge as the fields. */
+#helix-ultimate .hu-style-switcher .form-check-inline {
+	margin-right: 0;
+}
+
+#helix-ultimate .hu-style-switcher .controls {
+	flex: 0 0 auto;
+}
+
+/* Image sizes: one row each, [☐ Name] [W × H]. */
+#helix-ultimate .blog-panel .hu-group-blog_images .hu-subgroup {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 112px;
+	align-items: center;
+	column-gap: 8px;
+	margin: 0 0 6px;
+	padding: 0;
+	border: 0;
+}
+
+#helix-ultimate .hu-group-blog_images .hu-subgroup > [class*="col-"] {
+	width: auto;
+	max-width: none;
+	padding: 0;
+}
+
+#helix-ultimate .hu-group-blog_images .hu-subgroup .control-group,
+#helix-ultimate .hu-group-blog_images .hu-subgroup .control-group-inner {
+	margin: 0;
+	padding: 0;
+}
+
+#helix-ultimate .hu-group-blog_images .hu-style-checkbox .control-label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-group-blog_images .hu-style-checkbox .controls,
+#helix-ultimate .hu-group-blog_images .hu-style-checkbox .form-check {
+	display: flex;
+	align-items: center;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+}
+
+#helix-ultimate .hu-group-blog_images .hu-style-checkbox .form-check-input {
+	flex: 0 0 auto;
+	margin: 0;
+	vertical-align: middle;
+}
+
+#helix-ultimate .hu-dimension {
+	display: flex;
+	align-items: center;
+	height: 32px;
+	padding: 0 8px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background: var(--sp-input);
+	transition: border-color 0.12s ease, opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-dimension:hover {
+	border-color: var(--sp-divider);
+}
+
+#helix-ultimate .hu-dimension:focus-within {
+	border-color: var(--sp-blue);
+}
+
+#helix-ultimate .hu-edit-panel .hu-dimension input.form-control {
+	flex: 1 1 0;
+	width: 0;
+	min-width: 0;
+	min-height: 0;
+	height: 30px;
+	padding: 0;
+	border: 0 !important;
+	background: transparent !important;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+}
+
+#helix-ultimate .hu-edit-panel .hu-dimension input.form-control:hover {
+	padding: 0;
+}
+
+#helix-ultimate .hu-dimension .hu-dimension-x {
+	flex: 0 0 auto;
+	color: var(--sp-muted);
+	font-size: 12px;
+}
+
+/* A size that is off: its numbers are read-only and faded. */
+#helix-ultimate .hu-group-blog_images .uneditable {
+	opacity: 1;
+}
+
+#helix-ultimate .hu-group-blog_images .uneditable .hu-dimension {
+	opacity: 0.45;
+}
+
+#helix-ultimate .hu-group-blog_images .uneditable .hu-dimension:focus-within {
+	border-color: transparent;
+}
+
+/* Crop quality sits under the sizes. */
+#helix-ultimate .hu-group-blog_images .hu-subgroup + [class*="group-style"] {
+	margin-top: 12px;
+}
+
+/* Image size pickers: four equal tiles that fit the panel. */
+#helix-ultimate .hu-switcher-style-simple .hu-action-group {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 4px;
+	margin-top: 4px;
+	padding: 0;
+	border-radius: 0;
+	background: transparent;
+}
+
+#helix-ultimate .hu-switcher.hu-switcher-style-simple .hu-switcher-action,
+#helix-ultimate .hu-switcher.hu-switcher-style-simple .hu-switcher-action.active {
+	padding: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action-content {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 44px;
+	padding: 4px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background: var(--sp-input);
+	box-shadow: none;
+	transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+/* The icons have no viewBox: keep their own sizes (they show the size). */
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action svg {
+	display: block;
+	flex: 0 0 auto;
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action-content {
+	color: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action.active .hu-switcher-action-content {
+	color: var(--sp-blue);
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action:hover .hu-switcher-action-content {
+	border-color: var(--sp-divider);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action.active .hu-switcher-action-content {
+	border-color: var(--sp-blue);
+	background: var(--sp-chip);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-label {
+	overflow: hidden;
+	max-width: 100%;
+	margin: 0;
+	color: var(--sp-muted);
+	font-size: 11px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#helix-ultimate .hu-switcher-style-simple .hu-switcher-action.active .hu-switcher-label {
+	color: var(--sp-chip-text);
+	font-weight: 600;
+}
+
+/* Multi-select (Choices): a filled field with pastel chips. */
+#helix-ultimate .hu-edit-panel .choices {
+	margin: 0;
+}
+
+#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__inner {
+	min-height: 36px;
+	padding: 4px 32px 4px 4px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background: var(--sp-input) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat calc(100% - 12px) 50% / 12px 9px;
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"]:hover .choices__inner {
+	border-color: var(--sp-divider);
+}
+
+#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"].is-focused .choices__inner,
+#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"].is-open .choices__inner {
+	border-color: var(--sp-blue);
+}
+
+#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+}
+
+#helix-ultimate .hu-edit-panel .choices__list--multiple {
+	display: contents;
+}
+
+#helix-ultimate .hu-edit-panel .choices__list--multiple .choices__item {
+	display: inline-flex;
+	align-items: center;
+	width: auto;
+	margin: 0;
+	padding: 3px 4px 3px 8px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__button {
+	width: 16px;
+	height: 16px;
+	margin: 0 0 0 4px;
+	padding: 0;
+	border: 0;
+	border-radius: 4px;
+	background: currentColor;
+	opacity: 0.55;
+	-webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-width='1.6' d='M5 5l6 6M11 5l-6 6'/%3e%3c/svg%3e") center / 12px no-repeat;
+	mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-width='1.6' d='M5 5l6 6M11 5l-6 6'/%3e%3c/svg%3e") center / 12px no-repeat;
+}
+
+#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__button:hover {
+	opacity: 1;
+}
+
+#helix-ultimate .hu-edit-panel .choices__input--cloned {
+	flex: 1 0 4ch;
+	width: auto !important;
+	min-width: 4ch;
+	min-height: 0;
+	margin: 0;
+	padding: 3px 4px;
+	border: 0;
+	background: transparent;
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-edit-panel .choices__list--dropdown {
+	margin-top: 4px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 8px;
+	background: var(--sp-panel);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-edit-panel .choices__list--dropdown .choices__item--selectable.is-highlighted {
+	background: var(--sp-input);
+}

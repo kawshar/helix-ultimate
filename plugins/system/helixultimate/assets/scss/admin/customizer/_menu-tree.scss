@@ -1,0 +1,39 @@
+// Menu builder tree
+
+/* ------------------------------------------------------------------ */
+/* Menu builder tree: compact rows                                     */
+/* ------------------------------------------------------------------ */
+
+/* Row pitch (row height + gap). utils.calculateSiblingDistances() reads it
+   to size the connector lines, so lines and rows always line up. */
+#helix-ultimate #hu-menu-tree {
+	--hu-branch-pitch: 30px;
+	margin-top: 4px;
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-branch > .hu-menu-tree-contents {
+	margin: 2px 0 0;
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 28px;
+	padding: 4px 8px;
+	font-size: 13px;
+	line-height: 18px;
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
+	display: inline-flex;
+	margin: 0;
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-menu-branch-path {
+	height: calc(var(--hu-branch-pitch) + 1px);
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler:hover {
+	background: var(--sp-input);
+}

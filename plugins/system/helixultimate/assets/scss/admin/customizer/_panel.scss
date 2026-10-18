@@ -1,0 +1,140 @@
+// Panel
+
+/* ------------------------------------------------------------------ */
+/* Panel                                                               */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-edit-panel {
+	background: var(--sp-panel);
+	box-shadow: inset -1px 0 0 var(--sp-divider), 8px 0 24px rgba(17, 24, 39, 0.06);
+	font-size: 13px;
+}
+
+#helix-ultimate .hu-panel-header {
+	box-sizing: border-box;
+	height: var(--sp-header-height);
+	min-height: 0;
+	padding: 0 10px 0 14px;
+	border-bottom: 1px solid var(--sp-divider);
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	font-size: 15px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-panel-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* The Helix logo leads the panel header (the rail's top cell is the back button). */
+$hu-logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M6.976 15.448c-.039-.814.233-3.568 4.732-5.779 4.5-2.21 4.965-3.995 4.965-3.995-.465 2.444-1.241 3.143-5.508 5.43-4.066 2.182-4.189 4.344-4.189 4.344zM6.976 20.144s.123-2.162 4.19-4.344c4.266-2.288 5.042-2.987 5.507-5.43 0 0-.465 1.785-4.965 3.995-4.499 2.21-4.77 4.964-4.732 5.78z'/%3E%3Cpath fill-rule='evenodd' d='M12 23.999C5.385 23.999 0 18.616 0 12 0 5.382 5.384 0 12 0c6.618 0 12.002 5.383 12.002 12.001C24.002 18.616 18.617 24 12 24zm0-22.782C6.057 1.217 1.219 6.053 1.219 12c0 5.944 4.838 10.782 10.783 10.782 5.945 0 10.782-4.838 10.782-10.782 0-5.947-4.837-10.783-10.782-10.783z'/%3E%3C/svg%3E";
+
+#helix-ultimate .hu-panel-header::before {
+	content: '';
+	flex: 0 0 20px;
+	width: 20px;
+	height: 20px;
+	margin-right: 8px;
+	background-color: #0345bf;
+	-webkit-mask: url($hu-logo) center / contain no-repeat;
+	mask: url($hu-logo) center / contain no-repeat;
+}
+
+#helix-ultimate .hu-panel-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* Save lives in every panel header, next to close. */
+#helix-ultimate .hu-panel-save {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 28px;
+	padding: 0 14px;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	box-shadow: none;
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+#helix-ultimate .hu-panel-save:hover {
+	color: var(--sp-blue-dark);
+	background: #e0e6ff;
+}
+
+#helix-ultimate .hu-panel-save:focus-visible {
+	outline: 2px solid var(--sp-blue);
+	outline-offset: 1px;
+}
+
+#helix-ultimate .hu-panel-save:disabled {
+	opacity: 0.75;
+	cursor: progress;
+}
+
+#helix-ultimate .hu-panel-save .spinner-border {
+	width: 12px;
+	height: 12px;
+	border-width: 2px;
+}
+
+#helix-ultimate .hu-panel-save .hidden {
+	display: none;
+}
+
+
+
+
+
+#helix-ultimate .hu-groups-container {
+	background: var(--sp-panel);
+}
+
+/* Accordion groups */
+#helix-ultimate .hu-group-wrap {
+	border-bottom: 1px solid var(--sp-divider);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .hu-group-header-box {
+	padding: 14px 16px;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-group-wrap.active .hu-group-header-box {
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-group-toggle-icon {
+	font-size: 14px !important;
+	color: var(--sp-muted);
+}
+
+#helix-ultimate .active .hu-group-header-box .hu-group-toggle-icon {
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-field-list {
+	padding: 4px 16px 16px;
+	background: var(--sp-panel);
+	box-shadow: none;
+}
+
+/* Section labels without a group (e.g. Custom Code) */
+#helix-ultimate .hu-no-group-wrap {
+	padding: 16px;
+}

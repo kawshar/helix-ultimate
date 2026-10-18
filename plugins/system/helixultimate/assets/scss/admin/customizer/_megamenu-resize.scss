@@ -1,0 +1,156 @@
+// Mega menu rows as CSS Grid, column resizing
+
+/* ------------------------------------------------------------------ */
+/* Mega menu rows as CSS Grid; widths set by dragging between columns  */
+/* ------------------------------------------------------------------ */
+
+/* The template comes from the columns' widths (inline, see megamenu.js). */
+#helix-ultimate .hu-mega-menu-builder .hu-megamenu-columns-container,
+.hu-mega-menu-builder .hu-megamenu-columns-container {
+	display: grid;
+	grid-auto-flow: column;
+	gap: 8px;
+	margin: 0;
+}
+
+#helix-ultimate .hu-mega-menu-builder .hu-megamenu-columns-container > .hu-megamenu-col,
+.hu-mega-menu-builder .hu-megamenu-columns-container > .hu-megamenu-col {
+	width: auto;
+	max-width: none;
+	min-width: 0;
+	flex: none;
+	margin: 0;
+	padding: 0;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper {
+	position: relative;
+}
+
+.hu-col-resizers {
+	position: absolute;
+	z-index: 2;
+	pointer-events: none;
+}
+
+/* A slim hit area in the gap; a short bar shows on hover / drag / focus. */
+.hu-col-resizer {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 12px;
+	margin-left: -6px;
+	cursor: col-resize;
+	pointer-events: auto;
+	touch-action: none;
+}
+
+.hu-col-resizer::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 4px;
+	height: 28px;
+	border-radius: 2px;
+	background: var(--sp-handle-interactive, #9aa5b8);
+	opacity: 0;
+	transform: translate(-50%, -50%);
+	transition: opacity 0.12s ease, height 0.12s ease, background-color 0.12s ease;
+}
+
+.hu-megamenu-row-wrapper:hover .hu-col-resizer::before {
+	opacity: 0.6;
+}
+
+.hu-col-resizer:hover::before,
+.hu-col-resizer:focus-visible::before,
+.hu-megamenu-row-wrapper.is-resizing .hu-col-resizer::before {
+	height: 40px;
+	background: var(--sp-blue, #1f3bff);
+	opacity: 1;
+}
+
+/* The bar is the handle's focus indicator. */
+#helix-ultimate .hu-col-resizer:focus-visible,
+#helix-ultimate .hu-col-resizer:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.hu-megamenu-row-wrapper.is-resizing,
+.hu-megamenu-row-wrapper.is-resizing * {
+	cursor: col-resize !important;
+	user-select: none;
+}
+
+/* While resizing, the widths are what matters. */
+.hu-megamenu-row-wrapper.is-resizing .hu-col-width {
+	color: var(--sp-blue, #1f3bff);
+}
+
+/* Column header: grip, "Column", width, remove. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar span:not(.hu-col-width) {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar .hu-col-width {
+	flex: 0 0 auto;
+	color: var(--sp-muted);
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	margin-right: -2px;
+	padding: 0;
+	border: 0;
+	border-radius: 4px;
+	color: var(--sp-icon);
+	background: transparent;
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-col:hover .hu-megamenu-remove-column,
+#helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column:focus-visible {
+	opacity: 1;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column:hover {
+	color: var(--sp-danger, #dc2626);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-megamenu-step .is-single-column .hu-megamenu-remove-column {
+	display: none;
+}
+
+@media (hover: none) {
+	#helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column {
+		opacity: 1;
+	}
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a.hu-megamenu-add-column {
+	color: var(--sp-icon);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a.hu-megamenu-add-column:hover {
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-column.is-disabled {
+	opacity: 0.35;
+	pointer-events: none;
+}

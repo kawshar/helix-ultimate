@@ -1,0 +1,77 @@
+// Preset tiles
+
+/* Presets: a calmer mini site. Header with the logo dot, then one accent-tinted
+   block with a heading bar and a button. No topbar, menu, subtitle or text lines. */
+#helix-ultimate .hu-preset-mock {
+	height: 60px;
+	gap: 0;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-preset-mock :is(.hu-preset-mock__topbar, .hu-preset-mock__menu, .hu-preset-mock__body),
+#helix-ultimate .hu-preset-mock__hero i:nth-child(2) {
+	display: none;
+}
+
+#helix-ultimate .hu-preset-mock__header {
+	flex: 0 0 18px;
+	padding: 0 8px;
+}
+
+#helix-ultimate .hu-preset-mock__logo {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+}
+
+#helix-ultimate .hu-preset-mock__hero {
+	flex: 1 1 auto;
+	gap: 6px;
+	margin: 0 6px 6px;
+	padding: 0 8px;
+	background: color-mix(in srgb, var(--p-accent) 10%, var(--p-bg));
+}
+
+#helix-ultimate .hu-preset-mock__hero i:first-child {
+	width: 55%;
+	height: 4px;
+	opacity: 0.9;
+}
+
+#helix-ultimate .hu-preset-mock__button {
+	width: 20px;
+	height: 7px;
+	margin-top: 0;
+}
+
+/* Preset tile spacing: an even 8px frame; the logo dot, the hero's contents
+   and the name share one left edge. */
+#helix-ultimate .hu-presets .hu-preset {
+	padding: 8px;
+}
+
+#helix-ultimate .hu-preset-mock {
+	height: auto;
+	border-radius: 6px;
+}
+
+#helix-ultimate .hu-preset-mock__header {
+	flex: 0 0 auto;
+	height: 8px;
+	margin-bottom: 6px;
+	padding: 0 10px;
+}
+
+#helix-ultimate .hu-preset-mock__hero {
+	flex: 0 0 auto;
+	height: 40px;
+	gap: 6px;
+	margin: 0;
+	padding: 0 10px;
+	border-radius: 6px;
+}
+
+#helix-ultimate .hu-presets .hu-preset .hu-preset-title,
+#helix-ultimate .hu-presets .hu-preset.active .hu-preset-title {
+	padding: 8px 0 0 2px;
+}

@@ -1,10 +1,11 @@
+@charset "UTF-8";
+/* Generated from assets/scss/admin by `gulp css`. Edit the .scss source, not this file. */
 /**
  * @package Helix Ultimate Framework
  * @author JoomShaper https://www.joomshaper.com
  * @copyright Copyright (c) 2010 - 2025 JoomShaper
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
-
 /*
  * Customizer theme, aligned with the SP Page Builder editor colour guide:
  * cool blue-gray chrome, one blue accent, WCAG 2.1 AA.
@@ -14,1127 +15,1111 @@
  * and variables; status never by colour alone; 2px blue focus ring.
  * Loaded after helix-ultimate.css.
  */
-
 :root {
-	/* Surfaces */
-	--sp-panel: #ffffff;
-	--sp-input: #f2f5fa;
-	--sp-canvas: #ecf0f6;
-	--sp-divider: #e3e8f1;
-	--sp-stone: #e0e5ef;
-	--sp-handle: #c9d1df;
-	--sp-handle-interactive: #7f8ca3;
-
-	/* Text and icons */
-	--sp-text: #111827;
-	--sp-muted: #5b6980;
-	--sp-icon: #2e3a4f;
-
-	/* Accent */
-	--sp-blue: #1f3bff;
-	--sp-blue-dark: #1629b8;
-	--sp-chip: #eef1ff;
-	--sp-chip-text: #1b2fb8;
-
-	/* Status */
-	--sp-published: #1e8e5a;
-	--sp-published-text: #167a4c;
-	--sp-draft: #7f8ca3;
-	--sp-danger: #c2311e;
-
-	--sp-radius: 8px;
-	--sp-font: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Surfaces */
+  --sp-panel: #ffffff;
+  --sp-input: #f2f5fa;
+  --sp-canvas: #ecf0f6;
+  --sp-divider: #e3e8f1;
+  --sp-stone: #e0e5ef;
+  --sp-handle: #c9d1df;
+  --sp-handle-interactive: #7f8ca3;
+  /* Text and icons */
+  --sp-text: #111827;
+  --sp-muted: #5b6980;
+  --sp-icon: #2e3a4f;
+  /* Accent */
+  --sp-blue: #1f3bff;
+  --sp-blue-dark: #1629b8;
+  --sp-chip: #eef1ff;
+  --sp-chip-text: #1b2fb8;
+  /* Status */
+  --sp-published: #1e8e5a;
+  --sp-published-text: #167a4c;
+  --sp-draft: #7f8ca3;
+  --sp-danger: #c2311e;
+  --sp-radius: 8px;
+  /* Height of the header line shared by the rail (back button) and the panel title. */
+  --sp-header-height: 44px;
+  --sp-font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 #helix-ultimate {
-	background: var(--sp-canvas);
-	color: var(--sp-text);
-	font-family: var(--sp-font);
+  background: var(--sp-canvas);
+  color: var(--sp-text);
+  font-family: var(--sp-font);
 }
 
 /* Focus: a 1px blue ring tight to the control (fields turn their own border blue instead). Never removed. */
 #helix-ultimate :is(a, button, input, select, textarea, [tabindex], .hu-fieldset-header, .hu-group-header-box):focus-visible {
-	outline: 1px solid var(--sp-blue) !important;
-	outline-offset: 0;
-	box-shadow: none;
+  outline: 1px solid var(--sp-blue) !important;
+  outline-offset: 0;
+  box-shadow: none;
 }
 
 /* ------------------------------------------------------------------ */
 /* Rail                                                                */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-sidebar {
-	background: var(--sp-panel);
-	box-shadow: inset -1px 0 0 var(--sp-divider);
+  background: var(--sp-panel);
+  box-shadow: inset -1px 0 0 var(--sp-divider);
 }
 
 #helix-ultimate .hu-sidebar-brand,
 #helix-ultimate .hu-sidebar-footer {
-	border-color: var(--sp-divider);
-}
-
-#helix-ultimate .hu-sidebar .hu-version {
-	font-size: 11px;
-	font-weight: 600;
-	letter-spacing: -0.02em;
-	color: var(--sp-muted);
+  border-color: var(--sp-divider);
 }
 
 #helix-ultimate .hu-sidebar-nav {
-	padding: 8px 0;
+  padding: 8px 0;
 }
 
 #helix-ultimate #hu-options > div > .hu-fieldset-header::after {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-fieldset-header {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 36px;
-	height: 36px;
-	margin: 2px auto;
-	padding: 0;
-	border-radius: var(--sp-radius);
-	background: transparent;
-	box-shadow: none;
-	color: var(--sp-icon);
-	transition: background-color 0.15s ease, color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 2px auto;
+  padding: 0;
+  border-radius: var(--sp-radius);
+  background: transparent;
+  box-shadow: none;
+  color: var(--sp-icon);
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 #helix-ultimate .hu-fieldset-header-inner {
-	display: flex;
-	margin: 0;
+  display: flex;
+  margin: 0;
 }
 
 #helix-ultimate .hu-option-icon {
-	display: block;
-	width: 18px;
-	height: 18px;
-	background-color: currentColor;
-	filter: none;
-	-webkit-mask: var(--hu-icon) center / contain no-repeat;
-	mask: var(--hu-icon) center / contain no-repeat;
+  display: block;
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  filter: none;
+  -webkit-mask: var(--hu-icon) center/contain no-repeat;
+  mask: var(--hu-icon) center/contain no-repeat;
 }
 
 #helix-ultimate .hu-fieldset-header:hover:not(.active) {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-fieldset-header.active {
-	background: var(--sp-input);
-	box-shadow: none;
-	color: var(--sp-text);
-}
-
-/* Devices: a vertical segmented control */
-#helix-ultimate .hu-devices {
-	gap: 2px;
-	padding: 3px;
-	border-radius: 10px;
-	background: var(--sp-input);
-}
-
-#helix-ultimate .hu-device {
-	width: 30px;
-	height: 28px;
-	border-radius: 7px;
-}
-
-#helix-ultimate .hu-device svg {
-	fill: var(--sp-muted);
-}
-
-#helix-ultimate .hu-device:hover svg,
-#helix-ultimate .hu-device.active svg {
-	fill: var(--sp-text);
-}
-
-#helix-ultimate .hu-device.active {
-	background: var(--sp-panel);
-	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+  background: var(--sp-input);
+  box-shadow: none;
+  color: var(--sp-text);
 }
 
 /* Draft status: icon plus text for assistive tech, colour never alone */
 #helix-ultimate .hu-sidebar .hu-response {
-	color: var(--sp-muted);
+  color: var(--sp-muted);
 }
 
 #helix-ultimate .hu-sidebar .hu-done-msg .fa-check-circle {
-	color: var(--sp-published);
+  color: var(--sp-published);
 }
 
 #helix-ultimate .hu-sidebar .action-reset-drafts {
-	width: 28px;
-	height: 28px;
-	border-radius: var(--sp-radius);
-	color: var(--sp-icon);
-	background: var(--sp-input);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--sp-radius);
+  color: var(--sp-icon);
+  background: var(--sp-input);
 }
 
-#helix-ultimate .hu-sidebar-exit {
-	width: 32px;
-	height: 32px;
-	border-radius: var(--sp-radius);
-	color: var(--sp-icon);
+/* Top: back to the template style, on the same line as the panel header. */
+#helix-ultimate .hu-sidebar-brand {
+  box-sizing: border-box;
+  justify-content: center;
+  height: var(--sp-header-height);
+  padding: 0;
 }
 
-#helix-ultimate .hu-sidebar-exit:hover,
-#helix-ultimate .hu-sidebar-exit:focus {
-	color: var(--sp-text);
-	background: var(--sp-input);
+#helix-ultimate .hu-sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--sp-radius);
+  color: var(--sp-icon);
+  text-decoration: none;
+}
+
+#helix-ultimate .hu-sidebar-back:hover,
+#helix-ultimate .hu-sidebar-back:focus-visible {
+  color: var(--sp-text);
+  background: var(--sp-input);
 }
 
 /* ------------------------------------------------------------------ */
 /* Buttons                                                             */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-btn {
-	border-radius: var(--sp-radius);
-	font-family: var(--sp-font);
-	font-size: 13px;
-	font-weight: 600;
+  border-radius: var(--sp-radius);
+  font-family: var(--sp-font);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-btn-primary,
 #helix-ultimate .btn-primary {
-	border: 0;
-	color: #fff;
-	background: var(--sp-blue);
-	box-shadow: none;
+  border: 0;
+  color: #fff;
+  background: var(--sp-blue);
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-btn-primary::before,
 #helix-ultimate .hu-btn-primary::after {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-btn-primary:hover,
 #helix-ultimate .hu-btn-primary:focus,
 #helix-ultimate .btn-primary:hover {
-	color: #fff;
-	background: var(--sp-blue-dark);
+  color: #fff;
+  background: var(--sp-blue-dark);
 }
 
 #helix-ultimate .hu-btn-secondary {
-	color: var(--sp-text);
-	background: var(--sp-input);
+  color: var(--sp-text);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-btn-secondary:hover {
-	color: var(--sp-text);
-	background: var(--sp-divider);
+  color: var(--sp-text);
+  background: var(--sp-divider);
 }
 
 /* ------------------------------------------------------------------ */
 /* Panel                                                               */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-edit-panel {
-	background: var(--sp-panel);
-	box-shadow: inset -1px 0 0 var(--sp-divider), 8px 0 24px rgba(17, 24, 39, 0.06);
-	font-size: 13px;
+  background: var(--sp-panel);
+  box-shadow: inset -1px 0 0 var(--sp-divider), 8px 0 24px rgba(17, 24, 39, 0.06);
+  font-size: 13px;
 }
 
 #helix-ultimate .hu-panel-header {
-	min-height: 56px;
-	padding: 0 12px 0 16px;
-	border-bottom: 1px solid var(--sp-divider);
-	color: var(--sp-text);
-	background: var(--sp-panel);
-	font-size: 15px;
-	font-weight: 600;
+  box-sizing: border-box;
+  height: var(--sp-header-height);
+  min-height: 0;
+  padding: 0 10px 0 14px;
+  border-bottom: 1px solid var(--sp-divider);
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  font-size: 15px;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-panel-header {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The Helix logo leads the panel header (the rail's top cell is the back button). */
+#helix-ultimate .hu-panel-header::before {
+  content: "";
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  background-color: #0345bf;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M6.976 15.448c-.039-.814.233-3.568 4.732-5.779 4.5-2.21 4.965-3.995 4.965-3.995-.465 2.444-1.241 3.143-5.508 5.43-4.066 2.182-4.189 4.344-4.189 4.344zM6.976 20.144s.123-2.162 4.19-4.344c4.266-2.288 5.042-2.987 5.507-5.43 0 0-.465 1.785-4.965 3.995-4.499 2.21-4.77 4.964-4.732 5.78z'/%3E%3Cpath fill-rule='evenodd' d='M12 23.999C5.385 23.999 0 18.616 0 12 0 5.382 5.384 0 12 0c6.618 0 12.002 5.383 12.002 12.001C24.002 18.616 18.617 24 12 24zm0-22.782C6.057 1.217 1.219 6.053 1.219 12c0 5.944 4.838 10.782 10.783 10.782 5.945 0 10.782-4.838 10.782-10.782 0-5.947-4.837-10.783-10.782-10.783z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M6.976 15.448c-.039-.814.233-3.568 4.732-5.779 4.5-2.21 4.965-3.995 4.965-3.995-.465 2.444-1.241 3.143-5.508 5.43-4.066 2.182-4.189 4.344-4.189 4.344zM6.976 20.144s.123-2.162 4.19-4.344c4.266-2.288 5.042-2.987 5.507-5.43 0 0-.465 1.785-4.965 3.995-4.499 2.21-4.77 4.964-4.732 5.78z'/%3E%3Cpath fill-rule='evenodd' d='M12 23.999C5.385 23.999 0 18.616 0 12 0 5.382 5.384 0 12 0c6.618 0 12.002 5.383 12.002 12.001C24.002 18.616 18.617 24 12 24zm0-22.782C6.057 1.217 1.219 6.053 1.219 12c0 5.944 4.838 10.782 10.783 10.782 5.945 0 10.782-4.838 10.782-10.782 0-5.947-4.837-10.783-10.782-10.783z'/%3E%3C/svg%3E") center/contain no-repeat;
 }
 
 #helix-ultimate .hu-panel-title {
-	flex: 1 1 auto;
-	min-width: 0;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Save lives in every panel header, next to close. */
 #helix-ultimate .hu-panel-save {
-	display: inline-flex;
-	flex: 0 0 auto;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	height: 28px;
-	padding: 0 14px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	box-shadow: none;
-	font-size: 12.5px;
-	font-weight: 600;
-	line-height: 1;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--sp-radius);
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
+  box-shadow: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 #helix-ultimate .hu-panel-save:hover {
-	color: var(--sp-blue-dark);
-	background: #e0e6ff;
+  color: var(--sp-blue-dark);
+  background: #e0e6ff;
 }
 
 #helix-ultimate .hu-panel-save:focus-visible {
-	outline: 2px solid var(--sp-blue);
-	outline-offset: 1px;
+  outline: 2px solid var(--sp-blue);
+  outline-offset: 1px;
 }
 
 #helix-ultimate .hu-panel-save:disabled {
-	opacity: 0.75;
-	cursor: progress;
+  opacity: 0.75;
+  cursor: progress;
 }
 
 #helix-ultimate .hu-panel-save .spinner-border {
-	width: 12px;
-	height: 12px;
-	border-width: 2px;
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
 }
 
 #helix-ultimate .hu-panel-save .hidden {
-	display: none;
-}
-
-#helix-ultimate .hu-panel-close {
-	flex: 0 0 auto;
-	width: 28px;
-	height: 28px;
-	border-radius: var(--sp-radius);
-	background: transparent;
-}
-
-#helix-ultimate .hu-panel-close svg {
-	fill: var(--sp-icon);
-}
-
-#helix-ultimate .hu-panel-close:hover {
-	background: var(--sp-input);
-}
-
-#helix-ultimate .hu-panel-close:hover svg {
-	fill: var(--sp-text);
+  display: none;
 }
 
 #helix-ultimate .hu-groups-container {
-	background: var(--sp-panel);
+  background: var(--sp-panel);
 }
 
 /* Accordion groups */
 #helix-ultimate .hu-group-wrap {
-	border-bottom: 1px solid var(--sp-divider);
-	background: var(--sp-panel);
+  border-bottom: 1px solid var(--sp-divider);
+  background: var(--sp-panel);
 }
 
 #helix-ultimate .hu-group-header-box {
-	padding: 14px 16px;
-	color: var(--sp-text);
-	font-size: 13px;
-	font-weight: 500;
+  padding: 14px 16px;
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 #helix-ultimate .hu-group-wrap.active .hu-group-header-box {
-	font-weight: 600;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-group-toggle-icon {
-	font-size: 14px !important;
-	color: var(--sp-muted);
+  font-size: 14px !important;
+  color: var(--sp-muted);
 }
 
 #helix-ultimate .active .hu-group-header-box .hu-group-toggle-icon {
-	color: var(--sp-text);
+  color: var(--sp-text);
 }
 
 #helix-ultimate .hu-field-list {
-	padding: 4px 16px 16px;
-	background: var(--sp-panel);
-	box-shadow: none;
+  padding: 4px 16px 16px;
+  background: var(--sp-panel);
+  box-shadow: none;
 }
 
 /* Section labels without a group (e.g. Custom Code) */
 #helix-ultimate .hu-no-group-wrap {
-	padding: 16px;
+  padding: 16px;
 }
 
 /* ------------------------------------------------------------------ */
 /* Fields                                                              */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .control-group .control-label,
 #helix-ultimate .control-group .control-label label,
 #helix-ultimate label.control-label {
-	color: var(--sp-muted);
-	font-size: 13px;
-	font-weight: 500;
+  color: var(--sp-muted);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 #helix-ultimate .hu-help-icon {
-	color: var(--sp-muted);
-	font-size: 12px;
+  color: var(--sp-muted);
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-control-help,
 #helix-ultimate .control-help {
-	color: var(--sp-muted);
-	font-size: 12px;
+  color: var(--sp-muted);
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-field-separator,
 #helix-ultimate hr {
-	border-color: var(--sp-divider);
+  border-color: var(--sp-divider);
 }
 
 /* Inputs: filled, no visible border until hover/focus */
 #helix-ultimate .hu-edit-panel :is(input.form-control, textarea.form-control, select.form-select, select.form-control, .chosen-container .chosen-single, .chosen-container-multi .chosen-choices, .minicolors-input),
-#helix-ultimate .hu-edit-panel input[type='text']:not(.hu-unit-field-input),
-#helix-ultimate .hu-edit-panel input[type='number']:not(.hu-unit-field-input),
-#helix-ultimate .hu-edit-panel input[type='email'],
-#helix-ultimate .hu-edit-panel input[type='url'],
+#helix-ultimate .hu-edit-panel input[type=text]:not(.hu-unit-field-input),
+#helix-ultimate .hu-edit-panel input[type=number]:not(.hu-unit-field-input),
+#helix-ultimate .hu-edit-panel input[type=email],
+#helix-ultimate .hu-edit-panel input[type=url],
 #helix-ultimate .hu-edit-panel textarea {
-	min-height: 36px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background-color: var(--sp-input);
-	box-shadow: none;
-	font-family: var(--sp-font);
-	font-size: 12px;
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  color: var(--sp-text);
+  background-color: var(--sp-input);
+  box-shadow: none;
+  font-family: var(--sp-font);
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-edit-panel textarea {
-	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
-	line-height: 1.5;
+  font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+  line-height: 1.5;
 }
 
-#helix-ultimate .hu-edit-panel :is(input:not([type="checkbox"], [type="radio"]), textarea, select):hover:not(:disabled):not([readonly]) {
-	border-color: var(--sp-divider);
+#helix-ultimate .hu-edit-panel :is(input:not([type=checkbox], [type=radio]), textarea, select):hover:not(:disabled):not([readonly]) {
+  border-color: var(--sp-divider);
 }
 
 /* Focused fields turn white; the blue border comes from the field focus rule further down. */
-#helix-ultimate .hu-edit-panel :is(input:not([type="checkbox"], [type="radio"]), textarea, select):focus {
-	border-color: transparent;
-	background-color: var(--sp-panel);
-	box-shadow: none;
+#helix-ultimate .hu-edit-panel :is(input:not([type=checkbox], [type=radio]), textarea, select):focus {
+  border-color: transparent;
+  background-color: var(--sp-panel);
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-edit-panel ::placeholder {
-	color: var(--sp-muted);
-	opacity: 1;
+  color: var(--sp-muted);
+  opacity: 1;
 }
 
 /* Number + unit: one filled pill; the unit is plain text inside it */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group {
-	display: flex;
-	align-items: center;
-	height: 36px;
-	padding: 0;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	background: var(--sp-input);
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  background: var(--sp-input);
 }
 
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:hover {
-	border-color: var(--sp-divider);
+  border-color: var(--sp-divider);
 }
 
 /* Number + unit is one control, so it gets one focus ring around the whole pill. */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:focus-within {
-	border-color: transparent;
-	background: var(--sp-panel);
-	box-shadow: none;
-	outline: 2px solid var(--sp-blue);
-	outline-offset: 2px;
+  border-color: transparent;
+  background: var(--sp-panel);
+  box-shadow: none;
+  outline: 2px solid var(--sp-blue);
+  outline-offset: 2px;
 }
 
 #helix-ultimate .hu-edit-panel .hu-unit-group input:focus,
 #helix-ultimate .hu-edit-panel .hu-unit-group input:focus-visible {
-	outline: none !important;
-	box-shadow: none;
+  outline: none !important;
+  box-shadow: none;
 }
 
 /* The number input is see-through: the field's fill/white comes from the group. */
 #helix-ultimate .hu-edit-panel .hu-unit-group input.hu-unit-field-input {
-	background-color: transparent;
+  background-color: transparent;
 }
 
 /* The pill shows the hover state; the parts inside it don't draw their own. */
 #helix-ultimate .hu-edit-panel .hu-unit-group input.hu-unit-field-input:hover {
-	border-color: transparent;
-	background-color: transparent;
+  border-color: transparent;
+  background-color: transparent;
 }
 
 #helix-ultimate .hu-edit-panel .hu-unit-group input.hu-unit-field-input:focus {
-	background-color: transparent;
+  background-color: transparent;
 }
 
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input {
-	flex: 1 1 auto;
-	min-width: 0;
-	max-width: none;
-	min-height: 0;
-	height: 34px;
-	border: 0;
-	border-radius: var(--sp-radius) 0 0 var(--sp-radius);
-	color: var(--sp-text);
-	background: transparent;
-	box-shadow: none;
-	font-size: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+  height: 34px;
+  border: 0;
+  border-radius: var(--sp-radius) 0 0 var(--sp-radius);
+  color: var(--sp-text);
+  background: transparent;
+  box-shadow: none;
+  font-size: 12px;
 }
 
 /* Unit pill: plain text at the right edge; looks like a button only on hover, focus or while open. */
 /* The pill sits on top of the input's right edge, so showing / hiding it never shifts the number. */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group {
-	position: relative;
+  position: relative;
 }
 
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input {
-	padding-right: 40px;
+  padding-right: 40px;
 }
 
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill {
-	position: absolute;
-	top: 50%;
-	right: 4px;
-	z-index: 1;
-	transform: translateY(-50%);
-	height: 24px;
-	min-width: 24px;
-	padding: 0 6px;
-	border: 0;
-	border-radius: 6px;
-	color: var(--sp-muted);
-	background: transparent;
-	font: 500 12px/24px var(--sp-font);
-	text-align: center;
-	cursor: pointer;
-	transition: background-color 0.12s ease, box-shadow 0.12s ease, color 0.12s ease;
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  z-index: 1;
+  transform: translateY(-50%);
+  height: 24px;
+  min-width: 24px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--sp-muted);
+  background: transparent;
+  font: 500 12px/24px var(--sp-font);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease, color 0.12s ease;
 }
 
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:hover,
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:focus-visible,
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-menu-open .hu-unit-pill {
-	color: var(--sp-text);
-	background: var(--sp-panel);
-	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
-	outline: none;
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+  outline: none;
 }
 
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:focus-visible {
-	box-shadow: 0 0 0 2px var(--sp-blue);
+  box-shadow: 0 0 0 2px var(--sp-blue);
 }
 
 /* px is silent: no pill at all. Typing a unit (1.5rem) or Alt+↑/↓ switches it, and the pill appears. */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-default-unit:not(.is-menu-open) .hu-unit-pill {
-	display: none;
+  display: none;
 }
 
 /* Keywords (auto) have no number: the pill carries the value. */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-keyword .hu-unit-pill {
-	color: var(--sp-text);
+  color: var(--sp-text);
 }
 
 /* Old markup (if a template still renders the native select). */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group select.hu-unit-select {
-	display: none;
+  display: none;
 }
 
 /* Unit menu */
 .hu-unit-menu {
-	position: fixed;
-	z-index: 10050;
-	min-width: 64px;
-	margin: 0;
-	padding: 4px;
-	border: 1px solid var(--sp-divider, #e3e8f1);
-	border-radius: 8px;
-	background: var(--sp-panel, #fff);
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
-	list-style: none;
-	font: 500 12px/1 var(--sp-font, system-ui, sans-serif);
+  position: fixed;
+  z-index: 10050;
+  min-width: 64px;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--sp-divider, #e3e8f1);
+  border-radius: 8px;
+  background: var(--sp-panel, #fff);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+  list-style: none;
+  font: 500 12px/1 var(--sp-font, system-ui, sans-serif);
 }
 
-.hu-unit-menu [role="option"] {
-	padding: 7px 10px;
-	border-radius: 6px;
-	color: var(--sp-text, #111827);
-	cursor: pointer;
+.hu-unit-menu [role=option] {
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--sp-text, #111827);
+  cursor: pointer;
 }
 
-.hu-unit-menu [role="option"]:hover,
-.hu-unit-menu [role="option"]:focus {
-	outline: none;
-	background: var(--sp-input, #f2f5fa);
+.hu-unit-menu [role=option]:hover,
+.hu-unit-menu [role=option]:focus {
+  outline: none;
+  background: var(--sp-input, #f2f5fa);
 }
 
-.hu-unit-menu [role="option"][aria-selected="true"] {
-	color: var(--sp-chip-text, #1b2fb8);
-	background: var(--sp-chip, #eef1ff);
+.hu-unit-menu [role=option][aria-selected=true] {
+  color: var(--sp-chip-text, #1b2fb8);
+  background: var(--sp-chip, #eef1ff);
 }
 
 .hu-unit-menu .is-keyword {
-	margin-top: 4px;
-	border-top: 1px solid var(--sp-divider, #e3e8f1);
-	border-radius: 0 0 6px 6px;
+  margin-top: 4px;
+  border-top: 1px solid var(--sp-divider, #e3e8f1);
+  border-radius: 0 0 6px 6px;
 }
 
 .hu-unit-menu .is-keyword ~ .is-keyword {
-	margin-top: 0;
-	border-top: 0;
+  margin-top: 0;
+  border-top: 0;
 }
 
 /* Typography: per-device size inputs stay hidden until their device is active */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.hu-webfont-unit:not(.active) {
-	display: none;
+  display: none;
 }
 
 /* Typography: two columns per row fit the 272px panel */
 #helix-ultimate .hu-field-webfont .row {
-	row-gap: 4px;
+  row-gap: 4px;
 }
 
-#helix-ultimate .hu-field-webfont .row > [class*='col-'] {
-	flex: 0 0 50%;
-	max-width: 50%;
+#helix-ultimate .hu-field-webfont .row > [class*=col-] {
+  flex: 0 0 50%;
+  max-width: 50%;
 }
 
 #helix-ultimate .hu-field-webfont .hu-webfont-preview-wrapper,
 #helix-ultimate .hu-field-webfont .hu-webfont-preview {
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background: var(--sp-canvas);
+  border-radius: var(--sp-radius);
+  color: var(--sp-text);
+  background: var(--sp-canvas);
 }
 
 #helix-ultimate .hu-field-webfont .control-label,
 #helix-ultimate .hu-field-webfont label {
-	color: var(--sp-muted);
-	font-size: 12px;
-	font-weight: 500;
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 /* Switches */
-#helix-ultimate .hu-style-switcher input[type='checkbox'] {
-	width: 32px;
-	height: 18px;
-	border: 1px solid var(--sp-handle-interactive);
-	background: var(--sp-input);
-	box-shadow: none;
-	transition: background-color 0.15s ease, border-color 0.15s ease;
+#helix-ultimate .hu-style-switcher input[type=checkbox] {
+  width: 32px;
+  height: 18px;
+  border: 1px solid var(--sp-handle-interactive);
+  background: var(--sp-input);
+  box-shadow: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-#helix-ultimate .hu-style-switcher input[type='checkbox']::after {
-	top: 2px;
-	left: 2px;
-	width: 12px;
-	height: 12px;
-	background: var(--sp-handle-interactive);
-	box-shadow: none;
+#helix-ultimate .hu-style-switcher input[type=checkbox]::after {
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--sp-handle-interactive);
+  box-shadow: none;
 }
 
-#helix-ultimate .hu-style-switcher input[type='checkbox']:checked {
-	border-color: var(--sp-blue);
-	background: var(--sp-blue);
+#helix-ultimate .hu-style-switcher input[type=checkbox]:checked {
+  border-color: var(--sp-blue);
+  background: var(--sp-blue);
 }
 
-#helix-ultimate .hu-style-switcher input[type='checkbox']:checked::after,
-#helix-ultimate .hu-style-switcher input[type='checkbox']:hover:checked:not(:disabled)::after,
-#helix-ultimate .hu-style-switcher input[type='checkbox']:focus:checked:not(:disabled)::after {
-	left: 16px;
-	background: #fff;
+#helix-ultimate .hu-style-switcher input[type=checkbox]:checked::after,
+#helix-ultimate .hu-style-switcher input[type=checkbox]:hover:checked:not(:disabled)::after,
+#helix-ultimate .hu-style-switcher input[type=checkbox]:focus:checked:not(:disabled)::after {
+  left: 16px;
+  background: #fff;
 }
 
-#helix-ultimate .hu-style-switcher input[type='checkbox']:hover:not(:checked):not(:disabled)::after,
-#helix-ultimate .hu-style-switcher input[type='checkbox']:focus:not(:checked):not(:disabled)::after {
-	left: 2px;
+#helix-ultimate .hu-style-switcher input[type=checkbox]:hover:not(:checked):not(:disabled)::after,
+#helix-ultimate .hu-style-switcher input[type=checkbox]:focus:not(:checked):not(:disabled)::after {
+  left: 2px;
 }
 
 /* Segmented control (e.g. logo Image / Text) */
 #helix-ultimate .hu-switcher .hu-action-group {
-	padding: 3px;
-	border: 0;
-	border-radius: 10px;
-	background: var(--sp-input);
-	box-shadow: none;
+  padding: 3px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--sp-input);
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-switcher .hu-switcher-action {
-	padding: 6px 16px;
-	border-radius: 7px;
-	color: var(--sp-muted);
-	background: transparent;
-	box-shadow: none;
-	font-size: 13px;
-	font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 7px;
+  color: var(--sp-muted);
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 #helix-ultimate .hu-switcher .hu-switcher-action:hover {
-	color: var(--sp-text);
+  color: var(--sp-text);
 }
 
 #helix-ultimate .hu-switcher .hu-switcher-action.active {
-	color: var(--sp-text);
-	background: var(--sp-panel);
-	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
 }
 
 #helix-ultimate .hu-switcher .hu-switcher-action svg path {
-	fill: currentColor;
+  fill: currentColor;
 }
 
 /* Predefined header / off-canvas pickers: selection is a 2px blue outline */
 #helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap {
-	overflow: hidden;
-	border: 1px solid var(--sp-divider);
-	border-radius: var(--sp-radius);
-	background: var(--sp-panel);
+  overflow: hidden;
+  border: 1px solid var(--sp-divider);
+  border-radius: var(--sp-radius);
+  background: var(--sp-panel);
 }
 
 #helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap::after {
-	border: 2px solid var(--sp-blue);
-	border-radius: var(--sp-radius);
-	box-shadow: none;
+  border: 2px solid var(--sp-blue);
+  border-radius: var(--sp-radius);
+  box-shadow: none;
 }
 
 #helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li:hover:not(.active) > .img-wrap::after {
-	border-color: var(--sp-handle-interactive);
-	border-width: 1px;
+  border-color: var(--sp-handle-interactive);
+  border-width: 1px;
 }
 
 #helix-ultimate .hu-header-list > li > .hu-predefined-headers-title,
 #helix-ultimate .hu-offcanvas-list > li > .hu-predefined-offcanvas-title {
-	color: var(--sp-muted);
-	font-size: 12px;
-	line-height: 1.3;
+  color: var(--sp-muted);
+  font-size: 12px;
+  line-height: 1.3;
 }
 
 #helix-ultimate .hu-header-list > li.active > .hu-predefined-headers-title,
 #helix-ultimate .hu-offcanvas-list > li.active > .hu-predefined-offcanvas-title {
-	color: var(--sp-text);
-	font-weight: 600;
+  color: var(--sp-text);
+  font-weight: 600;
 }
 
 /* ------------------------------------------------------------------ */
 /* Image field: drop zone when empty, file row (thumb, name, x) when set */
 /* ------------------------------------------------------------------ */
-
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field {
-	position: relative;
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	min-height: 40px;
-	padding: 4px;
-	overflow: hidden;
-	border: 1px dashed var(--sp-handle-interactive, #c7cfdd);
-	border-radius: var(--sp-radius, 8px);
-	background: var(--sp-panel, #fff);
-	transition: border-color 0.12s ease, background-color 0.12s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 4px;
+  overflow: hidden;
+  border: 1px dashed var(--sp-handle-interactive, #c7cfdd);
+  border-radius: var(--sp-radius, 8px);
+  background: var(--sp-panel, #fff);
+  transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field:hover,
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field:focus-within {
-	border-color: var(--sp-blue, #1f3bff);
+  border-color: var(--sp-blue, #1f3bff);
 }
 
 /* Thumbnail */
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-image-holder {
-	flex: 0 0 32px;
-	width: 32px;
-	height: 32px;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-	border-radius: 4px;
-	background:
-		repeating-conic-gradient(#e9edf4 0% 25%, #fff 0% 50%) 50% / 8px 8px;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: repeating-conic-gradient(#e9edf4 0% 25%, #fff 0% 50%) 50%/8px 8px;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-image-holder img {
-	display: block;
-	width: 100%;
-	height: 100%;
-	max-width: none;
-	object-fit: contain;
-	border-radius: 0;
-	background: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  border-radius: 0;
+  background: none;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-empty .hu-image-holder {
-	display: none;
+  display: none;
 }
 
 /* Picker: the whole drop zone when empty, the file name (= Replace) when set */
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-picker {
-	display: flex;
-	flex: 1 1 auto;
-	align-items: center;
-	min-width: 0;
-	height: 32px;
-	margin: 0;
-	padding: 0 4px;
-	border: 0;
-	border-radius: 4px;
-	color: var(--sp-chip-text, #1b2fb8);
-	background: transparent;
-	box-shadow: none;
-	font: 500 13px/1.2 var(--sp-font, inherit);
-	text-align: left;
-	cursor: pointer;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  color: var(--sp-chip-text, #1b2fb8);
+  background: transparent;
+  box-shadow: none;
+  font: 500 13px/1.2 var(--sp-font, inherit);
+  text-align: left;
+  cursor: pointer;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-picker:focus-visible {
-	outline: 2px solid var(--sp-blue, #1f3bff);
-	outline-offset: 1px;
+  outline: 2px solid var(--sp-blue, #1f3bff);
+  outline-offset: 1px;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-picker__name {
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-picker:hover .hu-media-picker__name {
-	text-decoration: underline;
-	text-underline-offset: 2px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-picker__empty {
-	display: none;
-	gap: 6px;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
+  display: none;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-picker__hint {
-	color: var(--sp-muted, #6b7280);
-	font-weight: 400;
+  color: var(--sp-muted, #6b7280);
+  font-weight: 400;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-empty .hu-media-picker {
-	justify-content: center;
+  justify-content: center;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-empty .hu-media-picker__empty {
-	display: inline-flex;
+  display: inline-flex;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-empty .hu-media-picker__name {
-	display: none;
+  display: none;
 }
 
 /* Remove */
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-clear {
-	display: inline-flex;
-	flex: 0 0 28px;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	border-radius: 4px;
-	color: var(--sp-icon, #5b6980);
-	background: transparent;
-	box-shadow: none;
-	font-size: 12px;
-	cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 28px;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  color: var(--sp-icon, #5b6980);
+  background: transparent;
+  box-shadow: none;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-clear:hover,
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-clear:focus-visible {
-	color: var(--sp-danger, #c2311e);
-	background: var(--sp-input, #f2f5fa);
-	outline: none;
+  color: var(--sp-danger, #c2311e);
+  background: var(--sp-input, #f2f5fa);
+  outline: none;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-clear.hide {
-	display: none;
+  display: none;
 }
 
 /* Drag over / uploading */
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-dragover {
-	border-style: solid;
-	border-color: var(--sp-blue, #1f3bff);
-	background: var(--sp-chip, #eef1ff);
+  border-style: solid;
+  border-color: var(--sp-blue, #1f3bff);
+  background: var(--sp-chip, #eef1ff);
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-dragover::after {
-	content: attr(data-drop-label);
-	position: absolute;
-	inset: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--sp-chip-text, #1b2fb8);
-	background: var(--sp-chip, #eef1ff);
-	font: 600 13px/1 var(--sp-font, inherit);
-	pointer-events: none;
+  content: attr(data-drop-label);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sp-chip-text, #1b2fb8);
+  background: var(--sp-chip, #eef1ff);
+  font: 600 13px/1 var(--sp-font, inherit);
+  pointer-events: none;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field .hu-media-progress-bar {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: var(--hu-media-progress, 0%);
-	height: 2px;
-	background: var(--sp-blue, #1f3bff);
-	opacity: 0;
-	transition: width 0.15s ease;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--hu-media-progress, 0%);
+  height: 2px;
+  background: var(--sp-blue, #1f3bff);
+  opacity: 0;
+  transition: width 0.15s ease;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-uploading .hu-media-progress-bar {
-	opacity: 1;
+  opacity: 1;
 }
 
 :is(#helix-ultimate, .hu-options-modal) .hu-media-field.is-uploading .hu-media-picker {
-	color: var(--sp-muted, #6b7280);
-	pointer-events: none;
+  color: var(--sp-muted, #6b7280);
+  pointer-events: none;
 }
 
 #hu-media-manager.is-dragover {
-	outline: 2px dashed var(--sp-blue, #1f3bff);
-	outline-offset: -8px;
+  outline: 2px dashed var(--sp-blue, #1f3bff);
+  outline-offset: -8px;
 }
 
 /* ------------------------------------------------------------------ */
 /* Typography: font cards, "Add a font" list, searchable picker         */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .typography-panel .hu-groups-container {
-	background: var(--sp-panel);
+  background: var(--sp-panel);
 }
 
 #helix-ultimate .typography-panel .hu-no-group-wrap {
-	padding: 0 0 12px;
+  padding: 0 0 12px;
 }
 
 /* Font sections: flat, full-width, split by a divider (no card chrome). */
 #helix-ultimate .hu-typography-wrapper {
-	margin: 0;
-	padding: 12px 12px 14px;
-	border: 0;
-	border-bottom: 1px solid var(--sp-divider);
-	border-radius: 0;
-	background: transparent;
-	box-shadow: none;
+  margin: 0;
+  padding: 12px 12px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--sp-divider);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-typography-wrapper > div {
-	padding: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-typo-card[hidden],
 #helix-ultimate .hu-typo-add[hidden],
 #helix-ultimate .hu-typo-add li[hidden] {
-	display: none !important;
+  display: none !important;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-is-header {
-	padding: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-is-header .control-group,
 #helix-ultimate .hu-typography-wrapper .hu-is-header .control-group-checkbox {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 #helix-ultimate .hu-typo-card .hu-is-header .control-group-inner {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 #helix-ultimate .hu-typo-card .hu-is-header .control-label {
-	margin: 0;
-	color: var(--sp-text);
-	font-size: 13px;
-	font-weight: 600;
+  margin: 0;
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* The enable switch is driven by the remove / add buttons instead. */
 #helix-ultimate .hu-typo-card .hu-is-header .form-check {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-typo-card .hu-is-header {
-	cursor: pointer;
-	user-select: none;
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Collapse toggle (header) */
 #helix-ultimate .hu-typo-collapse {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 24px;
-	height: 24px;
-	margin-right: -4px;
-	padding: 0;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-icon);
-	background: transparent;
-	font-size: 10px;
-	cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--sp-radius);
+  color: var(--sp-icon);
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-typo-collapse:hover {
-	color: var(--sp-text);
-	background: var(--sp-input);
+  color: var(--sp-text);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-typo-collapse .fas {
-	transition: transform 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 #helix-ultimate .hu-typo-card.is-collapsed .hu-typo-collapse .fas {
-	transform: rotate(-90deg);
+  transform: rotate(-90deg);
 }
 
 /* Collapsed: header + one-line summary only. */
 #helix-ultimate .hu-typo-card.is-collapsed > :not(.hu-is-header),
 #helix-ultimate .hu-typo-card.is-collapsed .hu-typo-hint,
 #helix-ultimate .hu-typo-card:not(.is-collapsed) .hu-typo-summary {
-	display: none !important;
+  display: none !important;
 }
 
 #helix-ultimate .hu-typo-summary {
-	margin: 2px 0 0;
-	overflow: hidden;
-	color: var(--sp-muted);
-	font-size: 11.5px;
-	line-height: 1.4;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: var(--sp-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 #helix-ultimate .hu-typo-summary:empty {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-typo-card.is-collapsed {
-	padding-bottom: 12px;
+  padding-bottom: 12px;
 }
 
 #helix-ultimate .hu-typo-card .control-group {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 /* Extra fields after the font controls (e.g. Custom's selectors). */
 #helix-ultimate .hu-typo-card > .col-12:not(.hu-is-header) + .col-12 {
-	margin-top: 12px;
+  margin-top: 12px;
 }
 
 /* Remove font (bottom of an open card) */
 #helix-ultimate .hu-typo-footer {
-	display: flex;
-	justify-content: flex-end;
-	margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 
 #helix-ultimate .hu-typo-remove {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	height: 26px;
-	margin-right: -8px;
-	padding: 0 8px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-muted);
-	background: transparent;
-	font-size: 12px;
-	cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  margin-right: -8px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--sp-radius);
+  color: var(--sp-muted);
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-typo-remove .fas {
-	font-size: 11px;
+  font-size: 11px;
 }
 
 #helix-ultimate .hu-typo-remove:hover {
-	color: var(--sp-danger);
-	background: var(--sp-input);
+  color: var(--sp-danger);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-typo-hint {
-	margin: 2px 0 0;
-	color: var(--sp-muted);
-	font-size: 11.5px;
-	line-height: 1.4;
+  margin: 2px 0 0;
+  color: var(--sp-muted);
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 
 /* Field grid: Font / Weight + Size / Line height + Spacing / Color + Subset / Decoration + Alignment */
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-	gap: 10px 8px;
-	padding: 10px 0 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 8px;
+  padding: 10px 0 0;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont > .row {
-	display: contents;
+  display: contents;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont > .row > div {
-	width: auto;
-	max-width: none;
-	margin: 0 !important;
-	padding: 0;
+  width: auto;
+  max-width: none;
+  margin: 0 !important;
+  padding: 0;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper,
 #helix-ultimate .hu-typography-wrapper .hu-webfont-family {
-	grid-column: 1 / -1;
-	margin: 0 !important;
+  grid-column: 1/-1;
+  margin: 0 !important;
 }
 
-#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper { order: 0; }
-#helix-ultimate .hu-typography-wrapper .hu-webfont-family { order: 1; }
-#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(1) { order: 2; } /* weight */
-#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(2) { order: 3; } /* size */
-#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(2) { order: 4; } /* line height */
-#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(3) { order: 5; } /* letter spacing */
-#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(3) { order: 6; } /* color */
-#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(1) { order: 7; } /* subset */
-#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(1) { order: 8; }
-#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(2) { order: 9; }
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper {
+  order: 0;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-family {
+  order: 1;
+}
+
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(1) {
+  order: 2;
+} /* weight */
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(2) {
+  order: 3;
+} /* size */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(2) {
+  order: 4;
+} /* line height */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(3) {
+  order: 5;
+} /* letter spacing */
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(3) {
+  order: 6;
+} /* color */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(1) {
+  order: 7;
+} /* subset */
+#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(1) {
+  order: 8;
+}
+
+#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(2) {
+  order: 9;
+}
 
 #helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper {
-	padding: 8px 10px;
-	border-radius: var(--sp-radius);
-	background: var(--sp-input);
+  padding: 8px 10px;
+  border-radius: var(--sp-radius);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper.is-light-text {
-	background: #1f2937;
+  background: #1f2937;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-webfont-preview {
-	color: var(--sp-text);
-	display: -webkit-box;
-	overflow: hidden;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
-	background: transparent;
+  color: var(--sp-text);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  background: transparent;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont label {
-	margin-bottom: 4px !important;
-	color: var(--sp-muted);
-	font-size: 11.5px;
-	line-height: 16px;
+  margin-bottom: 4px !important;
+  color: var(--sp-muted);
+  font-size: 11.5px;
+  line-height: 16px;
 }
 
 /* One control height for every input in the grid. */
@@ -1142,391 +1127,390 @@
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont select:not(.hu-unit-select),
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont .form-control,
 #helix-ultimate .hu-typography-wrapper .hu-unit-group {
-	height: 32px;
-	min-height: 32px;
+  height: 32px;
+  min-height: 32px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont select:not(.hu-unit-select) {
-	width: 100%;
-	padding: 0 24px 0 10px;
-	border: 1px solid transparent;
-	background-color: var(--sp-input);
-	font-size: 12px;
+  width: 100%;
+  padding: 0 24px 0 10px;
+  border: 1px solid transparent;
+  background-color: var(--sp-input);
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-unit-field-input {
-	height: 32px;
-	min-width: 0;
-	padding: 0 36px 0 8px;
+  height: 32px;
+  min-width: 0;
+  padding: 0 36px 0 8px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-unit-group .hu-unit-pill {
-	height: 24px;
+  height: 24px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-font-line-height-input {
-	width: 100%;
-	padding: 0 8px;
+  width: 100%;
+  padding: 0 8px;
 }
 
 /* Decoration / alignment: four icons on one row. */
 #helix-ultimate .hu-typography-wrapper .hu-switcher {
-	display: block;
+  display: block;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-action-group {
-	display: flex;
-	gap: 2px;
-	padding: 2px;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-switcher-action {
-	display: inline-flex;
-	flex: 1 1 0;
-	align-items: center;
-	justify-content: center;
-	min-width: 0;
-	height: 28px;
-	padding: 0;
-	font-size: 12px;
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 28px;
+  padding: 0;
+  font-size: 12px;
 }
 
 /* Add a font: one button, a menu of the fonts that are off */
 #helix-ultimate .hu-typo-add {
-	position: relative;
-	margin: 0;
-	padding: 8px 12px 0;
+  position: relative;
+  margin: 0;
+  padding: 8px 12px 0;
 }
 
 #helix-ultimate .hu-typo-add__toggle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	width: 100%;
-	height: 36px;
-	padding: 0 12px;
-	border: 1px dashed var(--sp-handle-interactive);
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background: var(--sp-panel);
-	font-size: 13px;
-	font-weight: 600;
-	cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px dashed var(--sp-handle-interactive);
+  border-radius: var(--sp-radius);
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-typo-add__toggle .fas {
-	color: var(--sp-icon);
-	font-size: 11px;
+  color: var(--sp-icon);
+  font-size: 11px;
 }
 
 #helix-ultimate .hu-typo-add__toggle:hover,
 #helix-ultimate .hu-typo-add.is-open .hu-typo-add__toggle {
-	border-style: solid;
-	background: var(--sp-input);
+  border-style: solid;
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-typo-add__list {
-	position: absolute;
-	z-index: 20;
-	top: calc(100% + 4px);
-	right: 12px;
-	left: 12px;
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	margin: 0;
-	padding: 4px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 8px;
-	background: var(--sp-panel);
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
-	list-style: none;
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  right: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 8px;
+  background: var(--sp-panel);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+  list-style: none;
 }
 
 #helix-ultimate .hu-typo-add.is-up .hu-typo-add__list {
-	top: auto;
-	bottom: calc(36px + 4px);
+  top: auto;
+  bottom: 40px;
 }
 
 #helix-ultimate .hu-typo-add__list[hidden] {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-typo-add__item {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 8px;
-	width: 100%;
-	padding: 7px 10px;
-	border: 0;
-	border-radius: 6px;
-	color: var(--sp-text);
-	background: transparent;
-	text-align: left;
-	cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--sp-text);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-typo-add__item:is(:hover, :focus, :focus-visible) {
-	outline: none !important;
-	background: var(--sp-input);
+  outline: none !important;
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-typo-add__name {
-	font-size: 13px;
-	font-weight: 600;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-typo-add__inherit {
-	overflow: hidden;
-	color: var(--sp-muted);
-	font-size: 12px;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  overflow: hidden;
+  color: var(--sp-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Searchable font picker */
 .hu-font-picker {
-	min-width: 0;
-	max-width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .hu-font-picker__native {
-	display: none !important;
+  display: none !important;
 }
 
 .hu-font-picker {
-	position: relative;
+  position: relative;
 }
 
 .hu-font-picker__toggle {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	width: 100%;
-	height: 36px;
-	padding: 0 12px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background: var(--sp-input);
-	font-size: 13px;
-	text-align: left;
-	cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  color: var(--sp-text);
+  background: var(--sp-input);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
 }
 
 .hu-font-picker__toggle:hover {
-	border-color: var(--sp-divider);
+  border-color: var(--sp-divider);
 }
 
 .hu-font-picker.is-open .hu-font-picker__toggle {
-	border-color: var(--sp-divider);
-	background: var(--sp-panel);
+  border-color: var(--sp-divider);
+  background: var(--sp-panel);
 }
 
 .hu-font-picker__value {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .hu-font-picker__toggle .fa-chevron-down {
-	flex: 0 0 auto;
-	color: var(--sp-muted);
-	font-size: 10px;
+  flex: 0 0 auto;
+  color: var(--sp-muted);
+  font-size: 10px;
 }
 
 .hu-font-picker__popover {
-	position: absolute;
-	top: calc(100% + 4px);
-	left: 0;
-	right: 0;
-	z-index: 20;
-	padding: 6px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 10px;
-	background: var(--sp-panel);
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 6px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 10px;
+  background: var(--sp-panel);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
 }
 
 .hu-font-picker__search-wrap {
-	position: relative;
-	margin-bottom: 6px;
+  position: relative;
+  margin-bottom: 6px;
 }
 
 .hu-font-picker__search-wrap .fa-search {
-	position: absolute;
-	top: 50%;
-	left: 10px;
-	color: var(--sp-muted);
-	font-size: 12px;
-	transform: translateY(-50%);
-	pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  color: var(--sp-muted);
+  font-size: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .hu-font-picker input.hu-font-picker__search {
-	width: 100%;
-	height: 34px;
-	min-height: 0;
-	padding: 0 10px 0 30px;
+  width: 100%;
+  height: 34px;
+  min-height: 0;
+  padding: 0 10px 0 30px;
 }
 
 .hu-font-picker__list {
-	max-height: 260px;
-	margin: 0;
-	padding: 0;
-	overflow-y: auto;
-	list-style: none;
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
 }
 
 .hu-font-picker__group {
-	padding: 8px 8px 4px;
-	color: var(--sp-muted);
-	font-size: 11px;
-	font-weight: 700;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
+  padding: 8px 8px 4px;
+  color: var(--sp-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .hu-font-picker__option {
-	padding: 7px 8px;
-	border-radius: 6px;
-	color: var(--sp-text);
-	font-size: 13px;
-	cursor: pointer;
+  padding: 7px 8px;
+  border-radius: 6px;
+  color: var(--sp-text);
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .hu-font-picker__option.is-active {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
-.hu-font-picker__option[aria-selected='true'] {
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	font-weight: 600;
+.hu-font-picker__option[aria-selected=true] {
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
+  font-weight: 600;
 }
 
 .hu-font-picker__empty {
-	margin: 0;
-	padding: 12px 8px;
-	color: var(--sp-muted);
-	font-size: 12px;
+  margin: 0;
+  padding: 12px 8px;
+  color: var(--sp-muted);
+  font-size: 12px;
 }
 
 /* ------------------------------------------------------------------ */
 /* Layout builder: flat, full-width rows split by dividers              */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .layout-panel .hu-groups-container {
-	background: var(--sp-panel);
+  background: var(--sp-panel);
 }
 
 /* Drop the nested field wrappers' padding / negative margins. */
 #helix-ultimate .layout-panel .hu-no-group-wrap {
-	padding: 0;
+  padding: 0;
 }
 
 #helix-ultimate .layout-panel .hu-no-group-wrap .control-group {
-	margin: 0;
+  margin: 0;
 }
 
 #helix-ultimate .layout-panel .hu-no-group-wrap .control-group-inner {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #helix-ultimate #hu-layout-builder {
-	padding: 0 0 48px;
+  padding: 0 0 48px;
 }
 
 #helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) {
-	margin: 0;
-	padding-bottom: 0;
-	border-bottom: 1px solid var(--sp-divider);
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--sp-divider);
 }
 
 #helix-ultimate .hu-layout-section {
-	padding: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-layout-section-inner {
-	padding: 10px 12px 12px;
-	border: 0;
-	border-radius: 0;
-	background: transparent;
-	box-shadow: none;
+  padding: 10px 12px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-layout-section.ui-sortable-helper .hu-layout-section-inner {
-	border-radius: var(--sp-radius);
-	background: var(--sp-panel);
-	box-shadow: 0 6px 16px rgba(17, 24, 39, 0.15);
+  border-radius: var(--sp-radius);
+  background: var(--sp-panel);
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.15);
 }
 
 #helix-ultimate .hu-section-settings {
-	min-height: 24px;
-	padding: 0;
+  min-height: 24px;
+  padding: 0;
 }
 
 #helix-ultimate .hu-section-title {
-	color: var(--sp-text);
-	font-size: 13px;
-	font-weight: 600;
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-move-row {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 16px;
-	height: 24px;
-	margin: 0 4px 0 -4px;
-	vertical-align: middle;
-	cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 24px;
+  margin: 0 4px 0 -4px;
+  vertical-align: middle;
+  cursor: grab;
 }
 
 #helix-ultimate .hu-move-row svg {
-	fill: var(--sp-handle-interactive);
+  fill: var(--sp-handle-interactive);
 }
 
 #helix-ultimate .hu-move-row:hover svg {
-	fill: var(--sp-icon);
+  fill: var(--sp-icon);
 }
 
 #helix-ultimate .hu-layout-builder-action svg {
-	fill: var(--sp-icon);
+  fill: var(--sp-icon);
 }
 
 #helix-ultimate .hu-layout-builder-action:hover svg {
-	fill: var(--sp-text);
+  fill: var(--sp-text);
 }
 
 #helix-ultimate .hu-row-container {
-	padding: 8px 0 0;
+  padding: 8px 0 0;
 }
 
 #helix-ultimate .hu-row-container > .row {
-	margin-right: -2px;
-	margin-left: -2px;
+  margin-right: -2px;
+  margin-left: -2px;
 }
 
 #helix-ultimate .hu-layout-column {
-	padding-right: 2px;
-	padding-left: 2px;
+  padding-right: 2px;
+  padding-left: 2px;
 }
 
 #helix-ultimate .hu-column {
-	height: 28px;
-	line-height: 28px;
-	padding: 0 6px;
-	border: 0;
-	border-radius: 6px;
-	color: var(--sp-text);
-	background: var(--sp-stone);
-	font-size: 12px;
-	font-weight: 500;
+  height: 28px;
+  line-height: 28px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--sp-text);
+  background: var(--sp-stone);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 /* Three or more columns: tighter chips so names like "bottom2" / "Component" fit. */
@@ -1534,2925 +1518,2912 @@
 #helix-ultimate .hu-layout-column.col-3 .hu-column,
 #helix-ultimate .hu-layout-column.col-2 .hu-column,
 #helix-ultimate .hu-layout-column.col-1 .hu-column {
-	padding: 0 5px;
-	font-size: 11.5px;
+  padding: 0 5px;
+  font-size: 11.5px;
 }
 
 #helix-ultimate .hu-column-component {
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	font-weight: 600;
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-column-options {
-	background-color: var(--sp-panel);
-	border-radius: 4px;
-	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+  background-color: var(--sp-panel);
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
 }
 
 #helix-ultimate .hu-layout-column.ui-sortable-helper .hu-column {
-	border: 0;
-	color: var(--sp-text);
-	background: var(--sp-panel);
-	box-shadow: 0 0 0 2px var(--sp-blue), 0 6px 16px rgba(17, 24, 39, 0.15);
+  border: 0;
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  box-shadow: 0 0 0 2px var(--sp-blue), 0 6px 16px rgba(17, 24, 39, 0.15);
 }
 
 #helix-ultimate .hu-layout-column.ui-state-highlight,
 #helix-ultimate #hu-layout-builder .ui-state-highlight {
-	border: 1px dashed var(--sp-handle-interactive);
-	border-radius: var(--sp-radius);
-	background: var(--sp-panel);
+  border: 1px dashed var(--sp-handle-interactive);
+  border-radius: var(--sp-radius);
+  background: var(--sp-panel);
 }
 
 #helix-ultimate .hu-add-row {
-	/* Sits on the divider between rows. */
-	margin-bottom: -12px;
-	color: #fff;
-	background: var(--sp-blue);
+  /* Sits on the divider between rows. */
+  margin-bottom: -12px;
+  color: #fff;
+  background: var(--sp-blue);
 }
 
 #helix-ultimate .hu-add-row:hover,
 #helix-ultimate .hu-add-row:focus {
-	background: var(--sp-blue-dark);
+  background: var(--sp-blue-dark);
 }
 
 /* ------------------------------------------------------------------ */
 /* Colour picker (Coloris)                                             */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .clr-field,
 .hu-modal .clr-field,
 .hu-options-modal .clr-field {
-	display: block;
-	position: relative;
-	color: var(--sp-text, #111827);
+  display: block;
+  position: relative;
+  color: var(--sp-text, #111827);
 }
 
 #helix-ultimate .clr-field input,
 .hu-modal .clr-field input,
 .hu-options-modal .clr-field input {
-	width: 100%;
-	padding-left: 40px;
-	text-transform: uppercase;
-	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+  width: 100%;
+  padding-left: 40px;
+  text-transform: uppercase;
+  font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
 }
 
 #helix-ultimate .clr-field input::placeholder,
 .hu-modal .clr-field input::placeholder,
 .hu-options-modal .clr-field input::placeholder {
-	text-transform: none;
-	font-family: var(--sp-font, sans-serif);
+  text-transform: none;
+  font-family: var(--sp-font, sans-serif);
 }
 
 /* An empty colour shows a checkerboard swatch, meaning "inherit". */
 #helix-ultimate .clr-field button,
 .hu-modal .clr-field button,
 .hu-options-modal .clr-field button {
-	background-image: repeating-conic-gradient(#e3e8f1 0% 25%, #fff 0% 50%);
-	background-size: 10px 10px;
+  background-image: repeating-conic-gradient(#e3e8f1 0% 25%, #fff 0% 50%);
+  background-size: 10px 10px;
 }
 
 /* The swatch sits inside the field on the left. */
 #helix-ultimate .clr-field button,
 .hu-modal .clr-field button,
 .hu-options-modal .clr-field button {
-	top: 50%;
-	right: auto;
-	left: 6px;
-	width: 26px;
-	height: 26px;
-	border-radius: 6px;
-	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
-	transform: translateY(-50%);
+  top: 50%;
+  right: auto;
+  left: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+  transform: translateY(-50%);
 }
 
 #helix-ultimate .clr-field button::after,
 .hu-modal .clr-field button::after,
 .hu-options-modal .clr-field button::after {
-	border-radius: 6px;
-	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
 }
 
 .clr-picker {
-	border-radius: 12px;
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18), 0 0 0 1px #e3e8f1;
-	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18), 0 0 0 1px #e3e8f1;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .clr-picker .clr-gradient {
-	border-radius: 12px 12px 0 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .clr-picker input.clr-color {
-	height: 32px;
-	border: 1px solid transparent;
-	border-radius: 8px;
-	color: #111827;
-	background: #f2f5fa;
-	font-size: 12px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #111827;
+  background: #f2f5fa;
+  font-size: 12px;
 }
 
 .clr-picker input.clr-color:focus {
-	border-color: transparent;
-	outline: 2px solid #1f3bff;
-	outline-offset: 2px;
-	box-shadow: none;
+  border-color: transparent;
+  outline: 2px solid #1f3bff;
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 .clr-picker .clr-clear,
 .clr-picker .clr-close {
-	height: 28px;
-	padding: 0 12px;
-	border-radius: 8px;
-	font-size: 12px;
-	font-weight: 600;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .clr-picker .clr-clear {
-	color: #111827;
-	background: #f2f5fa;
+  color: #111827;
+  background: #f2f5fa;
 }
 
 .clr-picker .clr-close {
-	color: #fff;
-	background: #1f3bff;
+  color: #fff;
+  background: #1f3bff;
 }
 
 .clr-picker .clr-close:hover {
-	background: #1629b8;
+  background: #1629b8;
 }
 
 /* ------------------------------------------------------------------ */
 /* Preview canvas                                                      */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-preview {
-	background: var(--sp-canvas);
+  background: var(--sp-canvas);
 }
 
 #helix-ultimate #hu-template-preview {
-	box-shadow: 0 0 0 1px var(--sp-divider);
-	transition: width 0.3s linear;
+  box-shadow: 0 0 0 1px var(--sp-divider);
+  transition: width 0.3s linear;
 }
 
 /* Tooltips shown next to the rail (Joomla.utils.tooltip) */
 .hu-tooltip {
-	position: fixed;
-	z-index: 10000;
-	max-width: 240px;
-	padding: 5px 8px;
-	border-radius: 6px;
-	color: #fff;
-	background: #111827;
-	box-shadow: 0 4px 12px rgba(17, 24, 39, 0.2);
-	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	font-size: 12px;
-	font-weight: 500;
-	line-height: 1.3;
-	pointer-events: none;
+  position: fixed;
+  z-index: 10000;
+  max-width: 240px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  color: #fff;
+  background: #111827;
+  box-shadow: 0 4px 12px rgba(17, 24, 39, 0.2);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  pointer-events: none;
 }
 
 .hu-tooltip[hidden] {
-	display: none;
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	#helix-ultimate * {
-		transition: none !important;
-		animation: none !important;
-	}
+  #helix-ultimate * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
-
 /* Row Options modal: delete lives here instead of on the row. */
 .hu-options-modal-footer .hu-settings-delete-row {
-	margin-left: auto;
-	color: var(--sp-danger, #dc2626);
-	background: transparent;
+  margin-left: auto;
+  color: var(--sp-danger, #dc2626);
+  background: transparent;
 }
 
 .hu-options-modal-footer .hu-settings-delete-row:hover,
 .hu-options-modal-footer .hu-settings-delete-row:focus {
-	color: #fff;
-	background: var(--sp-danger, #dc2626);
+  color: #fff;
+  background: var(--sp-danger, #dc2626);
 }
 
 /* ------------------------------------------------------------------ */
 /* Presets: mini site previews in a two-column grid                     */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-presets {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 10px;
-	margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
 }
 
 #helix-ultimate .hu-presets .hu-preset {
-	position: relative;
-	float: none;
-	width: auto;
-	height: auto;
-	margin: 0;
-	padding: 6px 6px 8px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 10px;
-	display: flex;
-	flex-direction: column;
-	background: var(--sp-panel) !important; /* tiles carry an inline colour from PHP */
-	box-shadow: none;
-	cursor: pointer;
-	transition: border-color 0.12s ease, box-shadow 0.12s ease;
+  position: relative;
+  float: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 6px 6px 8px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  background: var(--sp-panel) !important; /* tiles carry an inline colour from PHP */
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 #helix-ultimate .hu-presets .hu-preset:hover {
-	border-color: var(--sp-handle-interactive);
+  border-color: var(--sp-handle-interactive);
 }
 
 #helix-ultimate .hu-presets .hu-preset:focus-visible {
-	outline: 2px solid var(--sp-blue);
-	outline-offset: 2px;
+  outline: 2px solid var(--sp-blue);
+  outline-offset: 2px;
 }
 
 #helix-ultimate .hu-presets .hu-preset.active {
-	border-color: var(--sp-blue);
-	box-shadow: 0 0 0 1px var(--sp-blue);
+  border-color: var(--sp-blue);
+  box-shadow: 0 0 0 1px var(--sp-blue);
 }
 
 /* Mini site in the preset's colours: a hairline topbar, header (logo + menu),
    an accent-tinted hero (heading + button) and body text. The accent leads;
    the dark topbar / footer colours stay out of the way at this size. */
 #helix-ultimate .hu-preset-contents {
-	display: block;
-	order: 0;
+  display: block;
+  order: 0;
 }
 
 #helix-ultimate .hu-presets .hu-preset > .hu-preset-title {
-	order: 1;
+  order: 1;
 }
 
 #helix-ultimate .hu-preset-mock {
-	display: flex;
-	flex-direction: column;
-	height: 76px;
-	overflow: hidden;
-	border-radius: 6px;
-	background: var(--p-bg);
-	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.07);
+  display: flex;
+  flex-direction: column;
+  height: 76px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--p-bg);
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.07);
 }
 
 #helix-ultimate .hu-preset-mock__topbar {
-	flex: 0 0 3px;
-	background: var(--p-topbar);
-	opacity: 0.85;
+  flex: 0 0 3px;
+  background: var(--p-topbar);
+  opacity: 0.85;
 }
 
 #helix-ultimate .hu-preset-mock__header {
-	display: flex;
-	flex: 0 0 15px;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 7px;
-	background: var(--p-header);
+  display: flex;
+  flex: 0 0 15px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 7px;
+  background: var(--p-header);
 }
 
 #helix-ultimate .hu-preset-mock__logo {
-	width: 14px;
-	height: 5px;
-	border-radius: 3px;
-	background: var(--p-logo);
+  width: 14px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--p-logo);
 }
 
 #helix-ultimate .hu-preset-mock__menu {
-	display: flex;
-	gap: 3px;
+  display: flex;
+  gap: 3px;
 }
 
 #helix-ultimate .hu-preset-mock i {
-	display: block;
-	border-radius: 2px;
-	font-style: normal;
+  display: block;
+  border-radius: 2px;
+  font-style: normal;
 }
 
 #helix-ultimate .hu-preset-mock__menu i {
-	width: 7px;
-	height: 2px;
-	background: var(--p-menu);
-	opacity: 0.45;
+  width: 7px;
+  height: 2px;
+  background: var(--p-menu);
+  opacity: 0.45;
 }
 
 #helix-ultimate .hu-preset-mock__hero {
-	display: flex;
-	flex: 0 0 34px;
-	flex-direction: column;
-	justify-content: center;
-	gap: 3px;
-	margin: 0 5px;
-	padding: 0 7px;
-	border-radius: 4px;
-	background: color-mix(in srgb, var(--p-accent) 14%, var(--p-bg));
+  display: flex;
+  flex: 0 0 34px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  margin: 0 5px;
+  padding: 0 7px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--p-accent) 14%, var(--p-bg));
 }
 
 #helix-ultimate .hu-preset-mock__hero i:first-child {
-	width: 60%;
-	height: 4px;
-	background: var(--p-accent);
+  width: 60%;
+  height: 4px;
+  background: var(--p-accent);
 }
 
 #helix-ultimate .hu-preset-mock__hero i:nth-child(2) {
-	width: 42%;
-	height: 2px;
-	background: var(--p-text);
-	opacity: 0.35;
+  width: 42%;
+  height: 2px;
+  background: var(--p-text);
+  opacity: 0.35;
 }
 
 #helix-ultimate .hu-preset-mock__button {
-	width: 22px;
-	height: 6px;
-	margin-top: 2px;
-	border-radius: 3px;
-	background: var(--p-accent);
+  width: 22px;
+  height: 6px;
+  margin-top: 2px;
+  border-radius: 3px;
+  background: var(--p-accent);
 }
 
 #helix-ultimate .hu-preset-mock__body {
-	display: flex;
-	flex: 1 1 auto;
-	flex-direction: column;
-	justify-content: center;
-	gap: 3px;
-	padding: 0 12px;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 12px;
 }
 
 #helix-ultimate .hu-preset-mock__body i {
-	height: 2px;
-	background: var(--p-text);
-	opacity: 0.2;
+  height: 2px;
+  background: var(--p-text);
+  opacity: 0.2;
 }
 
 #helix-ultimate .hu-preset-mock__body i:nth-child(2) {
-	width: 85%;
+  width: 85%;
 }
 
 #helix-ultimate .hu-preset-mock__body i:nth-child(3) {
-	width: 55%;
+  width: 55%;
 }
 
 /* Name row; the selected tile gets a check after its name. */
 #helix-ultimate .hu-presets .hu-preset-title {
-	position: static;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 6px;
-	padding: 8px 2px 0;
-	border-radius: 0;
-	color: var(--sp-text);
-	background: none;
-	font-size: 12.5px;
-	font-weight: 500;
-	line-height: 16px;
-	text-transform: none;
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 2px 0;
+  border-radius: 0;
+  color: var(--sp-text);
+  background: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 16px;
+  text-transform: none;
 }
 
 #helix-ultimate .hu-presets .hu-preset.active .hu-preset-title {
-	padding: 8px 2px 0;
-	color: var(--sp-text);
-	background: none;
-	font-weight: 600;
+  padding: 8px 2px 0;
+  color: var(--sp-text);
+  background: none;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-presets .hu-preset.active .hu-preset-title::after {
-	content: '';
-	flex: 0 0 16px;
-	height: 16px;
-	border-radius: 50%;
-	background: var(--sp-blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4.5 8.2l2.3 2.3 4.7-4.9'/%3E%3C/svg%3E") center / 16px no-repeat;
+  content: "";
+  flex: 0 0 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--sp-blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4.5 8.2l2.3 2.3 4.7-4.9'/%3E%3C/svg%3E") center/16px no-repeat;
 }
 
 /* Edit colours: shown on hover / keyboard focus, top-right of the preview. */
 #helix-ultimate .hu-presets .hu-edit-preset {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	z-index: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 24px;
-	height: 24px;
-	border-radius: 6px;
-	color: var(--sp-text);
-	background: var(--sp-panel);
-	box-shadow: 0 1px 3px rgba(17, 24, 39, 0.2);
-	font-size: 10px;
-	opacity: 0;
-	transition: opacity 0.12s ease;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.2);
+  font-size: 10px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
 }
 
 #helix-ultimate .hu-presets .hu-preset:hover .hu-edit-preset,
 #helix-ultimate .hu-presets .hu-preset:focus-within .hu-edit-preset,
 #helix-ultimate .hu-presets .hu-edit-preset:focus-visible {
-	opacity: 1;
+  opacity: 1;
 }
 
 #helix-ultimate .hu-presets .hu-edit-preset:hover {
-	color: var(--sp-blue);
+  color: var(--sp-blue);
 }
 
 @media (hover: none) {
-	#helix-ultimate .hu-presets .hu-edit-preset {
-		opacity: 1;
-	}
+  #helix-ultimate .hu-presets .hu-edit-preset {
+    opacity: 1;
+  }
 }
-
 /* ------------------------------------------------------------------ */
 /* Panel stack: steps slide in over a panel (Joomla.helixSubpanel)     */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-edit-panel {
-	position: relative;
+  position: relative;
 }
 
 #helix-ultimate .hu-edit-panel > .hu-groups-container,
 #helix-ultimate .hu-subpanel {
-	transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.24s ease;
+  transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.24s ease;
 }
 
 #helix-ultimate .hu-edit-panel > .hu-groups-container.is-behind,
 #helix-ultimate .hu-subpanel.is-behind {
-	transform: translateX(-24%);
-	opacity: 0;
-	pointer-events: none;
+  transform: translateX(-24%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 #helix-ultimate .hu-subpanel {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	z-index: 5;
-	display: flex;
-	flex-direction: column;
-	background: var(--sp-panel);
-	transform: translateX(100%);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  background: var(--sp-panel);
+  transform: translateX(100%);
 }
 
 #helix-ultimate .hu-subpanel.is-active:not(.is-behind) {
-	transform: none;
+  transform: none;
 }
 
 #helix-ultimate .hu-subpanel-header {
-	display: flex;
-	flex: 0 0 auto;
-	align-items: center;
-	gap: 4px;
-	min-height: 44px;
-	padding: 0 12px 0 6px;
-	border-bottom: 1px solid var(--sp-divider);
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0 12px 0 6px;
+  border-bottom: 1px solid var(--sp-divider);
 }
 
 #helix-ultimate .hu-subpanel-back {
-	display: inline-flex;
-	flex: 0 0 28px;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px;
-	padding: 0;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background: transparent;
-	cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 28px;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--sp-radius);
+  color: var(--sp-text);
+  background: transparent;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-subpanel-back:hover,
 #helix-ultimate .hu-subpanel-back:focus-visible {
-	background: var(--sp-input);
-	outline: none;
+  background: var(--sp-input);
+  outline: none;
 }
 
 #helix-ultimate .hu-subpanel-back:focus-visible {
-	box-shadow: 0 0 0 2px var(--sp-blue);
+  box-shadow: 0 0 0 2px var(--sp-blue);
 }
 
 #helix-ultimate .hu-subpanel-title {
-	min-width: 0;
-	margin: 0;
-	overflow: hidden;
-	color: var(--sp-text);
-	font-size: 14px;
-	font-weight: 600;
-	line-height: 1.3;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sp-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 #helix-ultimate .hu-subpanel-body {
-	flex: 1 1 auto;
-	min-height: 0;
-	padding: 12px;
-	overflow-y: auto;
-	overscroll-behavior: contain;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 #helix-ultimate .hu-subpanel-footer {
-	display: flex;
-	flex: 0 0 auto;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	padding: 10px 12px;
-	border-top: 1px solid var(--sp-divider);
-	background: var(--sp-panel);
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--sp-divider);
+  background: var(--sp-panel);
 }
 
 #helix-ultimate .hu-subpanel-footer .hu-btn {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	height: 32px;
-	padding: 0 12px;
-	font-size: 12.5px;
-	font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-subpanel-footer .hu-btn-link {
-	color: var(--sp-muted);
-	background: transparent;
-	box-shadow: none;
+  color: var(--sp-muted);
+  background: transparent;
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-subpanel-footer .hu-btn-link:hover {
-	color: var(--sp-text);
-	background: var(--sp-input);
+  color: var(--sp-text);
+  background: var(--sp-input);
 }
 
 @media (prefers-reduced-motion: reduce) {
-	#helix-ultimate .hu-edit-panel > .hu-groups-container,
-	#helix-ultimate .hu-subpanel {
-		transition: none;
-	}
+  #helix-ultimate .hu-edit-panel > .hu-groups-container,
+  #helix-ultimate .hu-subpanel {
+    transition: none;
+  }
 }
-
 /* Preset editor: colours grouped by area; label above a full-width field */
 #helix-ultimate .hu-subpanel-body:has(.hu-preset-groups) {
-	padding: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-preset-group {
-	border-bottom: 1px solid var(--sp-divider);
+  border-bottom: 1px solid var(--sp-divider);
 }
 
 #helix-ultimate .hu-preset-group__summary {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	min-height: 44px;
-	padding: 0 12px;
-	color: var(--sp-text);
-	font-size: 13px;
-	font-weight: 600;
-	list-style: none;
-	cursor: pointer;
-	user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
 }
 
 #helix-ultimate .hu-preset-group__summary::-webkit-details-marker {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-preset-group__summary:hover {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-preset-group__summary:focus-visible {
-	outline: 2px solid var(--sp-blue);
-	outline-offset: -2px;
+  outline: 2px solid var(--sp-blue);
+  outline-offset: -2px;
 }
 
 #helix-ultimate .hu-preset-group__title {
-	flex: 1 1 auto;
-	min-width: 0;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 /* Overlapping swatches summarise the group while it is closed. */
 #helix-ultimate .hu-preset-group__swatches {
-	display: inline-flex;
-	flex: 0 0 auto;
+  display: inline-flex;
+  flex: 0 0 auto;
 }
 
 #helix-ultimate .hu-preset-group__swatches i {
-	width: 14px;
-	height: 14px;
-	margin-left: -4px;
-	border-radius: 50%;
-	box-shadow: 0 0 0 2px var(--sp-panel), inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+  width: 14px;
+  height: 14px;
+  margin-left: -4px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--sp-panel), inset 0 0 0 1px rgba(17, 24, 39, 0.15);
 }
 
 #helix-ultimate .hu-preset-group__swatches i:first-child {
-	margin-left: 0;
+  margin-left: 0;
 }
 
 #helix-ultimate .hu-preset-group__chevron {
-	flex: 0 0 auto;
-	color: var(--sp-icon);
-	transform: rotate(-90deg);
-	transition: transform 0.15s ease;
+  flex: 0 0 auto;
+  color: var(--sp-icon);
+  transform: rotate(-90deg);
+  transition: transform 0.15s ease;
 }
 
 #helix-ultimate .hu-preset-group[open] .hu-preset-group__chevron {
-	transform: none;
+  transform: none;
 }
 
 #helix-ultimate .hu-preset-group__fields {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	padding: 2px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 2px 12px 14px;
 }
 
 #helix-ultimate .hu-preset-editor .control-group {
-	margin: 0;
+  margin: 0;
 }
 
 #helix-ultimate .hu-preset-editor .control-group-inner {
-	display: block;
-	margin: 0;
-	padding: 0;
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-preset-editor .control-label {
-	display: block;
-	margin: 0 0 4px;
-	color: var(--sp-muted);
-	font-size: 11.5px;
-	font-weight: 500;
-	line-height: 16px;
+  display: block;
+  margin: 0 0 4px;
+  color: var(--sp-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 16px;
 }
 
 #helix-ultimate .hu-preset-editor .clr-field input {
-	width: 100%;
-	height: 32px;
-	min-height: 32px;
-	padding-left: 34px;
-	font-size: 12px;
-	font-variant-numeric: tabular-nums;
+  width: 100%;
+  height: 32px;
+  min-height: 32px;
+  padding-left: 34px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 #helix-ultimate .hu-preset-editor .clr-field button {
-	left: 6px;
-	width: 20px;
-	height: 20px;
-	border-radius: 4px;
+  left: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
 }
 
 /* ------------------------------------------------------------------ */
 /* Menu builder tree: compact rows                                     */
 /* ------------------------------------------------------------------ */
-
 /* Row pitch (row height + gap). utils.calculateSiblingDistances() reads it
    to size the connector lines, so lines and rows always line up. */
 #helix-ultimate #hu-menu-tree {
-	--hu-branch-pitch: 30px;
-	margin-top: 4px;
+  --hu-branch-pitch: 30px;
+  margin-top: 4px;
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-branch > .hu-menu-tree-contents {
-	margin: 2px 0 0;
+  margin: 2px 0 0;
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	min-height: 28px;
-	padding: 4px 8px;
-	font-size: 13px;
-	line-height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 18px;
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
-	display: inline-flex;
-	margin: 0;
+  display: inline-flex;
+  margin: 0;
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-menu-branch-path {
-	height: calc(var(--hu-branch-pitch) + 1px);
+  height: calc(var(--hu-branch-pitch) + 1px);
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler:hover {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
 /* ------------------------------------------------------------------ */
 /* Mega menu / item settings as a panel step                           */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-edit-panel {
-	transition: width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* A root item with the mega menu switched off only needs the settings column. */
 #helix-ultimate .hu-edit-panel.is-wide:has(.hu-subpanel-megamenu:last-of-type .hu-mega-menu-builder.collapsed) {
-	--hu-panel-width: 272px !important;
+  --hu-panel-width: 272px !important;
 }
 
 #helix-ultimate .hu-megamenu-step,
 #helix-ultimate .hu-megamenu-step .hu-modal-megamenu-container {
-	width: auto;
-	height: auto;
-	background: transparent;
+  width: auto;
+  height: auto;
+  background: transparent;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-container {
-	display: flex !important;
-	align-items: flex-start;
-	gap: 16px;
-	height: auto;
+  display: flex !important;
+  align-items: flex-start;
+  gap: 16px;
+  height: auto;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-sidebar {
-	position: sticky;
-	top: 0;
-	flex: 0 0 220px;
-	width: 220px;
-	height: auto;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	border-radius: 0;
-	background: transparent;
-	box-shadow: none;
+  position: sticky;
+  top: 0;
+  flex: 0 0 220px;
+  width: 220px;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* Settings only (child items, or the mega menu switched off): full width. */
 #helix-ultimate .hu-subpanel-menu-settings .hu-megamenu-sidebar,
 #helix-ultimate .hu-megamenu-step.collapsed .hu-megamenu-sidebar {
-	flex: 1 1 auto;
-	width: 100%;
+  flex: 1 1 auto;
+  width: 100%;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-grid {
-	flex: 1 1 auto;
-	min-width: 0;
-	width: auto;
-	max-height: none;
-	padding: 0;
-	overflow: visible;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  max-height: none;
+  padding: 0;
+  overflow: visible;
 }
 
 /* Cells: type badge above the item name, remove on hover. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 2px;
-	min-width: 0;
-	padding: 5px 6px;
-	font-size: 12px;
-	line-height: 1.3;
-	overflow-wrap: anywhere;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 5px 6px;
+  font-size: 12px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-badge {
-	position: static;
-	order: -1;
-	padding: 1px 4px;
-	font-size: 9.5px;
-	letter-spacing: 0.02em;
-	text-transform: uppercase;
+  position: static;
+  order: -1;
+  padding: 1px 4px;
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove {
-	top: 3px;
-	right: 3px;
-	opacity: 0;
-	transition: opacity 0.12s ease;
+  top: 3px;
+  right: 3px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell:hover .hu-megamenu-cell-remove,
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell:focus-within .hu-megamenu-cell-remove {
-	opacity: 1;
+  opacity: 1;
 }
 
 @media (hover: none) {
-	#helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove {
-		opacity: 1;
-	}
+  #helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove {
+    opacity: 1;
+  }
 }
-
 /* Step header actions */
 #helix-ultimate .hu-subpanel-actions {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
 }
 
 #helix-ultimate .hu-subpanel-header .hu-subpanel-title {
-	flex: 1 1 auto;
+  flex: 1 1 auto;
 }
 
 #helix-ultimate .hu-subpanel-action {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	height: 28px;
-	padding: 0 10px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-icon);
-	background: transparent;
-	font-size: 12.5px;
-	font-weight: 500;
-	white-space: nowrap;
-	cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--sp-radius);
+  color: var(--sp-icon);
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-subpanel-action:hover {
-	color: var(--sp-text);
-	background: var(--sp-input);
+  color: var(--sp-text);
+  background: var(--sp-input);
 }
 
-#helix-ultimate .hu-subpanel-action[aria-pressed='true'] {
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
+#helix-ultimate .hu-subpanel-action[aria-pressed=true] {
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
 }
 
 #helix-ultimate .hu-subpanel-action:focus-visible {
-	outline: 2px solid var(--sp-blue);
-	outline-offset: 1px;
+  outline: 2px solid var(--sp-blue);
+  outline-offset: 1px;
 }
 
 /* Mega menu off: no columns to make room for. */
 #helix-ultimate .hu-subpanel-megamenu:has(.hu-mega-menu-builder.collapsed) .hu-megamenu-settings-toggle {
-	display: none;
+  display: none;
 }
 
 /* Slide the settings column away so the columns get the full width. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-sidebar {
-	overflow: hidden;
-	transition: flex-basis 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), margin 0.24s ease, opacity 0.18s ease;
+  overflow: hidden;
+  transition: flex-basis 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), margin 0.24s ease, opacity 0.18s ease;
 }
 
 #helix-ultimate .hu-megamenu-step.is-settings-hidden:not(.collapsed) .hu-megamenu-sidebar {
-	flex-basis: 0;
-	width: 0;
-	margin-right: -16px; /* cancels the gap */
-	opacity: 0;
-	pointer-events: none;
+  flex-basis: 0;
+  width: 0;
+  margin-right: -16px; /* cancels the gap */
+  opacity: 0;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	#helix-ultimate .hu-megamenu-step .hu-megamenu-sidebar {
-		transition: none;
-	}
+  #helix-ultimate .hu-megamenu-step .hu-megamenu-sidebar {
+    transition: none;
+  }
 }
-
 /* ------------------------------------------------------------------ */
 /* Row / Column Options as a Layout panel step                          */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-subpanel-body:has(> .hu-layout-settings) {
-	padding: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-layout-settings .hu-option-group {
-	border-bottom: 1px solid var(--sp-divider);
+  border-bottom: 1px solid var(--sp-divider);
 }
 
 #helix-ultimate .hu-layout-settings .hu-option-group-title {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	min-height: 44px;
-	padding: 0 12px;
-	color: var(--sp-text);
-	font-size: 13px;
-	font-weight: 600;
-	cursor: pointer;
-	user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
 }
 
 #helix-ultimate .hu-layout-settings .hu-option-group-title:hover {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-layout-settings .hu-option-group-title .fa-fw {
-	width: 16px;
-	color: var(--sp-icon);
-	font-size: 12px;
+  width: 16px;
+  color: var(--sp-icon);
+  font-size: 12px;
 }
 
 /* Chevron on the right, pointing down when open. */
 #helix-ultimate .hu-layout-settings .hu-option-group-title .fa-angle-right {
-	order: 2;
-	margin-left: auto;
-	color: var(--sp-icon);
-	transition: transform 0.15s ease;
+  order: 2;
+  margin-left: auto;
+  color: var(--sp-icon);
+  transition: transform 0.15s ease;
 }
 
 #helix-ultimate .hu-layout-settings .hu-option-group.active .hu-option-group-title {
-	color: var(--sp-text);
+  color: var(--sp-text);
 }
 
 #helix-ultimate .hu-layout-settings .hu-option-group.active .hu-option-group-title .fa-angle-right {
-	transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 #helix-ultimate .hu-layout-settings .hu-option-group-list {
-	padding: 2px 12px 14px;
+  padding: 2px 12px 14px;
 }
 
 /* Fields: label above a full-width control, 12px apart. */
 #helix-ultimate .hu-layout-settings .control-group {
-	margin: 0 0 12px;
+  margin: 0 0 12px;
 }
 
 #helix-ultimate .hu-layout-settings .control-group:last-child {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 #helix-ultimate .hu-layout-settings .control-group-inner {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-layout-settings .control-label,
 #helix-ultimate .hu-layout-settings .control-group > label {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	margin: 0 0 4px;
-	color: var(--sp-muted);
-	font-size: 11.5px;
-	font-weight: 500;
-	line-height: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  color: var(--sp-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 16px;
 }
 
 #helix-ultimate .hu-layout-settings .hu-help-icon {
-	margin: 0;
-	color: var(--sp-icon);
-	font-size: 11px;
-	cursor: pointer;
+  margin: 0;
+  color: var(--sp-icon);
+  font-size: 11px;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-layout-settings .hu-control-help {
-	margin: 4px 0 6px;
-	color: var(--sp-muted);
-	font-size: 11.5px;
-	line-height: 1.45;
+  margin: 4px 0 6px;
+  color: var(--sp-muted);
+  font-size: 11.5px;
+  line-height: 1.45;
 }
 
-#helix-ultimate .hu-layout-settings input.hu-input:not([type='checkbox']):not([type='hidden']),
+#helix-ultimate .hu-layout-settings input.hu-input:not([type=checkbox]):not([type=hidden]),
 #helix-ultimate .hu-layout-settings select.hu-input,
 #helix-ultimate .hu-layout-settings textarea.hu-input {
-	width: 100%;
+  width: 100%;
 }
 
 /* On/off settings: label left, switch right, one line. */
 #helix-ultimate .hu-layout-settings .control-group-checkbox .checkbox,
 #helix-ultimate .hu-layout-settings .control-group-checkbox .control-label {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	margin: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 0;
 }
 
 #helix-ultimate .hu-layout-settings .control-group-checkbox .control-label {
-	color: var(--sp-text);
-	font-size: 12.5px;
+  color: var(--sp-text);
+  font-size: 12.5px;
 }
 
-#helix-ultimate .hu-layout-settings .control-group-checkbox .control-label input[type='checkbox'] {
-	margin: 0 0 0 auto;
+#helix-ultimate .hu-layout-settings .control-group-checkbox .control-label input[type=checkbox] {
+  margin: 0 0 0 auto;
 }
 
 /* Every field label in the step looks the same (some sit outside .control-label). */
 #helix-ultimate .hu-layout-settings label:not(.control-label):not(.form-check-label) {
-	display: block;
-	margin: 0 0 4px;
-	color: var(--sp-muted);
-	font-size: 11.5px;
-	font-weight: 500;
-	line-height: 16px;
+  display: block;
+  margin: 0 0 4px;
+  color: var(--sp-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 16px;
 }
 
 /* Selects match the filled inputs. */
 #helix-ultimate .hu-layout-settings select.hu-input {
-	height: 34px;
-	padding: 0 32px 0 10px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	background-color: var(--sp-input);
-	box-shadow: none;
-	font-size: 12.5px;
+  height: 34px;
+  padding: 0 32px 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  background-color: var(--sp-input);
+  box-shadow: none;
+  font-size: 12.5px;
 }
 
 #helix-ultimate .hu-layout-settings select.hu-input:hover {
-	border-color: var(--sp-divider);
+  border-color: var(--sp-divider);
 }
 
 /* Typography: an empty colour previews the colour the site uses now (muted, so it reads as a default). */
 #helix-ultimate .hu-field-webfont .clr-field:has(input:placeholder-shown) button {
-	background-image: none;
-	background-color: var(--hu-default-color, transparent);
-	opacity: 0.6;
+  background-image: none;
+  background-color: var(--hu-default-color, transparent);
+  opacity: 0.6;
 }
 
-#helix-ultimate .hu-field-webfont .clr-field:not([style*='--hu-default-color']):has(input:placeholder-shown) button {
-	background-image: repeating-conic-gradient(#e3e8f1 0% 25%, #fff 0% 50%);
-	background-size: 10px 10px;
-	opacity: 1;
+#helix-ultimate .hu-field-webfont .clr-field:not([style*="--hu-default-color"]):has(input:placeholder-shown) button {
+  background-image: repeating-conic-gradient(#e3e8f1 0% 25%, #fff 0% 50%);
+  background-size: 10px 10px;
+  opacity: 1;
 }
 
 /* Measured defaults read as placeholders, not values. */
 #helix-ultimate .hu-field-webfont input::placeholder {
-	color: var(--sp-muted);
-	opacity: 0.85;
+  color: var(--sp-muted);
+  opacity: 0.85;
 }
 
 /* "→ to use": accept the measured default in an empty, focused font field. */
 #helix-ultimate .hu-field-webfont .has-default-hint {
-	position: relative;
+  position: relative;
 }
 
 #helix-ultimate .hu-field-webfont .has-default-hint::after {
-	content: attr(data-hint);
-	position: absolute;
-	right: 6px;
-	bottom: 7px;
-	display: flex;
-	align-items: center;
-	height: 18px;
-	padding: 0 5px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 4px;
-	color: var(--sp-muted);
-	background: var(--sp-panel);
-	font-size: 10px;
-	font-weight: 600;
-	line-height: 1;
-	white-space: nowrap;
-	pointer-events: none;
+  content: attr(data-hint);
+  position: absolute;
+  right: 6px;
+  bottom: 7px;
+  display: flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 5px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 4px;
+  color: var(--sp-muted);
+  background: var(--sp-panel);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* Line height: no spinner arrows (↑/↓ still step the value). */
 #helix-ultimate .hu-field-webfont .hu-font-line-height-input {
-	-moz-appearance: textfield;
-	appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 #helix-ultimate .hu-field-webfont .hu-font-line-height-input::-webkit-inner-spin-button,
 #helix-ultimate .hu-field-webfont .hu-font-line-height-input::-webkit-outer-spin-button {
-	margin: 0;
-	-webkit-appearance: none;
+  margin: 0;
+  -webkit-appearance: none;
 }
 
 /* Unit fields: keep clear of the unit pill. */
 #helix-ultimate .hu-field-webfont .hu-unit-group.has-default-hint::after {
-	right: 38px;
+  right: 38px;
 }
 
 /* ------------------------------------------------------------------ */
 /* Typography v2: header card with an "Aa" sample, labels in the fields */
 /* ------------------------------------------------------------------ */
-
 /* The big preview text is replaced by the sample in the header. */
 #helix-ultimate .hu-typo-card .hu-webfont-preview-wrapper {
-	display: none !important;
+  display: none !important;
 }
 
 /* Header: [Aa] name / summary [chevron], as one bordered row. */
 #helix-ultimate .hu-typo-card > .hu-is-header {
-	display: grid;
-	grid-template-columns: 40px minmax(0, 1fr) auto;
-	grid-template-rows: auto auto;
-	align-items: center;
-	column-gap: 10px;
-	padding: 8px 8px 8px 6px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 10px;
-	background: var(--sp-panel);
-	transition: border-color 0.12s ease, background-color 0.12s ease;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 10px;
+  padding: 8px 8px 8px 6px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 10px;
+  background: var(--sp-panel);
+  transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
 #helix-ultimate .hu-typo-card > .hu-is-header:hover {
-	border-color: var(--sp-handle-interactive);
+  border-color: var(--sp-handle-interactive);
 }
 
 #helix-ultimate .hu-typo-card > .hu-is-header > .group-style-no-group,
 #helix-ultimate .hu-typo-card > .hu-is-header .control-group,
 #helix-ultimate .hu-typo-card > .hu-is-header .control-group-inner,
 #helix-ultimate .hu-typo-card > .hu-is-header .controls {
-	display: contents;
+  display: contents;
 }
 
-
-
 #helix-ultimate .hu-typo-card > .hu-is-header .control-label {
-	grid-row: 1;
-	grid-column: 2;
-	align-self: end;
-	margin: 0;
-	font-size: 13.5px;
-	font-weight: 600;
-	line-height: 1.25;
+  grid-row: 1;
+  grid-column: 2;
+  align-self: end;
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 #helix-ultimate .hu-typography-wrapper.hu-typo-card:not(.is-collapsed) .hu-typo-summary,
 #helix-ultimate .hu-typo-card .hu-typo-summary {
-	display: block !important;
-	grid-row: 2;
-	grid-column: 2;
-	align-self: start;
-	margin: 1px 0 0;
-	color: var(--sp-chip-text);
-	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
-	font-size: 11px;
+  display: block !important;
+  grid-row: 2;
+  grid-column: 2;
+  align-self: start;
+  margin: 1px 0 0;
+  color: var(--sp-chip-text);
+  font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 11px;
 }
 
 #helix-ultimate .hu-typo-card .hu-typo-summary:empty {
-	display: none !important;
+  display: none !important;
 }
 
 #helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-hint {
-	display: none !important;
+  display: none !important;
 }
 
 #helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-collapse {
-	grid-row: 1 / 3;
-	grid-column: 3;
-	margin: 0;
+  grid-row: 1/3;
+  grid-column: 3;
+  margin: 0;
 }
 
 #helix-ultimate .hu-typo-card.is-collapsed {
-	padding-bottom: 8px;
+  padding-bottom: 8px;
 }
 
 /* Fields: one grid, two columns. */
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont.hu-typo-fields {
-	gap: 8px;
-	padding: 10px 0 0;
+  gap: 8px;
+  padding: 10px 0 0;
 }
 
 /* Order of the controls (beats the older column-order rules). */
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .hu-typo-family { order: 1 !important; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > .hu-typo-subset { order: 2 !important; grid-column: 1 / -1; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-weight) { order: 3 !important; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-size) { order: 4 !important; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-line) { order: 5 !important; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-spacing) { order: 6 !important; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-align) { order: 7 !important; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-decoration) { order: 8 !important; }
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-color) { order: 9 !important; grid-column: 1 / -1; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .hu-typo-family {
+  order: 1 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > .hu-typo-subset {
+  order: 2 !important;
+  grid-column: 1/-1;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-weight) {
+  order: 3 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-size) {
+  order: 4 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-line) {
+  order: 5 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-spacing) {
+  order: 6 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-align) {
+  order: 7 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-decoration) {
+  order: 8 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-color) {
+  order: 9 !important;
+  grid-column: 1/-1;
+}
 
 /* Rows: label beside the control. */
 #helix-ultimate .hu-typo-fields .hu-typo-row {
-	display: grid;
-	grid-template-columns: 56px minmax(0, 1fr);
-	align-items: center;
-	gap: 8px;
-	margin: 0 !important;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-row > label {
-	margin: 0 !important;
-	color: var(--sp-muted);
-	font-size: 12px;
-	font-weight: 500;
-	line-height: 1.2;
+  margin: 0 !important;
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-family > .hu-font-picker {
-	grid-column: 2;
+  grid-column: 2;
 }
 
 /* Pairs: the label sits inside the control, the value is right-aligned. */
 #helix-ultimate .hu-typo-fields .hu-typo-inline {
-	position: relative;
-	display: grid;
+  position: relative;
+  display: grid;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-inline > label {
-	z-index: 2;
-	display: flex;
-	grid-area: 1 / 1;
-	align-items: center;
-	align-self: center;
-	justify-self: start;
-	gap: 4px;
-	max-width: 62%;
-	margin: 0 !important;
-	padding-left: 10px;
-	overflow: hidden;
-	color: var(--sp-muted);
-	font-size: 12px;
-	font-weight: 500;
-	line-height: 1.2;
-	white-space: nowrap;
-	pointer-events: none;
+  z-index: 2;
+  display: flex;
+  grid-area: 1/1;
+  align-items: center;
+  align-self: center;
+  justify-self: start;
+  gap: 4px;
+  max-width: 62%;
+  margin: 0 !important;
+  padding-left: 10px;
+  overflow: hidden;
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-inline > :not(label) {
-	grid-area: 1 / 1;
+  grid-area: 1/1;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-inline select,
 #helix-ultimate .hu-typo-fields .hu-typo-inline input.hu-unit-field-input,
 #helix-ultimate .hu-typo-fields .hu-typo-inline .hu-font-line-height-input {
-	text-align: right;
-	text-align-last: right;
+  text-align: right;
+  text-align-last: right;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-weight select {
-	padding-left: 64px !important;
-	padding-right: 26px !important;
+  padding-left: 64px !important;
+  padding-right: 26px !important;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-inline .hu-font-line-height-input {
-	padding: 0 10px 0 74px;
+  padding: 0 10px 0 74px;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-inline .hu-unit-group input.hu-unit-field-input {
-	padding-left: 56px;
-	padding-right: 34px;
+  padding-left: 56px;
+  padding-right: 34px;
 }
 
 /* In the pairs the "→" chip takes the label's place while the field is focused. */
 #helix-ultimate .hu-typo-fields .hu-typo-inline:has(.has-default-hint) > label {
-	visibility: hidden;
+  visibility: hidden;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-inline .has-default-hint::after {
-	right: auto;
-	left: 8px;
+  right: auto;
+  left: 8px;
 }
 
 /* Alignment and decoration: icon groups side by side, labels for screen readers only. */
 #helix-ultimate .hu-typo-fields .hu-typo-toggles > label {
-	position: absolute !important;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-	clip: rect(0 0 0 0);
-	white-space: nowrap;
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-toggles .hu-action-group {
-	height: 34px;
-	align-items: center;
+  height: 34px;
+  align-items: center;
 }
 
 #helix-ultimate .hu-typo-fields .hu-typo-toggles .hu-switcher-action {
-	height: 28px;
+  height: 28px;
 }
 
 /* An unset weight shows the site's weight in the placeholder colour. */
-#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-weight select:has(option[value='']:checked) {
-	color: var(--sp-muted);
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-weight select:has(option[value=""]:checked) {
+  color: var(--sp-muted);
 }
 
 /* Weight: numeric dropdown (the native select stays hidden in the form). */
 #helix-ultimate .hu-typography-wrapper .hu-field-webfont select.hu-weight-native {
-	display: none !important;
+  display: none !important;
 }
 
 #helix-ultimate .hu-typo-fields .hu-weight-toggle {
-	grid-area: 1 / 1;
-	width: 100%;
-	height: 32px;
-	padding: 0 10px 0 64px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background: var(--sp-input);
-	font-size: 12.5px;
-	font-variant-numeric: tabular-nums;
-	text-align: right;
-	cursor: pointer;
+  grid-area: 1/1;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px 0 64px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  color: var(--sp-text);
+  background: var(--sp-input);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-typo-fields .hu-weight-toggle:hover {
-	border-color: var(--sp-divider);
+  border-color: var(--sp-divider);
 }
 
-#helix-ultimate .hu-typo-fields .hu-weight-toggle[aria-expanded='true'],
+#helix-ultimate .hu-typo-fields .hu-weight-toggle[aria-expanded=true],
 #helix-ultimate .hu-typo-fields .hu-weight-toggle:focus-visible {
-	outline: 2px solid var(--sp-blue);
-	outline-offset: 2px;
-	background: var(--sp-panel);
+  outline: 2px solid var(--sp-blue);
+  outline-offset: 2px;
+  background: var(--sp-panel);
 }
 
 /* Not set: the site's weight, in the placeholder colour. */
 #helix-ultimate .hu-typo-fields .hu-weight-toggle.is-default {
-	color: var(--sp-muted);
+  color: var(--sp-muted);
 }
 
 .hu-unit-menu.hu-weight-menu {
-	min-width: 112px;
-	max-height: min(320px, calc(100vh - 16px));
-	overflow-y: auto;
-	font-variant-numeric: tabular-nums;
-	text-align: right;
+  min-width: 112px;
+  max-height: min(320px, 100vh - 16px);
+  overflow-y: auto;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .hu-unit-menu.hu-weight-menu .is-default-option {
-	margin-bottom: 4px;
-	border-bottom: 1px solid var(--sp-divider, #e3e8f1);
-	border-radius: 6px 6px 0 0;
-	color: var(--sp-muted, #6b7280);
-	font-weight: 500;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--sp-divider, #e3e8f1);
+  border-radius: 6px 6px 0 0;
+  color: var(--sp-muted, #6b7280);
+  font-weight: 500;
 }
 
 /* Font row: label | font picker | subset dropdown (no label of its own). */
 /* Label on top; the font picker and the subset share the full width below. */
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family {
-	grid-template-columns: minmax(0, 1fr) minmax(84px, 32%);
-	row-gap: 4px;
+  grid-template-columns: minmax(0, 1fr) minmax(84px, 32%);
+  row-gap: 4px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > label {
-	grid-column: 1 / -1;
-	font-size: 11.5px;
-	line-height: 16px;
+  grid-column: 1/-1;
+  font-size: 11.5px;
+  line-height: 16px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > .hu-font-picker {
-	grid-column: 1;
+  grid-column: 1;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > select.hu-typo-subset-select {
-	grid-column: 2;
-	width: 100%;
-	min-width: 0;
-	height: 32px;
-	padding: 0 22px 0 8px !important;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	background-color: var(--sp-input);
-	background-position: right 6px center;
-	font-size: 12px;
+  grid-column: 2;
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  padding: 0 22px 0 8px !important;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  background-color: var(--sp-input);
+  background-position: right 6px center;
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > select.hu-typo-subset-select:hover {
-	border-color: var(--sp-divider);
+  border-color: var(--sp-divider);
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-subset-moved {
-	display: none !important;
+  display: none !important;
 }
 
 /* Colour: label on top, the colour field full width below (like Font). */
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-color {
-	grid-template-columns: minmax(0, 1fr);
-	row-gap: 4px;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 4px;
 }
 
 #helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-color > label {
-	font-size: 11.5px;
-	line-height: 16px;
+  font-size: 11.5px;
+  line-height: 16px;
 }
 
 /* Font cards carry their own border, so no divider between sections. */
 #helix-ultimate .hu-typography-wrapper.hu-typo-card {
-	padding-top: 4px;
-	padding-bottom: 4px;
-	border-bottom: 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom: 0;
 }
 
 /* Every field (text, number, select, textarea, and the buttons that act as fields)
    rests without a shadow and shows focus as its own 1px border turning blue. */
-#helix-ultimate :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"]), select, textarea, .hu-font-picker__toggle, .hu-weight-toggle),
+#helix-ultimate :is(input:not([type=checkbox], [type=radio], [type=range], [type=button], [type=submit]), select, textarea, .hu-font-picker__toggle, .hu-weight-toggle),
 .hu-font-picker input.hu-font-picker__search {
-	box-shadow: none !important;
+  box-shadow: none !important;
 }
 
-#helix-ultimate :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"]), select, textarea, .hu-font-picker__toggle, .hu-weight-toggle):is(:focus, :focus-visible),
+#helix-ultimate :is(input:not([type=checkbox], [type=radio], [type=range], [type=button], [type=submit]), select, textarea, .hu-font-picker__toggle, .hu-weight-toggle):is(:focus, :focus-visible),
 .hu-font-picker input.hu-font-picker__search:is(:focus, :focus-visible) {
-	outline: none !important;
-	border-color: var(--sp-blue) !important;
+  outline: none !important;
+  border-color: var(--sp-blue) !important;
 }
 
 /* Number + unit: the same 1px blue border on the whole pill, not on the input inside it. */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:focus-within {
-	border-color: var(--sp-blue);
-	outline: none;
+  border-color: var(--sp-blue);
+  outline: none;
 }
 
 #helix-ultimate .hu-unit-group input:focus-visible {
-	border-color: transparent !important;
+  border-color: transparent !important;
 }
-
 
 /* Header: no "Aa" column; the name is the font sample. */
 #helix-ultimate .hu-typo-card > .hu-is-header {
-	grid-template-columns: minmax(0, 1fr) auto;
-	padding: 8px 8px 8px 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 8px 8px 8px 12px;
 }
 
 #helix-ultimate .hu-typo-card > .hu-is-header .control-label.hu-typo-sample {
-	grid-column: 1;
-	overflow: hidden;
-	font-size: 15px;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  grid-column: 1;
+  overflow: hidden;
+  font-size: 15px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 #helix-ultimate .hu-typography-wrapper.hu-typo-card:not(.is-collapsed) .hu-typo-summary,
 #helix-ultimate .hu-typo-card .hu-typo-summary {
-	grid-column: 1;
+  grid-column: 1;
 }
 
 #helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-collapse {
-	grid-column: 2;
+  grid-column: 2;
 }
 
 /* ------------------------------------------------------------------ */
 /* Blog panel                                                          */
 /* ------------------------------------------------------------------ */
-
 /* Spacing, not divider lines, between the fields. */
 #helix-ultimate .blog-panel .hu-field-list .hu-field-separator {
-	margin-bottom: 4px;
-	padding-bottom: 12px;
-	border-bottom: 0;
+  margin-bottom: 4px;
+  padding-bottom: 12px;
+  border-bottom: 0;
 }
 
 /* Switches end on the same edge as the fields. */
 #helix-ultimate .hu-style-switcher .form-check-inline {
-	margin-right: 0;
+  margin-right: 0;
 }
 
 #helix-ultimate .hu-style-switcher .controls {
-	flex: 0 0 auto;
+  flex: 0 0 auto;
 }
 
 /* Image sizes: one row each, [☐ Name] [W × H]. */
 #helix-ultimate .blog-panel .hu-group-blog_images .hu-subgroup {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) 112px;
-	align-items: center;
-	column-gap: 8px;
-	margin: 0 0 6px;
-	padding: 0;
-	border: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  align-items: center;
+  column-gap: 8px;
+  margin: 0 0 6px;
+  padding: 0;
+  border: 0;
 }
 
-#helix-ultimate .hu-group-blog_images .hu-subgroup > [class*="col-"] {
-	width: auto;
-	max-width: none;
-	padding: 0;
+#helix-ultimate .hu-group-blog_images .hu-subgroup > [class*=col-] {
+  width: auto;
+  max-width: none;
+  padding: 0;
 }
 
 #helix-ultimate .hu-group-blog_images .hu-subgroup .control-group,
 #helix-ultimate .hu-group-blog_images .hu-subgroup .control-group-inner {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-group-blog_images .hu-style-checkbox .control-label {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin: 0;
-	color: var(--sp-text);
-	font-size: 13px;
-	font-weight: 500;
-	cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-group-blog_images .hu-style-checkbox .controls,
 #helix-ultimate .hu-group-blog_images .hu-style-checkbox .form-check {
-	display: flex;
-	align-items: center;
-	min-height: 0;
-	margin: 0;
-	padding: 0;
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-group-blog_images .hu-style-checkbox .form-check-input {
-	flex: 0 0 auto;
-	margin: 0;
-	vertical-align: middle;
+  flex: 0 0 auto;
+  margin: 0;
+  vertical-align: middle;
 }
 
 #helix-ultimate .hu-dimension {
-	display: flex;
-	align-items: center;
-	height: 32px;
-	padding: 0 8px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	background: var(--sp-input);
-	transition: border-color 0.12s ease, opacity 0.12s ease;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  background: var(--sp-input);
+  transition: border-color 0.12s ease, opacity 0.12s ease;
 }
 
 #helix-ultimate .hu-dimension:hover {
-	border-color: var(--sp-divider);
+  border-color: var(--sp-divider);
 }
 
 #helix-ultimate .hu-dimension:focus-within {
-	border-color: var(--sp-blue);
+  border-color: var(--sp-blue);
 }
 
 #helix-ultimate .hu-edit-panel .hu-dimension input.form-control {
-	flex: 1 1 0;
-	width: 0;
-	min-width: 0;
-	min-height: 0;
-	height: 30px;
-	padding: 0;
-	border: 0 !important;
-	background: transparent !important;
-	font-variant-numeric: tabular-nums;
-	text-align: center;
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  min-height: 0;
+  height: 30px;
+  padding: 0;
+  border: 0 !important;
+  background: transparent !important;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 #helix-ultimate .hu-edit-panel .hu-dimension input.form-control:hover {
-	padding: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-dimension .hu-dimension-x {
-	flex: 0 0 auto;
-	color: var(--sp-muted);
-	font-size: 12px;
+  flex: 0 0 auto;
+  color: var(--sp-muted);
+  font-size: 12px;
 }
 
 /* A size that is off: its numbers are read-only and faded. */
 #helix-ultimate .hu-group-blog_images .uneditable {
-	opacity: 1;
+  opacity: 1;
 }
 
 #helix-ultimate .hu-group-blog_images .uneditable .hu-dimension {
-	opacity: 0.45;
+  opacity: 0.45;
 }
 
 #helix-ultimate .hu-group-blog_images .uneditable .hu-dimension:focus-within {
-	border-color: transparent;
+  border-color: transparent;
 }
 
 /* Crop quality sits under the sizes. */
-#helix-ultimate .hu-group-blog_images .hu-subgroup + [class*="group-style"] {
-	margin-top: 12px;
+#helix-ultimate .hu-group-blog_images .hu-subgroup + [class*=group-style] {
+  margin-top: 12px;
 }
 
 /* Image size pickers: four equal tiles that fit the panel. */
 #helix-ultimate .hu-switcher-style-simple .hu-action-group {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 4px;
-	margin-top: 4px;
-	padding: 0;
-	border-radius: 0;
-	background: transparent;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 4px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 #helix-ultimate .hu-switcher.hu-switcher-style-simple .hu-switcher-action,
 #helix-ultimate .hu-switcher.hu-switcher-style-simple .hu-switcher-action.active {
-	padding: 0;
-	border-radius: 0;
-	background: transparent;
-	box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
-	min-width: 0;
-	cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action-content {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 44px;
-	padding: 4px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	background: var(--sp-input);
-	box-shadow: none;
-	transition: border-color 0.12s ease, background-color 0.12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  background: var(--sp-input);
+  box-shadow: none;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
 /* The icons have no viewBox: keep their own sizes (they show the size). */
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action svg {
-	display: block;
-	flex: 0 0 auto;
+  display: block;
+  flex: 0 0 auto;
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action-content {
-	color: var(--sp-handle-interactive);
+  color: var(--sp-handle-interactive);
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action.active .hu-switcher-action-content {
-	color: var(--sp-blue);
+  color: var(--sp-blue);
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action:hover .hu-switcher-action-content {
-	border-color: var(--sp-divider);
-	box-shadow: none;
+  border-color: var(--sp-divider);
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action.active .hu-switcher-action-content {
-	border-color: var(--sp-blue);
-	background: var(--sp-chip);
-	box-shadow: none;
+  border-color: var(--sp-blue);
+  background: var(--sp-chip);
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-label {
-	overflow: hidden;
-	max-width: 100%;
-	margin: 0;
-	color: var(--sp-muted);
-	font-size: 11px;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0;
+  color: var(--sp-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 #helix-ultimate .hu-switcher-style-simple .hu-switcher-action.active .hu-switcher-label {
-	color: var(--sp-chip-text);
-	font-weight: 600;
+  color: var(--sp-chip-text);
+  font-weight: 600;
 }
 
 /* Multi-select (Choices): a filled field with pastel chips. */
 #helix-ultimate .hu-edit-panel .choices {
-	margin: 0;
+  margin: 0;
 }
 
-#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__inner {
-	min-height: 36px;
-	padding: 4px 32px 4px 4px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	background: var(--sp-input) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat calc(100% - 12px) 50% / 12px 9px;
-	font-size: 12px;
+#helix-ultimate .hu-edit-panel .choices[data-type*=select-multiple] .choices__inner {
+  min-height: 36px;
+  padding: 4px 32px 4px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  background: var(--sp-input) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat calc(100% - 12px) 50%/12px 9px;
+  font-size: 12px;
 }
 
-#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"]:hover .choices__inner {
-	border-color: var(--sp-divider);
+#helix-ultimate .hu-edit-panel .choices[data-type*=select-multiple]:hover .choices__inner {
+  border-color: var(--sp-divider);
 }
 
-#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"].is-focused .choices__inner,
-#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"].is-open .choices__inner {
-	border-color: var(--sp-blue);
+#helix-ultimate .hu-edit-panel .choices[data-type*=select-multiple].is-focused .choices__inner,
+#helix-ultimate .hu-edit-panel .choices[data-type*=select-multiple].is-open .choices__inner {
+  border-color: var(--sp-blue);
 }
 
-#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__inner {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 4px;
+#helix-ultimate .hu-edit-panel .choices[data-type*=select-multiple] .choices__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
 }
 
 #helix-ultimate .hu-edit-panel .choices__list--multiple {
-	display: contents;
+  display: contents;
 }
 
 #helix-ultimate .hu-edit-panel .choices__list--multiple .choices__item {
-	display: inline-flex;
-	align-items: center;
-	width: auto;
-	margin: 0;
-	padding: 3px 4px 3px 8px;
-	border: 0;
-	border-radius: 6px;
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	font-size: 12px;
-	font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  margin: 0;
+  padding: 3px 4px 3px 8px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
+  font-size: 12px;
+  font-weight: 500;
 }
 
-#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__button {
-	width: 16px;
-	height: 16px;
-	margin: 0 0 0 4px;
-	padding: 0;
-	border: 0;
-	border-radius: 4px;
-	background: currentColor;
-	opacity: 0.55;
-	-webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-width='1.6' d='M5 5l6 6M11 5l-6 6'/%3e%3c/svg%3e") center / 12px no-repeat;
-	mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-width='1.6' d='M5 5l6 6M11 5l-6 6'/%3e%3c/svg%3e") center / 12px no-repeat;
+#helix-ultimate .hu-edit-panel .choices[data-type*=select-multiple] .choices__button {
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: currentColor;
+  opacity: 0.55;
+  -webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-width='1.6' d='M5 5l6 6M11 5l-6 6'/%3e%3c/svg%3e") center/12px no-repeat;
+  mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-width='1.6' d='M5 5l6 6M11 5l-6 6'/%3e%3c/svg%3e") center/12px no-repeat;
 }
 
-#helix-ultimate .hu-edit-panel .choices[data-type*="select-multiple"] .choices__button:hover {
-	opacity: 1;
+#helix-ultimate .hu-edit-panel .choices[data-type*=select-multiple] .choices__button:hover {
+  opacity: 1;
 }
 
 #helix-ultimate .hu-edit-panel .choices__input--cloned {
-	flex: 1 0 4ch;
-	width: auto !important;
-	min-width: 4ch;
-	min-height: 0;
-	margin: 0;
-	padding: 3px 4px;
-	border: 0;
-	background: transparent;
-	font-size: 12px;
+  flex: 1 0 4ch;
+  width: auto !important;
+  min-width: 4ch;
+  min-height: 0;
+  margin: 0;
+  padding: 3px 4px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-edit-panel .choices__list--dropdown {
-	margin-top: 4px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 8px;
-	background: var(--sp-panel);
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
-	font-size: 12px;
+  margin-top: 4px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 8px;
+  background: var(--sp-panel);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-edit-panel .choices__list--dropdown .choices__item--selectable.is-highlighted {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
 /* Checkboxes: no resting shadow, and the same focus as the fields: their own border turns blue (keyboard only). */
-#helix-ultimate input[type="checkbox"]:not(.hu-style-switcher input),
-#helix-ultimate input[type="checkbox"]:not(.hu-style-switcher input):focus {
-	box-shadow: none !important;
+#helix-ultimate input[type=checkbox]:not(.hu-style-switcher input),
+#helix-ultimate input[type=checkbox]:not(.hu-style-switcher input):focus {
+  box-shadow: none !important;
 }
 
-#helix-ultimate input[type="checkbox"]:not(.hu-style-switcher input):focus-visible {
-	outline: none !important;
-	border-color: var(--sp-blue) !important;
-	box-shadow: none !important;
+#helix-ultimate input[type=checkbox]:not(.hu-style-switcher input):focus-visible {
+  outline: none !important;
+  border-color: var(--sp-blue) !important;
+  box-shadow: none !important;
 }
 
 /* Import & Export: full-width buttons, one after the other; Import is the light one. */
 #helix-ultimate .hu-importer-wrapper {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 #helix-ultimate .hu-importer-wrapper .hu-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	width: 100%;
-	height: 36px;
-	margin: 0;
-	padding: 0 14px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	box-shadow: none;
-	font-size: 13px;
-	font-weight: 600;
-	white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--sp-radius);
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 #helix-ultimate .hu-importer-wrapper #btn-hu-import-settings {
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
 }
 
 #helix-ultimate .hu-importer-wrapper #btn-hu-import-settings:hover {
-	color: var(--sp-chip-text);
-	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
+  color: var(--sp-chip-text);
+  background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
 }
 
 /* "Inline" fields (logo/header heights, offsets, widths): label on top, field full width below. */
 #helix-ultimate .hu-edit-panel .control-group-inner.hu-inline-group {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-	gap: 6px;
-	margin-bottom: 0;
-	text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin-bottom: 0;
+  text-align: left;
 }
 
 #helix-ultimate .hu-edit-panel .hu-inline-group .control-label {
-	margin: 0 !important;
+  margin: 0 !important;
 }
 
 #helix-ultimate .hu-edit-panel .hu-inline-group .controls {
-	width: 100%;
-	margin-left: 0;
+  width: 100%;
+  margin-left: 0;
 }
 
 /* No pill for px, so no room kept for it. */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-default-unit:not(.is-menu-open) input.hu-unit-field-input {
-	padding-right: 12px;
+  padding-right: 12px;
 }
-
 
 /* One focus style for every button-like control: the same 1px ring, no gap, no glow.
    Field-like buttons (font picker, weight) use the field's blue border instead. */
-:is(#helix-ultimate, .hu-modal, .hu-options-modal) :is(a, button, [tabindex], [role="button"], .hu-fieldset-header, .hu-group-header-box):not(.hu-font-picker__toggle, .hu-weight-toggle, .hu-col-resizer, input, select, textarea):focus-visible {
-	outline: 1px solid var(--sp-blue) !important;
-	outline-offset: 0 !important;
-	box-shadow: none !important;
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) :is(a, button, [tabindex], [role=button], .hu-fieldset-header, .hu-group-header-box):not(.hu-font-picker__toggle, .hu-weight-toggle, .hu-col-resizer, input, select, textarea):focus-visible {
+  outline: 1px solid var(--sp-blue) !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Number + unit: only the group draws the border (hover, focus); the input inside sits flush with none. */
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input,
 :is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input:is(:hover, :focus, :focus-visible) {
-	margin: 0 !important;
-	border-color: transparent !important;
-	background-color: transparent !important;
+  margin: 0 !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Tab switcher (logo Image / Text): full width, equal halves, flush with the fields below. */
 #helix-ultimate .hu-switcher-style-tab,
 #helix-ultimate .hu-switcher-style-tab.hu-align-center {
-	text-align: left;
+  text-align: left;
 }
 
 #helix-ultimate .hu-switcher-style-tab .hu-action-group,
 #helix-ultimate .hu-switcher-style-tab.hu-align-center .hu-action-group {
-	display: grid;
-	grid-auto-columns: minmax(0, 1fr);
-	grid-auto-flow: column;
-	gap: 2px;
-	width: 100%;
-	margin: 0;
-	padding: 3px;
-	border: 0;
-	border-radius: calc(var(--sp-radius) + 2px);
-	background: var(--sp-input);
-	box-shadow: none;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 2px;
+  width: 100%;
+  margin: 0;
+  padding: 3px;
+  border: 0;
+  border-radius: calc(var(--sp-radius) + 2px);
+  background: var(--sp-input);
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-switcher-style-tab .hu-switcher-action {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 30px;
-	margin: 0;
-	padding: 0 12px;
-	border-radius: var(--sp-radius);
-	cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  margin: 0;
+  padding: 0 12px;
+  border-radius: var(--sp-radius);
+  cursor: pointer;
 }
 
 #helix-ultimate .hu-switcher-style-tab .hu-switcher-action-content:empty {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-switcher-style-tab .hu-switcher-label {
-	margin: 0;
-	color: inherit;
-	font-size: 13px;
-	line-height: 1;
+  margin: 0;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
 }
 
 #helix-ultimate .hu-switcher-style-tab .hu-switcher-action.active {
-	font-weight: 600;
+  font-weight: 600;
 }
 
 /* The tab switcher heads its group: a little space before the fields it controls. */
-#helix-ultimate .hu-field-list > [class*="group-style"]:first-child:has(.hu-switcher-style-tab) {
-	margin-bottom: 4px;
-	padding-top: 4px;
+#helix-ultimate .hu-field-list > [class*=group-style]:first-child:has(.hu-switcher-style-tab) {
+  margin-bottom: 4px;
+  padding-top: 4px;
 }
 
-#helix-ultimate .hu-field-list > [class*="group-style"]:has(.hu-switcher-style-tab) .control-group {
-	margin-bottom: 12px;
+#helix-ultimate .hu-field-list > [class*=group-style]:has(.hu-switcher-style-tab) .control-group {
+  margin-bottom: 12px;
 }
-
 
 /* Presets: a calmer mini site. Header with the logo dot, then one accent-tinted
    block with a heading bar and a button. No topbar, menu, subtitle or text lines. */
 #helix-ultimate .hu-preset-mock {
-	height: 60px;
-	gap: 0;
-	box-shadow: none;
+  height: 60px;
+  gap: 0;
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-preset-mock :is(.hu-preset-mock__topbar, .hu-preset-mock__menu, .hu-preset-mock__body),
 #helix-ultimate .hu-preset-mock__hero i:nth-child(2) {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-preset-mock__header {
-	flex: 0 0 18px;
-	padding: 0 8px;
+  flex: 0 0 18px;
+  padding: 0 8px;
 }
 
 #helix-ultimate .hu-preset-mock__logo {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 #helix-ultimate .hu-preset-mock__hero {
-	flex: 1 1 auto;
-	gap: 6px;
-	margin: 0 6px 6px;
-	padding: 0 8px;
-	background: color-mix(in srgb, var(--p-accent) 10%, var(--p-bg));
+  flex: 1 1 auto;
+  gap: 6px;
+  margin: 0 6px 6px;
+  padding: 0 8px;
+  background: color-mix(in srgb, var(--p-accent) 10%, var(--p-bg));
 }
 
 #helix-ultimate .hu-preset-mock__hero i:first-child {
-	width: 55%;
-	height: 4px;
-	opacity: 0.9;
+  width: 55%;
+  height: 4px;
+  opacity: 0.9;
 }
 
 #helix-ultimate .hu-preset-mock__button {
-	width: 20px;
-	height: 7px;
-	margin-top: 0;
+  width: 20px;
+  height: 7px;
+  margin-top: 0;
 }
 
 /* Preset tile spacing: an even 8px frame; the logo dot, the hero's contents
    and the name share one left edge. */
 #helix-ultimate .hu-presets .hu-preset {
-	padding: 8px;
+  padding: 8px;
 }
 
 #helix-ultimate .hu-preset-mock {
-	height: auto;
-	border-radius: 6px;
+  height: auto;
+  border-radius: 6px;
 }
 
 #helix-ultimate .hu-preset-mock__header {
-	flex: 0 0 auto;
-	height: 8px;
-	margin-bottom: 6px;
-	padding: 0 10px;
+  flex: 0 0 auto;
+  height: 8px;
+  margin-bottom: 6px;
+  padding: 0 10px;
 }
 
 #helix-ultimate .hu-preset-mock__hero {
-	flex: 0 0 auto;
-	height: 40px;
-	gap: 6px;
-	margin: 0;
-	padding: 0 10px;
-	border-radius: 6px;
+  flex: 0 0 auto;
+  height: 40px;
+  gap: 6px;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: 6px;
 }
 
 #helix-ultimate .hu-presets .hu-preset .hu-preset-title,
 #helix-ultimate .hu-presets .hu-preset.active .hu-preset-title {
-	padding: 8px 0 0 2px;
+  padding: 8px 0 0 2px;
 }
 
 /* Mega menu settings: same fields as the rest of the panel, one per row. */
 #helix-ultimate .hu-megamenu-sidebar {
-	display: flex;
-	flex-direction: column;
-	gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 #helix-ultimate .hu-megamenu-sidebar :is(.hu-megamenu-settings, .hu-megamenu-alignment, .hu-menuitem-dropdown-position) {
-	width: 100%;
+  width: 100%;
 }
 
 #helix-ultimate .hu-megamenu-sidebar .hu-megamenu-settings:empty {
-	display: none;
+  display: none;
 }
 
 #helix-ultimate .hu-megamenu-sidebar .control-group {
-	width: 100%;
-	margin: 0;
+  width: 100%;
+  margin: 0;
 }
 
 #helix-ultimate .hu-megamenu-sidebar .control-group > label,
 #helix-ultimate .hu-megamenu-sidebar .control-group .control-label {
-	display: block;
-	margin: 0 0 6px;
-	color: var(--sp-muted);
-	font-size: 13px;
-	font-weight: 500;
+  display: block;
+  margin: 0 0 6px;
+  color: var(--sp-muted);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 /* Switch rows: label left, switch on the right edge. */
 #helix-ultimate .hu-megamenu-sidebar .hu-style-switcher .checkbox,
 #helix-ultimate .hu-megamenu-sidebar .hu-style-switcher .control-label {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
 }
 
 #helix-ultimate .hu-megamenu-sidebar .hu-style-switcher .checkbox::before,
 #helix-ultimate .hu-megamenu-sidebar .hu-style-switcher .checkbox::after {
-	content: none;
+  content: none;
 }
 
-#helix-ultimate .hu-megamenu-sidebar :is(select.hu-input, input.hu-input[type="text"]) {
-	width: 100%;
-	height: 36px;
-	min-height: 36px;
-	padding: 0 12px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background-color: var(--sp-input);
-	box-shadow: none;
-	font-family: var(--sp-font);
-	font-size: 12px;
+#helix-ultimate .hu-megamenu-sidebar :is(select.hu-input, input.hu-input[type=text]) {
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius);
+  color: var(--sp-text);
+  background-color: var(--sp-input);
+  box-shadow: none;
+  font-family: var(--sp-font);
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-megamenu-sidebar select.hu-input {
-	padding-right: 36px;
-	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-	background-repeat: no-repeat;
-	background-position: calc(100% - 12px) 50%;
-	background-size: 12px 9px;
-	appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 12px) 50%;
+  background-size: 12px 9px;
+  appearance: none;
 }
 
-#helix-ultimate .hu-megamenu-sidebar :is(select.hu-input, input.hu-input[type="text"]):hover {
-	border-color: var(--sp-divider);
+#helix-ultimate .hu-megamenu-sidebar :is(select.hu-input, input.hu-input[type=text]):hover {
+  border-color: var(--sp-divider);
 }
 
-#helix-ultimate .hu-megamenu-sidebar :is(select.hu-input, input.hu-input[type="text"]):focus {
-	border-color: var(--sp-blue);
-	background-color: var(--sp-panel);
-	outline: none;
+#helix-ultimate .hu-megamenu-sidebar :is(select.hu-input, input.hu-input[type=text]):focus {
+  border-color: var(--sp-blue);
+  background-color: var(--sp-panel);
+  outline: none;
 }
 
 /* Colour fields: the swatch sits inside the filled field. */
 #helix-ultimate .hu-megamenu-sidebar .clr-field {
-	display: block;
-	width: 100%;
+  display: block;
+  width: 100%;
 }
 
 #helix-ultimate .hu-megamenu-sidebar .clr-field input.hu-input {
-	padding-left: 40px;
+  padding-left: 40px;
 }
 
 #helix-ultimate .hu-megamenu-sidebar .clr-field button {
-	right: auto;
-	left: 6px;
-	width: 24px;
-	height: 24px;
-	border-radius: 6px;
-	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.12);
+  right: auto;
+  left: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.12);
 }
 
 /* No colour set: show an empty swatch, not a dark one. */
 #helix-ultimate .hu-megamenu-sidebar .clr-field:has(input:placeholder-shown) button {
-	color: transparent !important;
-	background:
-		linear-gradient(135deg, transparent calc(50% - 1px), var(--sp-danger, #dc2626) calc(50% - 1px), var(--sp-danger, #dc2626) calc(50% + 1px), transparent calc(50% + 1px)),
-		var(--sp-panel);
+  color: transparent !important;
+  background: linear-gradient(135deg, transparent calc(50% - 1px), var(--sp-danger, #dc2626) calc(50% - 1px), var(--sp-danger, #dc2626) calc(50% + 1px), transparent calc(50% + 1px)), var(--sp-panel);
 }
 
 #helix-ultimate .hu-megamenu-sidebar .clr-field:has(input:placeholder-shown) button::after {
-	content: none;
+  content: none;
 }
 
 /* Badge fields follow the others without a divider. */
 #helix-ultimate .hu-megamenu-sidebar .hu-megamenu-badge {
-	display: flex;
-	flex-direction: column;
-	gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-#helix-ultimate .hu-megamenu-sidebar .control-group :is(select.hu-input, input.hu-input[type="text"]) {
-	width: 100% !important;
-	max-width: none !important;
+#helix-ultimate .hu-megamenu-sidebar .control-group :is(select.hu-input, input.hu-input[type=text]) {
+  width: 100% !important;
+  max-width: none !important;
 }
 
 #helix-ultimate .hu-megamenu-sidebar .hu-style-switcher .control-label {
-	flex: 1 1 auto;
-	width: 100%;
-	color: var(--sp-text);
+  flex: 1 1 auto;
+  width: 100%;
+  color: var(--sp-text);
 }
 
 #helix-ultimate .hu-megamenu-sidebar .hu-megamenu-settings .control-group {
-	display: block;
+  display: block;
 }
 
 /* Add New Row: the light pastel button, not a solid primary one. */
 #helix-ultimate .hu-megamenu-add-row .hu-btn,
 #helix-ultimate .hu-megamenu-add-row .hu-btn.hu-btn-primary {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	height: 32px;
-	padding: 0 14px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	box-shadow: none;
-	font-size: 13px;
-	font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--sp-radius);
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-megamenu-add-row .hu-btn:hover {
-	color: var(--sp-chip-text);
-	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
+  color: var(--sp-chip-text);
+  background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
 }
 
 /* ------------------------------------------------------------------ */
 /* Mega menu grid: the Layout panel's approach. Flat rows split by     */
 /* dividers, plain bordered columns, filled item chips, quiet add.     */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper {
-	margin: 0;
-	padding: 12px 0;
-	border-radius: 0;
-	background: transparent;
+  margin: 0;
+  padding: 12px 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper:first-child {
-	padding-top: 0;
+  padding-top: 0;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper + .hu-megamenu-row-wrapper {
-	border-top: 1px solid var(--sp-divider);
+  border-top: 1px solid var(--sp-divider);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar {
-	align-items: center;
-	min-height: 24px;
-	margin-bottom: 8px;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 8px;
 }
 
 #helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar) {
-	display: flex;
-	align-items: center;
-	gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 #helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar) svg {
-	fill: var(--sp-handle-interactive);
-	opacity: 1;
+  fill: var(--sp-handle-interactive);
+  opacity: 1;
 }
 
 #helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar):hover svg {
-	fill: var(--sp-icon);
+  fill: var(--sp-icon);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-left span {
-	margin: 0;
-	color: var(--sp-text);
-	font-size: 13px;
-	font-weight: 600;
+  margin: 0;
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar span {
-	margin: 0;
-	color: var(--sp-muted);
-	font-size: 12px;
-	font-weight: 500;
+  margin: 0;
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right {
-	display: flex;
-	align-items: center;
-	gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px;
-	margin: 0;
-	border-radius: var(--sp-radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border-radius: var(--sp-radius);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a svg {
-	fill: var(--sp-icon);
+  fill: var(--sp-icon);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a:hover {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a:hover svg {
-	fill: var(--sp-text);
+  fill: var(--sp-text);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a.hu-megamenu-remove-row:hover svg {
-	fill: var(--sp-danger, #dc2626);
+  fill: var(--sp-danger, #dc2626);
 }
 
 /* Columns: white, a hairline border, no shadow. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-contents-wrapper {
-	height: 100%;
-	padding: 8px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 8px;
-	background: var(--sp-panel);
-	box-shadow: none;
+  height: 100%;
+  padding: 8px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 8px;
+  background: var(--sp-panel);
+  box-shadow: none;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar {
-	margin-bottom: 6px;
+  margin-bottom: 6px;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-contents {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 /* Items: filled chips, the type as a small muted label. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell {
-	min-height: 0;
-	margin: 0;
-	padding: 6px 8px;
-	border: 0;
-	border-radius: 6px;
-	color: var(--sp-text);
-	background: var(--sp-input);
-	font-size: 12.5px;
-	font-weight: 500;
+  min-height: 0;
+  margin: 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--sp-text);
+  background: var(--sp-input);
+  font-size: 12.5px;
+  font-weight: 500;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell:hover {
-	background: color-mix(in srgb, var(--sp-input) 70%, var(--sp-divider));
+  background: color-mix(in srgb, var(--sp-input) 70%, var(--sp-divider));
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-badge,
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell:hover .hu-megamenu-badge {
-	padding: 0;
-	border-radius: 0;
-	color: var(--sp-muted);
-	background: transparent;
-	font-size: 10px;
-	font-weight: 600;
-	letter-spacing: 0.04em;
-	opacity: 1;
-	visibility: visible;
+  padding: 0;
+  border-radius: 0;
+  color: var(--sp-muted);
+  background: transparent;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 1;
+  visibility: visible;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove {
-	top: 4px;
-	right: 4px;
-	color: var(--sp-icon);
-	font-size: 12px;
+  top: 4px;
+  right: 4px;
+  color: var(--sp-icon);
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove:hover {
-	color: var(--sp-danger, #dc2626);
+  color: var(--sp-danger, #dc2626);
 }
 
 /* Add an item: a quiet dashed slot that wakes up on hover. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 28px;
-	margin-top: 4px;
-	padding: 0;
-	border: 1px dashed var(--sp-divider);
-	border-radius: 6px;
-	background: transparent;
-	font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  margin-top: 4px;
+  padding: 0;
+  border: 1px dashed var(--sp-divider);
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item span {
-	color: var(--sp-icon);
+  color: var(--sp-icon);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item:hover {
-	border-color: var(--sp-blue);
-	background: var(--sp-chip);
+  border-color: var(--sp-blue);
+  background: var(--sp-chip);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item:hover span {
-	color: var(--sp-blue);
+  color: var(--sp-blue);
 }
 
 /* Menu Item / Module chooser */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell-options {
-	margin-top: 4px;
-	padding: 4px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 8px;
-	background: var(--sp-panel);
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+  margin-top: 4px;
+  padding: 4px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 8px;
+  background: var(--sp-panel);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell-options-item {
-	display: block;
-	padding: 7px 10px;
-	border-radius: 6px;
-	color: var(--sp-text);
-	font-size: 12px;
-	text-decoration: none;
+  display: block;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--sp-text);
+  font-size: 12px;
+  text-decoration: none;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell-options-item:hover {
-	background: var(--sp-input);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-row {
-	margin-top: 16px;
+  margin-top: 16px;
 }
 
 /* Break long item names between words (hyphenate if needed), not mid-word. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell {
-	overflow-wrap: break-word;
-	hyphens: auto;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 /* A plain plus instead of the filled circle. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item .fa-plus-circle::before {
-	content: "\f067";
+  content: "\f067";
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item span {
-	color: var(--sp-handle-interactive);
-	font-size: 11px;
+  color: var(--sp-handle-interactive);
+  font-size: 11px;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell > span:first-child {
-	max-width: 100%;
-	overflow-wrap: anywhere;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 @supports (overflow-wrap: anywhere) {
-	/* Prefer whole-word breaks; split a word only when it cannot fit at all. */
-	#helix-ultimate .hu-megamenu-step .hu-megamenu-cell > span:first-child {
-		word-break: normal;
-		overflow-wrap: break-word;
-		align-self: stretch;
-	}
+  /* Prefer whole-word breaks; split a word only when it cannot fit at all. */
+  #helix-ultimate .hu-megamenu-step .hu-megamenu-cell > span:first-child {
+    word-break: normal;
+    overflow-wrap: break-word;
+    align-self: stretch;
+  }
 }
-
 /* ------------------------------------------------------------------ */
 /* Column layout picker (row columns / new row)                        */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-slots, .hu-megamenu-add-slots) {
-	width: 320px;
-	max-width: calc(100vw - 32px);
-	height: auto;
-	padding: 12px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 10px;
-	background: var(--sp-panel);
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  height: auto;
+  padding: 12px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 10px;
+  background: var(--sp-panel);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-slots {
-	top: 32px;
-	right: 0;
-	z-index: 5;
-	text-align: left;
+  top: 32px;
+  right: 0;
+  z-index: 5;
+  text-align: left;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-slots {
-	z-index: 5;
-	margin: 8px auto 0;
+  z-index: 5;
+  margin: 8px auto 0;
 }
 
 #helix-ultimate .hu-megamenu-layout-options {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-	gap: 4px;
-	margin: 0;
-	padding: 6px;
-	border: 1px solid var(--sp-divider);
-	border-radius: 8px;
-	color: var(--sp-muted);
-	background: var(--sp-panel);
-	text-decoration: none;
-	transition: border-color 0.12s ease, background-color 0.12s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 8px;
+  color: var(--sp-muted);
+  background: var(--sp-panel);
+  text-decoration: none;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout:hover {
-	border-color: var(--sp-handle-interactive);
-	color: var(--sp-text);
+  border-color: var(--sp-handle-interactive);
+  color: var(--sp-text);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout.active {
-	border-color: var(--sp-blue);
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
+  border-color: var(--sp-blue);
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
 }
 
 /* Bars in a 12-column grid, one per column. */
 #helix-ultimate .hu-layout-preview {
-	display: flex;
-	gap: 2px;
-	height: 14px;
+  display: flex;
+  gap: 2px;
+  height: 14px;
 }
 
 #helix-ultimate .hu-layout-preview i {
-	display: block;
-	min-width: 0;
-	border-radius: 3px;
-	background: var(--sp-handle-interactive);
+  display: block;
+  min-width: 0;
+  border-radius: 3px;
+  background: var(--sp-handle-interactive);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout:hover .hu-layout-preview i {
-	background: var(--sp-icon);
+  background: var(--sp-icon);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout.active .hu-layout-preview i {
-	background: var(--sp-blue);
+  background: var(--sp-blue);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-layout-name {
-	margin: 0;
-	color: inherit;
-	font-size: 11px;
-	font-variant-numeric: tabular-nums;
-	text-align: center;
-}
-
-/* Custom layout: always there, previews as you type. */
-#helix-ultimate .hu-megamenu-columns-layout .hu-megamenu-custom-layout {
-	display: grid;
-	gap: 6px;
-	margin-top: 12px;
-	padding-top: 12px;
-	border-top: 1px solid var(--sp-divider);
-}
-
-#helix-ultimate .hu-megamenu-custom-layout label {
-	margin: 0;
-	color: var(--sp-muted);
-	font-size: 12px;
-	font-weight: 500;
-}
-
-#helix-ultimate .hu-megamenu-custom-layout-row {
-	display: flex;
-	gap: 6px;
-}
-
-#helix-ultimate .hu-megamenu-columns-layout .hu-megamenu-custom-layout input.hu-megamenu-custom-layout-field {
-	flex: 1 1 auto;
-	min-width: 0;
-	height: 32px;
-	min-height: 0;
-	margin: 0;
-	padding: 0 10px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius);
-	color: var(--sp-text);
-	background: var(--sp-input);
-	box-shadow: none;
-	font-size: 12px;
-	font-variant-numeric: tabular-nums;
-}
-
-#helix-ultimate .hu-megamenu-custom-layout input.hu-megamenu-custom-layout-field:focus {
-	border-color: var(--sp-blue);
-	background: var(--sp-panel);
-	outline: none;
-}
-
-#helix-ultimate .hu-megamenu-custom-layout.is-invalid input.hu-megamenu-custom-layout-field {
-	border-color: var(--sp-danger, #dc2626);
-}
-
-#helix-ultimate .hu-megamenu-custom-layout .hu-megamenu-custom-layout-apply {
-	flex: 0 0 auto;
-	height: 32px;
-	padding: 0 14px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	box-shadow: none;
-	font-size: 12px;
-	font-weight: 600;
-}
-
-#helix-ultimate .hu-megamenu-custom-layout .hu-megamenu-custom-layout-apply:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
-}
-
-#helix-ultimate .hu-megamenu-custom-layout-preview:empty {
-	display: none;
-}
-
-#helix-ultimate .hu-megamenu-custom-layout-preview i {
-	background: var(--sp-blue);
-}
-
-#helix-ultimate .hu-megamenu-custom-layout-hint {
-	color: var(--sp-muted);
-	font-size: 11px;
-}
-
-#helix-ultimate .hu-megamenu-custom-layout.is-invalid .hu-megamenu-custom-layout-hint {
-	color: var(--sp-danger, #dc2626);
+  margin: 0;
+  color: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 /* ------------------------------------------------------------------ */
 /* Mega menu rows as CSS Grid; widths set by dragging between columns  */
 /* ------------------------------------------------------------------ */
-
 /* The template comes from the columns' widths (inline, see megamenu.js). */
 #helix-ultimate .hu-mega-menu-builder .hu-megamenu-columns-container,
 .hu-mega-menu-builder .hu-megamenu-columns-container {
-	display: grid;
-	grid-auto-flow: column;
-	gap: 8px;
-	margin: 0;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 8px;
+  margin: 0;
 }
 
 #helix-ultimate .hu-mega-menu-builder .hu-megamenu-columns-container > .hu-megamenu-col,
 .hu-mega-menu-builder .hu-megamenu-columns-container > .hu-megamenu-col {
-	width: auto;
-	max-width: none;
-	min-width: 0;
-	flex: none;
-	margin: 0;
-	padding: 0;
+  width: auto;
+  max-width: none;
+  min-width: 0;
+  flex: none;
+  margin: 0;
+  padding: 0;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper {
-	position: relative;
+  position: relative;
 }
 
 .hu-col-resizers {
-	position: absolute;
-	z-index: 2;
-	pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* A slim hit area in the gap; a short bar shows on hover / drag / focus. */
 .hu-col-resizer {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 12px;
-	margin-left: -6px;
-	cursor: col-resize;
-	pointer-events: auto;
-	touch-action: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  margin-left: -6px;
+  cursor: col-resize;
+  pointer-events: auto;
+  touch-action: none;
 }
 
 .hu-col-resizer::before {
-	content: '';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 4px;
-	height: 28px;
-	border-radius: 2px;
-	background: var(--sp-handle-interactive, #9aa5b8);
-	opacity: 0;
-	transform: translate(-50%, -50%);
-	transition: opacity 0.12s ease, height 0.12s ease, background-color 0.12s ease;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 28px;
+  border-radius: 2px;
+  background: var(--sp-handle-interactive, #9aa5b8);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.12s ease, height 0.12s ease, background-color 0.12s ease;
 }
 
 .hu-megamenu-row-wrapper:hover .hu-col-resizer::before {
-	opacity: 0.6;
+  opacity: 0.6;
 }
 
 .hu-col-resizer:hover::before,
 .hu-col-resizer:focus-visible::before,
 .hu-megamenu-row-wrapper.is-resizing .hu-col-resizer::before {
-	height: 40px;
-	background: var(--sp-blue, #1f3bff);
-	opacity: 1;
+  height: 40px;
+  background: var(--sp-blue, #1f3bff);
+  opacity: 1;
 }
 
 /* The bar is the handle's focus indicator. */
 #helix-ultimate .hu-col-resizer:focus-visible,
 #helix-ultimate .hu-col-resizer:focus {
-	outline: none !important;
-	box-shadow: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .hu-megamenu-row-wrapper.is-resizing,
 .hu-megamenu-row-wrapper.is-resizing * {
-	cursor: col-resize !important;
-	user-select: none;
+  cursor: col-resize !important;
+  user-select: none;
 }
 
 /* While resizing, the widths are what matters. */
 .hu-megamenu-row-wrapper.is-resizing .hu-col-width {
-	color: var(--sp-blue, #1f3bff);
+  color: var(--sp-blue, #1f3bff);
 }
 
 /* Column header: grip, "Column", width, remove. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar span:not(.hu-col-width) {
-	flex: 1 1 auto;
-	min-width: 0;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar .hu-col-width {
-	flex: 0 0 auto;
-	color: var(--sp-muted);
-	font-size: 11px;
-	font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+  color: var(--sp-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column {
-	display: inline-flex;
-	flex: 0 0 auto;
-	align-items: center;
-	justify-content: center;
-	width: 20px;
-	height: 20px;
-	margin-right: -2px;
-	padding: 0;
-	border: 0;
-	border-radius: 4px;
-	color: var(--sp-icon);
-	background: transparent;
-	opacity: 0;
-	transition: opacity 0.12s ease;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: -2px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  color: var(--sp-icon);
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.12s ease;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-col:hover .hu-megamenu-remove-column,
 #helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column:focus-visible {
-	opacity: 1;
+  opacity: 1;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column:hover {
-	color: var(--sp-danger, #dc2626);
-	background: var(--sp-input);
+  color: var(--sp-danger, #dc2626);
+  background: var(--sp-input);
 }
 
 #helix-ultimate .hu-megamenu-step .is-single-column .hu-megamenu-remove-column {
-	display: none;
+  display: none;
 }
 
 @media (hover: none) {
-	#helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column {
-		opacity: 1;
-	}
+  #helix-ultimate .hu-megamenu-step .hu-megamenu-remove-column {
+    opacity: 1;
+  }
 }
-
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a.hu-megamenu-add-column {
-	color: var(--sp-icon);
+  color: var(--sp-icon);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a.hu-megamenu-add-column:hover {
-	color: var(--sp-text);
+  color: var(--sp-text);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-column.is-disabled {
-	opacity: 0.35;
-	pointer-events: none;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------ */
 /* Module / menu item picker: a dropdown with search, tabs and a list  */
 /* ------------------------------------------------------------------ */
-
 .hu-megamenu-container .hu-megamenu-popover {
-	right: auto;
-	bottom: auto;
-	width: 300px;
-	height: auto;
-	margin: 0;
-	padding: 6px;
-	border: 1px solid var(--sp-divider, #e3e8f1);
-	border-radius: 10px;
-	background: var(--sp-panel, #fff);
-	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
-	z-index: 1000;
+  right: auto;
+  bottom: auto;
+  width: 300px;
+  height: auto;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--sp-divider, #e3e8f1);
+  border-radius: 10px;
+  background: var(--sp-panel, #fff);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+  z-index: 1000;
 }
 
 .hu-megamenu-popover .hu-megamenu-search-wrapper {
-	position: relative;
-	margin: 0 0 6px;
-	padding: 0;
-	background: none;
+  position: relative;
+  margin: 0 0 6px;
+  padding: 0;
+  background: none;
 }
 
 .hu-megamenu-popover .hu-megamenu-search-wrapper .fa-search {
-	position: absolute;
-	top: 50%;
-	left: 10px;
-	color: var(--sp-muted, #5d6b82);
-	font-size: 12px;
-	transform: translateY(-50%);
-	pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  color: var(--sp-muted, #5d6b82);
+  font-size: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .hu-megamenu-popover input.hu-megamenu-module-search {
-	width: 100%;
-	height: 34px;
-	min-height: 0;
-	margin: 0;
-	padding: 0 10px 0 30px;
-	border: 1px solid transparent;
-	border-radius: var(--sp-radius, 8px);
-	color: var(--sp-text, #111827);
-	background: var(--sp-input, #f2f5fa);
-	box-shadow: none !important;
-	font-size: 12px;
+  width: 100%;
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 10px 0 30px;
+  border: 1px solid transparent;
+  border-radius: var(--sp-radius, 8px);
+  color: var(--sp-text, #111827);
+  background: var(--sp-input, #f2f5fa);
+  box-shadow: none !important;
+  font-size: 12px;
 }
 
 .hu-megamenu-popover input.hu-megamenu-module-search:focus {
-	border-color: var(--sp-blue, #1f3bff) !important;
-	background: var(--sp-panel, #fff);
-	outline: none !important;
+  border-color: var(--sp-blue, #1f3bff) !important;
+  background: var(--sp-panel, #fff);
+  outline: none !important;
 }
 
 /* Modules / Menu Items: a small segmented control. */
 .hu-megamenu-popover .hu-mm-picker-tabs {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 2px;
-	margin: 0 0 4px;
-	padding: 2px;
-	border-radius: var(--sp-radius, 8px);
-	background: var(--sp-input, #f2f5fa);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin: 0 0 4px;
+  padding: 2px;
+  border-radius: var(--sp-radius, 8px);
+  background: var(--sp-input, #f2f5fa);
 }
 
 .hu-megamenu-popover .hu-mm-picker-tab {
-	height: 26px;
-	padding: 0 8px;
-	border: 0;
-	border-radius: 6px;
-	color: var(--sp-muted, #5d6b82);
-	background: transparent;
-	font-size: 12px;
-	font-weight: 500;
-	cursor: pointer;
+  height: 26px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--sp-muted, #5d6b82);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .hu-megamenu-popover .hu-mm-picker-tab:hover {
-	color: var(--sp-text, #111827);
+  color: var(--sp-text, #111827);
 }
 
 .hu-megamenu-popover .hu-mm-picker-tab.is-active {
-	color: var(--sp-text, #111827);
-	background: var(--sp-panel, #fff);
-	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
-	font-weight: 600;
+  color: var(--sp-text, #111827);
+  background: var(--sp-panel, #fff);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+  font-weight: 600;
 }
 
 .hu-megamenu-popover .hu-mm-picker-list {
-	max-height: 260px;
-	margin: 0;
-	padding: 0;
-	overflow-y: auto;
-	list-style: none;
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
 }
 
 .hu-megamenu-popover .hu-mm-picker-list[hidden],
 .hu-megamenu-popover .hu-mm-picker-option[hidden],
 .hu-megamenu-popover .hu-mm-picker-empty[hidden] {
-	display: none;
+  display: none;
 }
 
 .hu-megamenu-popover .hu-mm-picker-option {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 8px;
-	padding: 7px 10px;
-	border-radius: 6px;
-	color: var(--sp-text, #111827);
-	font-size: 12.5px;
-	cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--sp-text, #111827);
+  font-size: 12.5px;
+  cursor: pointer;
 }
 
 .hu-megamenu-popover .hu-mm-picker-option:hover,
 .hu-megamenu-popover .hu-mm-picker-option:focus {
-	outline: none !important;
-	background: var(--sp-input, #f2f5fa);
+  outline: none !important;
+  background: var(--sp-input, #f2f5fa);
 }
 
 .hu-megamenu-popover .hu-mm-picker-option:focus-visible {
-	box-shadow: inset 0 0 0 1px var(--sp-blue, #1f3bff) !important;
+  box-shadow: inset 0 0 0 1px var(--sp-blue, #1f3bff) !important;
 }
 
 .hu-megamenu-popover .hu-mm-picker-title {
-	min-width: 0;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .hu-megamenu-popover .hu-mm-picker-meta {
-	flex: 0 0 auto;
-	max-width: 45%;
-	overflow: hidden;
-	color: var(--sp-muted, #5d6b82);
-	font-size: 11px;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  flex: 0 0 auto;
+  max-width: 45%;
+  overflow: hidden;
+  color: var(--sp-muted, #5d6b82);
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .hu-megamenu-popover .hu-mm-picker-empty {
-	padding: 14px 10px;
-	color: var(--sp-muted, #5d6b82);
-	font-size: 12px;
-	text-align: center;
+  padding: 14px 10px;
+  color: var(--sp-muted, #5d6b82);
+  font-size: 12px;
+  text-align: center;
 }
 
 /* The list scrolls itself; the old fixed-height, padded container does not. */
 .hu-megamenu-popover .hu-megamenu-modules-container {
-	height: auto;
-	padding: 0;
-	overflow: visible;
+  height: auto;
+  padding: 0;
+  overflow: visible;
 }
 
 /* The add slot shows when the column is hovered or has focus (and always in an
    empty column, or while its picker is open). It keeps its space, so nothing jumps. */
 #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item {
-	opacity: 0;
-	transition: opacity 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+  opacity: 0;
+  transition: opacity 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-col:is(:hover, :focus-within) .hu-megamenu-add-new-item,
 #helix-ultimate .hu-megamenu-step .hu-megamenu-col:not(:has(.hu-megamenu-cell)) .hu-megamenu-add-new-item,
-#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item[aria-expanded="true"] {
-	opacity: 1;
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item[aria-expanded=true] {
+  opacity: 1;
 }
 
 @media (hover: none) {
-	#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item {
-		opacity: 1;
-	}
+  #helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item {
+    opacity: 1;
+  }
 }
-
 /* ------------------------------------------------------------------ */
 /* A menu item cell's own sub items, sortable in place                 */
 /* ------------------------------------------------------------------ */
-
 #helix-ultimate .hu-megamenu-step .hu-cell-children {
-	align-self: stretch;
-	margin: 4px 0 0;
-	padding: 4px 0 0;
-	border-top: 1px solid var(--sp-divider);
-	list-style: none;
-	transition: opacity 0.12s ease;
+  align-self: stretch;
+  margin: 4px 0 0;
+  padding: 4px 0 0;
+  border-top: 1px solid var(--sp-divider);
+  list-style: none;
+  transition: opacity 0.12s ease;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-cell-children.is-saving {
-	opacity: 0.5;
-	pointer-events: none;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-cell-child {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	min-width: 0;
-	padding: 3px 4px;
-	border-radius: 4px;
-	color: var(--sp-muted);
-	font-size: 12px;
-	font-weight: 400;
-	line-height: 1.35;
-	cursor: grab;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 3px 4px;
+  border-radius: 4px;
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
+  cursor: grab;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-cell-child:hover {
-	color: var(--sp-text);
-	background: var(--sp-panel);
+  color: var(--sp-text);
+  background: var(--sp-panel);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-cell-child-handle {
-	display: inline-flex;
-	flex: 0 0 auto;
-	color: var(--sp-handle-interactive);
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--sp-handle-interactive);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-cell-child:hover .hu-cell-child-handle {
-	color: var(--sp-icon);
+  color: var(--sp-icon);
 }
 
 /* Menu tree: the grip takes no space. It shows on hover / focus just outside the
    row, over the end of the connector line (or in the margin for top-level items). */
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler {
-	position: relative;
-	padding-left: 8px;
+  position: relative;
+  padding-left: 8px;
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
-	position: absolute;
-	top: 50%;
-	left: -12px;
-	padding: 2px 2px;
-	background: var(--sp-panel);
-	opacity: 0;
-	transform: translateY(-50%);
-	transition: opacity 0.12s ease;
-	pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  padding: 2px 2px;
+  background: var(--sp-panel);
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 0.12s ease;
+  pointer-events: none;
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler:is(:hover, :focus-within) .hu-branch-icon,
 #helix-ultimate #hu-menu-tree .hu-menu-tree-branch.dragging .hu-branch-icon,
 #helix-ultimate #hu-menu-tree .hu-menu-tree-branch.ui-sortable-helper .hu-branch-icon {
-	opacity: 1;
+  opacity: 1;
 }
 
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler {
-	cursor: grab;
+  cursor: grab;
 }
 
 @media (hover: none) {
-	#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
-		opacity: 1;
-	}
+  #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
+    opacity: 1;
+  }
+}
+/* ------------------------------------------------------------------ */
+/* Device switch: on a setting's label row (desktop / tablet / mobile) */
+/* ------------------------------------------------------------------ */
+#helix-ultimate .control-label.has-device-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#helix-ultimate .hu-device-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 7px;
+  background: var(--sp-input);
+}
+
+#helix-ultimate .hu-device-switch .hu-device {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  color: var(--sp-muted);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+#helix-ultimate .hu-device-switch .hu-device:hover {
+  color: var(--sp-text);
+}
+
+#helix-ultimate .hu-device-switch .hu-device.active {
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+}
+
+/* Typography size: one button showing the current device, next to "Size". */
+#helix-ultimate .hu-webfont-size > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#helix-ultimate .hu-device-cycle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  color: var(--sp-muted);
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+#helix-ultimate .hu-device-cycle:hover {
+  color: var(--sp-blue);
+  background: var(--sp-input);
 }

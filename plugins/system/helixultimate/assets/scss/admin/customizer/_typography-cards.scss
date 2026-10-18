@@ -1,0 +1,355 @@
+// Typography cards: header, labels in the fields
+
+/* ------------------------------------------------------------------ */
+/* Typography v2: header card with an "Aa" sample, labels in the fields */
+/* ------------------------------------------------------------------ */
+
+/* The big preview text is replaced by the sample in the header. */
+#helix-ultimate .hu-typo-card .hu-webfont-preview-wrapper {
+	display: none !important;
+}
+
+/* Header: [Aa] name / summary [chevron], as one bordered row. */
+#helix-ultimate .hu-typo-card > .hu-is-header {
+	display: grid;
+	grid-template-columns: 40px minmax(0, 1fr) auto;
+	grid-template-rows: auto auto;
+	align-items: center;
+	column-gap: 10px;
+	padding: 8px 8px 8px 6px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 10px;
+	background: var(--sp-panel);
+	transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header:hover {
+	border-color: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header > .group-style-no-group,
+#helix-ultimate .hu-typo-card > .hu-is-header .control-group,
+#helix-ultimate .hu-typo-card > .hu-is-header .control-group-inner,
+#helix-ultimate .hu-typo-card > .hu-is-header .controls {
+	display: contents;
+}
+
+
+
+#helix-ultimate .hu-typo-card > .hu-is-header .control-label {
+	grid-row: 1;
+	grid-column: 2;
+	align-self: end;
+	margin: 0;
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+#helix-ultimate .hu-typography-wrapper.hu-typo-card:not(.is-collapsed) .hu-typo-summary,
+#helix-ultimate .hu-typo-card .hu-typo-summary {
+	display: block !important;
+	grid-row: 2;
+	grid-column: 2;
+	align-self: start;
+	margin: 1px 0 0;
+	color: var(--sp-chip-text);
+	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+	font-size: 11px;
+}
+
+#helix-ultimate .hu-typo-card .hu-typo-summary:empty {
+	display: none !important;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-hint {
+	display: none !important;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-collapse {
+	grid-row: 1 / 3;
+	grid-column: 3;
+	margin: 0;
+}
+
+#helix-ultimate .hu-typo-card.is-collapsed {
+	padding-bottom: 8px;
+}
+
+/* Fields: one grid, two columns. */
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont.hu-typo-fields {
+	gap: 8px;
+	padding: 10px 0 0;
+}
+
+/* Order of the controls (beats the older column-order rules). */
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .hu-typo-family { order: 1 !important; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > .hu-typo-subset { order: 2 !important; grid-column: 1 / -1; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-weight) { order: 3 !important; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-size) { order: 4 !important; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-line) { order: 5 !important; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-spacing) { order: 6 !important; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-align) { order: 7 !important; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-decoration) { order: 8 !important; }
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields > .row > :has(> .hu-typo-color) { order: 9 !important; grid-column: 1 / -1; }
+
+/* Rows: label beside the control. */
+#helix-ultimate .hu-typo-fields .hu-typo-row {
+	display: grid;
+	grid-template-columns: 56px minmax(0, 1fr);
+	align-items: center;
+	gap: 8px;
+	margin: 0 !important;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-row > label {
+	margin: 0 !important;
+	color: var(--sp-muted);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.2;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-family > .hu-font-picker {
+	grid-column: 2;
+}
+
+/* Pairs: the label sits inside the control, the value is right-aligned. */
+#helix-ultimate .hu-typo-fields .hu-typo-inline {
+	position: relative;
+	display: grid;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-inline > label {
+	z-index: 2;
+	display: flex;
+	grid-area: 1 / 1;
+	align-items: center;
+	align-self: center;
+	justify-self: start;
+	gap: 4px;
+	max-width: 62%;
+	margin: 0 !important;
+	padding-left: 10px;
+	overflow: hidden;
+	color: var(--sp-muted);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.2;
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-inline > :not(label) {
+	grid-area: 1 / 1;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-inline select,
+#helix-ultimate .hu-typo-fields .hu-typo-inline input.hu-unit-field-input,
+#helix-ultimate .hu-typo-fields .hu-typo-inline .hu-font-line-height-input {
+	text-align: right;
+	text-align-last: right;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-weight select {
+	padding-left: 64px !important;
+	padding-right: 26px !important;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-inline .hu-font-line-height-input {
+	padding: 0 10px 0 74px;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-inline .hu-unit-group input.hu-unit-field-input {
+	padding-left: 56px;
+	padding-right: 34px;
+}
+
+/* In the pairs the "→" chip takes the label's place while the field is focused. */
+#helix-ultimate .hu-typo-fields .hu-typo-inline:has(.has-default-hint) > label {
+	visibility: hidden;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-inline .has-default-hint::after {
+	right: auto;
+	left: 8px;
+}
+
+/* Alignment and decoration: icon groups side by side, labels for screen readers only. */
+#helix-ultimate .hu-typo-fields .hu-typo-toggles > label {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-toggles .hu-action-group {
+	height: 34px;
+	align-items: center;
+}
+
+#helix-ultimate .hu-typo-fields .hu-typo-toggles .hu-switcher-action {
+	height: 28px;
+}
+
+/* An unset weight shows the site's weight in the placeholder colour. */
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-weight select:has(option[value='']:checked) {
+	color: var(--sp-muted);
+}
+
+/* Weight: numeric dropdown (the native select stays hidden in the form). */
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont select.hu-weight-native {
+	display: none !important;
+}
+
+#helix-ultimate .hu-typo-fields .hu-weight-toggle {
+	grid-area: 1 / 1;
+	width: 100%;
+	height: 32px;
+	padding: 0 10px 0 64px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: var(--sp-input);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-fields .hu-weight-toggle:hover {
+	border-color: var(--sp-divider);
+}
+
+#helix-ultimate .hu-typo-fields .hu-weight-toggle[aria-expanded='true'],
+#helix-ultimate .hu-typo-fields .hu-weight-toggle:focus-visible {
+	outline: 2px solid var(--sp-blue);
+	outline-offset: 2px;
+	background: var(--sp-panel);
+}
+
+/* Not set: the site's weight, in the placeholder colour. */
+#helix-ultimate .hu-typo-fields .hu-weight-toggle.is-default {
+	color: var(--sp-muted);
+}
+
+.hu-unit-menu.hu-weight-menu {
+	min-width: 112px;
+	max-height: min(320px, calc(100vh - 16px));
+	overflow-y: auto;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+.hu-unit-menu.hu-weight-menu .is-default-option {
+	margin-bottom: 4px;
+	border-bottom: 1px solid var(--sp-divider, #e3e8f1);
+	border-radius: 6px 6px 0 0;
+	color: var(--sp-muted, #6b7280);
+	font-weight: 500;
+}
+
+/* Font row: label | font picker | subset dropdown (no label of its own). */
+/* Label on top; the font picker and the subset share the full width below. */
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family {
+	grid-template-columns: minmax(0, 1fr) minmax(84px, 32%);
+	row-gap: 4px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > label {
+	grid-column: 1 / -1;
+	font-size: 11.5px;
+	line-height: 16px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > .hu-font-picker {
+	grid-column: 1;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > select.hu-typo-subset-select {
+	grid-column: 2;
+	width: 100%;
+	min-width: 0;
+	height: 32px;
+	padding: 0 22px 0 8px !important;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background-color: var(--sp-input);
+	background-position: right 6px center;
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-family > select.hu-typo-subset-select:hover {
+	border-color: var(--sp-divider);
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-subset-moved {
+	display: none !important;
+}
+
+/* Colour: label on top, the colour field full width below (like Font). */
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-color {
+	grid-template-columns: minmax(0, 1fr);
+	row-gap: 4px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-typo-fields .hu-typo-color > label {
+	font-size: 11.5px;
+	line-height: 16px;
+}
+
+/* Font cards carry their own border, so no divider between sections. */
+#helix-ultimate .hu-typography-wrapper.hu-typo-card {
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border-bottom: 0;
+}
+
+/* Every field (text, number, select, textarea, and the buttons that act as fields)
+   rests without a shadow and shows focus as its own 1px border turning blue. */
+#helix-ultimate :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"]), select, textarea, .hu-font-picker__toggle, .hu-weight-toggle),
+.hu-font-picker input.hu-font-picker__search {
+	box-shadow: none !important;
+}
+
+#helix-ultimate :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"]), select, textarea, .hu-font-picker__toggle, .hu-weight-toggle):is(:focus, :focus-visible),
+.hu-font-picker input.hu-font-picker__search:is(:focus, :focus-visible) {
+	outline: none !important;
+	border-color: var(--sp-blue) !important;
+}
+
+/* Number + unit: the same 1px blue border on the whole pill, not on the input inside it. */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:focus-within {
+	border-color: var(--sp-blue);
+	outline: none;
+}
+
+#helix-ultimate .hu-unit-group input:focus-visible {
+	border-color: transparent !important;
+}
+
+
+/* Header: no "Aa" column; the name is the font sample. */
+#helix-ultimate .hu-typo-card > .hu-is-header {
+	grid-template-columns: minmax(0, 1fr) auto;
+	padding: 8px 8px 8px 12px;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header .control-label.hu-typo-sample {
+	grid-column: 1;
+	overflow: hidden;
+	font-size: 15px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#helix-ultimate .hu-typography-wrapper.hu-typo-card:not(.is-collapsed) .hu-typo-summary,
+#helix-ultimate .hu-typo-card .hu-typo-summary {
+	grid-column: 1;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-collapse {
+	grid-column: 2;
+}

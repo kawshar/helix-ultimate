@@ -1,0 +1,32 @@
+// Customizer (assets/css/admin/customizer.css), built by `gulp css` / `gulp watch`.
+// Partials are plain CSS for now, loaded in cascade order: a later partial
+// can refine an earlier one, so keep the order when adding or moving rules.
+
+@use 'customizer/tokens';
+@use 'customizer/rail';
+@use 'customizer/buttons';
+@use 'customizer/panel';
+@use 'customizer/fields';
+@use 'customizer/media';
+@use 'customizer/typography';
+@use 'customizer/layout';
+@use 'customizer/color-picker';
+@use 'customizer/preview';
+@use 'customizer/presets';
+@use 'customizer/subpanel';
+@use 'customizer/menu-tree';
+@use 'customizer/megamenu-step';
+@use 'customizer/layout-settings';
+@use 'customizer/typography-cards';
+@use 'customizer/blog';
+@use 'customizer/field-refinements';
+@use 'customizer/logo-switcher';
+@use 'customizer/preset-tiles';
+@use 'customizer/megamenu-settings';
+@use 'customizer/megamenu-grid';
+@use 'customizer/megamenu-layout-picker';
+@use 'customizer/megamenu-resize';
+@use 'customizer/megamenu-picker';
+@use 'customizer/megamenu-cell-children';
+@use 'customizer/menu-tree-grip';
+@use 'customizer/device-switch';

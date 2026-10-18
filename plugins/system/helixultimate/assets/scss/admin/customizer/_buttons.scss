@@ -1,0 +1,42 @@
+// Buttons
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-btn {
+	border-radius: var(--sp-radius);
+	font-family: var(--sp-font);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-btn-primary,
+#helix-ultimate .btn-primary {
+	border: 0;
+	color: #fff;
+	background: var(--sp-blue);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-btn-primary::before,
+#helix-ultimate .hu-btn-primary::after {
+	display: none;
+}
+
+#helix-ultimate .hu-btn-primary:hover,
+#helix-ultimate .hu-btn-primary:focus,
+#helix-ultimate .btn-primary:hover {
+	color: #fff;
+	background: var(--sp-blue-dark);
+}
+
+#helix-ultimate .hu-btn-secondary {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-btn-secondary:hover {
+	color: var(--sp-text);
+	background: var(--sp-divider);
+}

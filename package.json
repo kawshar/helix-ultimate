@@ -10,15 +10,20 @@
     "esbuild": "0.25.5",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
+    "gulp-sass": "6.0.1",
     "gulp-uglify-es": "^3.0.0",
     "gulp-zip": "^5.1.0",
     "mysqldump": "^3.2.0",
+    "sass": "1.89.2",
     "shelljs": "^0.8.4",
     "typescript": "5.8.3"
   },
   "scripts": {
     "build:admin": "node scripts/build-admin.mjs",
     "watch:admin": "node scripts/build-admin.mjs --watch",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "build:css": "gulp css",
+    "build": "gulp build",
+    "watch": "gulp watch"
   }
 }

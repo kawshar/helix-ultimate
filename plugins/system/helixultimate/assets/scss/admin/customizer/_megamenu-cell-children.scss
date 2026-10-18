@@ -1,0 +1,48 @@
+// Sub items of a menu item cell
+
+/* ------------------------------------------------------------------ */
+/* A menu item cell's own sub items, sortable in place                 */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-megamenu-step .hu-cell-children {
+	align-self: stretch;
+	margin: 4px 0 0;
+	padding: 4px 0 0;
+	border-top: 1px solid var(--sp-divider);
+	list-style: none;
+	transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-cell-children.is-saving {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-cell-child {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	padding: 3px 4px;
+	border-radius: 4px;
+	color: var(--sp-muted);
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.35;
+	cursor: grab;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-cell-child:hover {
+	color: var(--sp-text);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-cell-child-handle {
+	display: inline-flex;
+	flex: 0 0 auto;
+	color: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-cell-child:hover .hu-cell-child-handle {
+	color: var(--sp-icon);
+}

@@ -469,8 +469,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	 *
 	 * @param {string} device  `desktop`, `tablet`, `mobile` (or `md`, `sm`, `xs`)
 	 */
+	let currentDevice = 'desktop';
+
 	function switchBetweenDevices(device) {
 		const name = deviceMap[device] || 'desktop';
+
+		currentDevice = name;
 		const widthMap = {
 			desktop: '100%',
 			tablet: `${settings.breakpoints.tablet}px`,
@@ -478,8 +482,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		};
 
 		document.querySelectorAll('.hu-device').forEach(button => {
-			button.classList.toggle('active', button.dataset.device === name);
+			const active = button.dataset.device === name;
+			button.classList.toggle('active', active);
+			button.setAttribute('aria-pressed', String(active));
 		});
+
+		syncDeviceCycles();
 
 		// Typography size inputs follow the device.
 		['', '-sm', '-xs'].forEach(size => {
@@ -505,11 +513,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	Joomla.helixSwitchDevice = switchBetweenDevices;
 
-	document.querySelectorAll('.hu-device').forEach(button => {
-		button.addEventListener('click', event => {
-			event.preventDefault();
-			switchBetweenDevices(button.dataset.device);
+	/*
+	 * Device switches sit on the settings that have a value per device (logo
+	 * height, header height, typography size), not in the rail. Every switch
+	 * shows the same device: picking one resizes the preview and shows that
+	 * device's value in all of them.
+	 */
+	const DEVICES = ['desktop', 'tablet', 'mobile'];
+	const deviceLabel = device =>
+		textOr(`HELIX_ULTIMATE_DEVICE_${device.toUpperCase()}`, device.charAt(0).toUpperCase() + device.slice(1));
+
+	function textOr(key, fallback) {
+		const value = Joomla.Text ? Joomla.Text._(key) : '';
+		return value && value !== key ? value : fallback;
+	}
+
+	const deviceIcons = {
+		desktop: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M2 3.5h12v7.5H2zM5.5 13.5h5"/></svg>',
+		tablet: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M3.5 1.75h9v12.5h-9z"/><circle cx="8" cy="12" r=".8" fill="currentColor"/></svg>',
+		mobile: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M5 1.75h6v12.5H5z"/><circle cx="8" cy="12" r=".7" fill="currentColor"/></svg>',
+	};
+
+	/** Three buttons (desktop / tablet / mobile) for a setting's label row. */
+	function deviceSwitch() {
+		const group = document.createElement('span');
+
+		group.className = 'hu-device-switch';
+		group.setAttribute('role', 'group');
+		group.setAttribute('aria-label', textOr('HELIX_ULTIMATE_PREVIEW_DEVICE', 'Preview device'));
+
+		DEVICES.forEach(device => {
+			const button = document.createElement('button');
+
+			button.type = 'button';
+			button.className = `hu-device${device === currentDevice ? ' active' : ''}`;
+			button.dataset.device = device;
+			button.title = deviceLabel(device);
+			button.setAttribute('aria-label', deviceLabel(device));
+			button.setAttribute('aria-pressed', String(device === currentDevice));
+			button.innerHTML = deviceIcons[device];
+			group.appendChild(button);
 		});
+
+		return group;
+	}
+
+	/** One button that shows the current device and steps to the next (where space is tight). */
+	function deviceCycle() {
+		const button = document.createElement('button');
+
+		button.type = 'button';
+		button.className = 'hu-device-cycle';
+		syncDeviceCycle(button);
+
+		return button;
+	}
+
+	function syncDeviceCycle(button) {
+		button.dataset.device = currentDevice;
+		button.innerHTML = deviceIcons[currentDevice];
+		button.title = `${textOr('HELIX_ULTIMATE_PREVIEW_DEVICE', 'Preview device')}: ${deviceLabel(currentDevice)}`;
+		button.setAttribute('aria-label', button.title);
+	}
+
+	function syncDeviceCycles() {
+		document.querySelectorAll('.hu-device-cycle').forEach(syncDeviceCycle);
+	}
+
+	// Logo height / header height: every variant reads like the desktop one, with the switch.
+	[
+		{ name: 'logo_height', parent: '.group-style-logo' },
+		{ name: 'header_height', parent: '.group-style-header' },
+	].forEach(({ name, parent }) => {
+		const base = document.querySelector(`input[name=${name}]`);
+		const baseLabel = base && base.closest(parent)?.querySelector('.control-label');
+		const text = baseLabel ? baseLabel.textContent.trim() : '';
+
+		['', '_sm', '_xs'].forEach(size => {
+			const input = document.querySelector(`input[name=${name}${size}]`);
+			const label = input && input.closest(parent)?.querySelector('.control-label');
+
+			if (!label || label.querySelector('.hu-device-switch')) return;
+
+			if (size && text) label.textContent = text;
+			label.classList.add('has-device-switch');
+			label.appendChild(deviceSwitch());
+		});
+	});
+
+	// Typography: the size label gets the one-button version.
+	document.querySelectorAll('.hu-webfont-size > label').forEach(label => {
+		if (label.querySelector('.hu-device-cycle')) return;
+		label.appendChild(deviceCycle());
+	});
+
+	delegate(document, 'click', '.hu-device', (event, button) => {
+		event.preventDefault();
+		switchBetweenDevices(button.dataset.device);
+	});
+
+	delegate(document, 'click', '.hu-device-cycle', (event, button) => {
+		event.preventDefault();
+		event.stopPropagation();
+		switchBetweenDevices(DEVICES[(DEVICES.indexOf(currentDevice) + 1) % DEVICES.length]);
 	});
 
 	delegate(document, 'click', '.helix-responsive-devices span', (event, span) => {
@@ -537,64 +643,102 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	const panelFor = name => document.querySelector(`.${name}-panel`);
 
-	/** Open a panel from the sidebar, or close it when it is already open. */
+	/**
+	 * Sidebar panels: exactly one is open. A rail icon switches to its panel
+	 * (clicking the open one does nothing), and Basic opens on load.
+	 */
+	function openPanel(header) {
+		const panel = header && panelFor(header.dataset.fieldset);
+
+		if (!panel || panel.classList.contains('active-panel')) return;
+
+		document.querySelectorAll('.hu-edit-panel.active-panel').forEach(item => item.classList.remove('active-panel'));
+		panel.classList.add('active-panel');
+
+		document.querySelectorAll('#hu-options .hu-fieldset-header.active').forEach(item => item.classList.remove('active'));
+		header.classList.add('active');
+
+		Joomla.utils.calculateSiblingDistances();
+	}
+
 	document.querySelectorAll('.hu-fieldset-header').forEach(header => {
 		header.addEventListener('click', event => {
 			event.preventDefault();
+			openPanel(header);
+		});
+	});
 
-			const panel = panelFor(header.dataset.fieldset);
+	if (!document.querySelector('.hu-edit-panel.active-panel')) {
+		openPanel(document.querySelector('.hu-fieldset-header[data-fieldset="basic"]') || document.querySelector('.hu-fieldset-header'));
+	}
 
-			if (!panel) return;
+	// A panel cannot be closed, so its close button goes.
+	document.querySelectorAll('.hu-panel-close').forEach(button => button.remove());
 
-			if (panel.classList.contains('active-panel')) {
-				panel.classList.remove('active-panel');
-				header.classList.remove('active');
-				return;
+	/**
+	 * Accordion groups: exactly one open group per panel. Opening a group closes
+	 * the others; the open one stays open (there is always a section showing).
+	 */
+	function openGroup(groupHeader) {
+		const fieldList = groupHeader.nextElementSibling;
+		const panel = groupHeader.closest('.hu-edit-panel');
+
+		if (!fieldList || !panel) return;
+
+		panel.querySelectorAll('.hu-group-wrap .hu-field-list.active-group').forEach(previous => {
+			if (previous !== fieldList) {
+				previous.classList.remove('active-group');
+				previous.parentElement.classList.remove('active');
+				previous.previousElementSibling?.setAttribute('aria-expanded', 'false');
+				hide(previous);
 			}
-
-			document.querySelectorAll('.hu-edit-panel.active-panel').forEach(item => item.classList.remove('active-panel'));
-			panel.classList.add('active-panel');
-
-			document.querySelectorAll('#hu-options .hu-fieldset-header.active').forEach(item => item.classList.remove('active'));
-			header.classList.add('active');
-
-			Joomla.utils.calculateSiblingDistances();
 		});
-	});
 
-	document.querySelectorAll('.hu-panel-close').forEach(button => {
-		button.addEventListener('click', event => {
-			event.preventDefault();
+		fieldList.classList.add('active-group');
+		groupHeader.parentElement.classList.add('active');
+		groupHeader.setAttribute('aria-expanded', 'true');
+		toggle(fieldList, true, 'block');
+	}
 
-			const panel = button.closest('.hu-edit-panel');
-			if (panel) panel.classList.remove('active-panel');
+	/**
+	 * A panel with groups but none open opens its first group. Groups hidden by
+	 * `data-dependon` (display: none) are skipped.
+	 */
+	function ensureOpenGroup(panel) {
+		const groups = [...panel.querySelectorAll('.hu-group-wrap')].filter(group => getComputedStyle(group).display !== 'none');
 
-			document.querySelectorAll(`.${button.dataset.sidebarclass} .hu-fieldset-header`).forEach(header => header.classList.remove('active'));
-		});
-	});
+		if (!groups.length || groups.some(group => group.classList.contains('active'))) return;
 
-	/** Accordion groups: one open group per panel. */
+		const header = groups[0].querySelector(':scope > .hu-group-header-box');
+		if (header) openGroup(header);
+	}
+
 	document.querySelectorAll('.hu-group-header-box').forEach(groupHeader => {
+		groupHeader.setAttribute('role', 'button');
+		groupHeader.setAttribute('tabindex', '0');
+		groupHeader.setAttribute('aria-expanded', String(groupHeader.parentElement.classList.contains('active')));
+
 		groupHeader.addEventListener('click', event => {
 			event.preventDefault();
-
-			const fieldList = groupHeader.nextElementSibling;
-			const panel = groupHeader.closest('.hu-edit-panel');
-
-			panel.querySelectorAll('.hu-group-wrap .hu-field-list.active-group').forEach(previous => {
-				if (previous !== fieldList) {
-					previous.classList.remove('active-group');
-					previous.parentElement.classList.remove('active');
-					hide(previous);
-				}
-			});
-
-			const opening = !fieldList.classList.contains('active-group');
-
-			fieldList.classList.toggle('active-group', opening);
-			groupHeader.parentElement.classList.toggle('active', opening);
-			toggle(fieldList, opening, 'block');
+			openGroup(groupHeader);
 		});
+
+		groupHeader.addEventListener('keydown', event => {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
+				openGroup(groupHeader);
+			}
+		});
+	});
+
+	// On load, and each time a panel opens (it gets .active-panel).
+	const panelObserver = new MutationObserver(records =>
+		records.forEach(record => record.target.classList.contains('active-panel') && ensureOpenGroup(record.target))
+	);
+
+	document.querySelectorAll('.hu-edit-panel').forEach(panel => {
+		ensureOpenGroup(panel);
+		panelObserver.observe(panel, { attributes: true, attributeFilter: ['class'] });
 	});
 
 	/* ------------------------------------------------------------------ */

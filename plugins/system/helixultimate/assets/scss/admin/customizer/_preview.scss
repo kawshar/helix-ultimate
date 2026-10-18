@@ -1,0 +1,55 @@
+// Preview canvas
+
+/* ------------------------------------------------------------------ */
+/* Preview canvas                                                      */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-preview {
+	background: var(--sp-canvas);
+}
+
+#helix-ultimate #hu-template-preview {
+	box-shadow: 0 0 0 1px var(--sp-divider);
+	transition: width 0.3s linear;
+}
+
+/* Tooltips shown next to the rail (Joomla.utils.tooltip) */
+.hu-tooltip {
+	position: fixed;
+	z-index: 10000;
+	max-width: 240px;
+	padding: 5px 8px;
+	border-radius: 6px;
+	color: #fff;
+	background: #111827;
+	box-shadow: 0 4px 12px rgba(17, 24, 39, 0.2);
+	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.3;
+	pointer-events: none;
+}
+
+.hu-tooltip[hidden] {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#helix-ultimate * {
+		transition: none !important;
+		animation: none !important;
+	}
+}
+
+/* Row Options modal: delete lives here instead of on the row. */
+.hu-options-modal-footer .hu-settings-delete-row {
+	margin-left: auto;
+	color: var(--sp-danger, #dc2626);
+	background: transparent;
+}
+
+.hu-options-modal-footer .hu-settings-delete-row:hover,
+.hu-options-modal-footer .hu-settings-delete-row:focus {
+	color: #fff;
+	background: var(--sp-danger, #dc2626);
+}

@@ -1,0 +1,162 @@
+// Layout builder
+
+/* ------------------------------------------------------------------ */
+/* Layout builder: flat, full-width rows split by dividers              */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .layout-panel .hu-groups-container {
+	background: var(--sp-panel);
+}
+
+/* Drop the nested field wrappers' padding / negative margins. */
+#helix-ultimate .layout-panel .hu-no-group-wrap {
+	padding: 0;
+}
+
+#helix-ultimate .layout-panel .hu-no-group-wrap .control-group {
+	margin: 0;
+}
+
+#helix-ultimate .layout-panel .hu-no-group-wrap .control-group-inner {
+	margin: 0;
+	padding: 0;
+}
+
+#helix-ultimate #hu-layout-builder {
+	padding: 0 0 48px;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) {
+	margin: 0;
+	padding-bottom: 0;
+	border-bottom: 1px solid var(--sp-divider);
+}
+
+#helix-ultimate .hu-layout-section {
+	padding: 0;
+}
+
+#helix-ultimate .hu-layout-section-inner {
+	padding: 10px 12px 12px;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-layout-section.ui-sortable-helper .hu-layout-section-inner {
+	border-radius: var(--sp-radius);
+	background: var(--sp-panel);
+	box-shadow: 0 6px 16px rgba(17, 24, 39, 0.15);
+}
+
+#helix-ultimate .hu-section-settings {
+	min-height: 24px;
+	padding: 0;
+}
+
+#helix-ultimate .hu-section-title {
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-move-row {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 24px;
+	margin: 0 4px 0 -4px;
+	vertical-align: middle;
+	cursor: grab;
+}
+
+#helix-ultimate .hu-move-row svg {
+	fill: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-move-row:hover svg {
+	fill: var(--sp-icon);
+}
+
+#helix-ultimate .hu-layout-builder-action svg {
+	fill: var(--sp-icon);
+}
+
+#helix-ultimate .hu-layout-builder-action:hover svg {
+	fill: var(--sp-text);
+}
+
+#helix-ultimate .hu-row-container {
+	padding: 8px 0 0;
+}
+
+#helix-ultimate .hu-row-container > .row {
+	margin-right: -2px;
+	margin-left: -2px;
+}
+
+#helix-ultimate .hu-layout-column {
+	padding-right: 2px;
+	padding-left: 2px;
+}
+
+#helix-ultimate .hu-column {
+	height: 28px;
+	line-height: 28px;
+	padding: 0 6px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-text);
+	background: var(--sp-stone);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+/* Three or more columns: tighter chips so names like "bottom2" / "Component" fit. */
+#helix-ultimate .hu-layout-column.col-4 .hu-column,
+#helix-ultimate .hu-layout-column.col-3 .hu-column,
+#helix-ultimate .hu-layout-column.col-2 .hu-column,
+#helix-ultimate .hu-layout-column.col-1 .hu-column {
+	padding: 0 5px;
+	font-size: 11.5px;
+}
+
+#helix-ultimate .hu-column-component {
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-column-options {
+	background-color: var(--sp-panel);
+	border-radius: 4px;
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+}
+
+#helix-ultimate .hu-layout-column.ui-sortable-helper .hu-column {
+	border: 0;
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	box-shadow: 0 0 0 2px var(--sp-blue), 0 6px 16px rgba(17, 24, 39, 0.15);
+}
+
+#helix-ultimate .hu-layout-column.ui-state-highlight,
+#helix-ultimate #hu-layout-builder .ui-state-highlight {
+	border: 1px dashed var(--sp-handle-interactive);
+	border-radius: var(--sp-radius);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .hu-add-row {
+	/* Sits on the divider between rows. */
+	margin-bottom: -12px;
+	color: #fff;
+	background: var(--sp-blue);
+}
+
+#helix-ultimate .hu-add-row:hover,
+#helix-ultimate .hu-add-row:focus {
+	background: var(--sp-blue-dark);
+}

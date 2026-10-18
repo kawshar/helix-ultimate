@@ -1,0 +1,176 @@
+// Module / menu item picker
+
+/* ------------------------------------------------------------------ */
+/* Module / menu item picker: a dropdown with search, tabs and a list  */
+/* ------------------------------------------------------------------ */
+
+.hu-megamenu-container .hu-megamenu-popover {
+	right: auto;
+	bottom: auto;
+	width: 300px;
+	height: auto;
+	margin: 0;
+	padding: 6px;
+	border: 1px solid var(--sp-divider, #e3e8f1);
+	border-radius: 10px;
+	background: var(--sp-panel, #fff);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+	z-index: 1000;
+}
+
+.hu-megamenu-popover .hu-megamenu-search-wrapper {
+	position: relative;
+	margin: 0 0 6px;
+	padding: 0;
+	background: none;
+}
+
+.hu-megamenu-popover .hu-megamenu-search-wrapper .fa-search {
+	position: absolute;
+	top: 50%;
+	left: 10px;
+	color: var(--sp-muted, #5d6b82);
+	font-size: 12px;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+.hu-megamenu-popover input.hu-megamenu-module-search {
+	width: 100%;
+	height: 34px;
+	min-height: 0;
+	margin: 0;
+	padding: 0 10px 0 30px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius, 8px);
+	color: var(--sp-text, #111827);
+	background: var(--sp-input, #f2f5fa);
+	box-shadow: none !important;
+	font-size: 12px;
+}
+
+.hu-megamenu-popover input.hu-megamenu-module-search:focus {
+	border-color: var(--sp-blue, #1f3bff) !important;
+	background: var(--sp-panel, #fff);
+	outline: none !important;
+}
+
+/* Modules / Menu Items: a small segmented control. */
+.hu-megamenu-popover .hu-mm-picker-tabs {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 2px;
+	margin: 0 0 4px;
+	padding: 2px;
+	border-radius: var(--sp-radius, 8px);
+	background: var(--sp-input, #f2f5fa);
+}
+
+.hu-megamenu-popover .hu-mm-picker-tab {
+	height: 26px;
+	padding: 0 8px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-muted, #5d6b82);
+	background: transparent;
+	font-size: 12px;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.hu-megamenu-popover .hu-mm-picker-tab:hover {
+	color: var(--sp-text, #111827);
+}
+
+.hu-megamenu-popover .hu-mm-picker-tab.is-active {
+	color: var(--sp-text, #111827);
+	background: var(--sp-panel, #fff);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+	font-weight: 600;
+}
+
+.hu-megamenu-popover .hu-mm-picker-list {
+	max-height: 260px;
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+	list-style: none;
+}
+
+.hu-megamenu-popover .hu-mm-picker-list[hidden],
+.hu-megamenu-popover .hu-mm-picker-option[hidden],
+.hu-megamenu-popover .hu-mm-picker-empty[hidden] {
+	display: none;
+}
+
+.hu-megamenu-popover .hu-mm-picker-option {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 7px 10px;
+	border-radius: 6px;
+	color: var(--sp-text, #111827);
+	font-size: 12.5px;
+	cursor: pointer;
+}
+
+.hu-megamenu-popover .hu-mm-picker-option:hover,
+.hu-megamenu-popover .hu-mm-picker-option:focus {
+	outline: none !important;
+	background: var(--sp-input, #f2f5fa);
+}
+
+.hu-megamenu-popover .hu-mm-picker-option:focus-visible {
+	box-shadow: inset 0 0 0 1px var(--sp-blue, #1f3bff) !important;
+}
+
+.hu-megamenu-popover .hu-mm-picker-title {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.hu-megamenu-popover .hu-mm-picker-meta {
+	flex: 0 0 auto;
+	max-width: 45%;
+	overflow: hidden;
+	color: var(--sp-muted, #5d6b82);
+	font-size: 11px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.hu-megamenu-popover .hu-mm-picker-empty {
+	padding: 14px 10px;
+	color: var(--sp-muted, #5d6b82);
+	font-size: 12px;
+	text-align: center;
+}
+
+/* The list scrolls itself; the old fixed-height, padded container does not. */
+.hu-megamenu-popover .hu-megamenu-modules-container {
+	height: auto;
+	padding: 0;
+	overflow: visible;
+}
+
+/* The add slot shows when the column is hovered or has focus (and always in an
+   empty column, or while its picker is open). It keeps its space, so nothing jumps. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item {
+	opacity: 0;
+	transition: opacity 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-col:is(:hover, :focus-within) .hu-megamenu-add-new-item,
+#helix-ultimate .hu-megamenu-step .hu-megamenu-col:not(:has(.hu-megamenu-cell)) .hu-megamenu-add-new-item,
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item[aria-expanded="true"] {
+	opacity: 1;
+}
+
+@media (hover: none) {
+	#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item {
+		opacity: 1;
+	}
+}

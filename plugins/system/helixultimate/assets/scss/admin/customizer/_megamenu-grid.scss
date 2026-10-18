@@ -1,0 +1,233 @@
+// Mega menu grid
+
+/* ------------------------------------------------------------------ */
+/* Mega menu grid: the Layout panel's approach. Flat rows split by     */
+/* dividers, plain bordered columns, filled item chips, quiet add.     */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper {
+	margin: 0;
+	padding: 12px 0;
+	border-radius: 0;
+	background: transparent;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper:first-child {
+	padding-top: 0;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-wrapper + .hu-megamenu-row-wrapper {
+	border-top: 1px solid var(--sp-divider);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar {
+	align-items: center;
+	min-height: 24px;
+	margin-bottom: 8px;
+}
+
+#helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar) {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+#helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar) svg {
+	fill: var(--sp-handle-interactive);
+	opacity: 1;
+}
+
+#helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar):hover svg {
+	fill: var(--sp-icon);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-left span {
+	margin: 0;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar span {
+	margin: 0;
+	color: var(--sp-muted);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	margin: 0;
+	border-radius: var(--sp-radius);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a svg {
+	fill: var(--sp-icon);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a:hover {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a:hover svg {
+	fill: var(--sp-text);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-right > a.hu-megamenu-remove-row:hover svg {
+	fill: var(--sp-danger, #dc2626);
+}
+
+/* Columns: white, a hairline border, no shadow. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-contents-wrapper {
+	height: 100%;
+	padding: 8px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 8px;
+	background: var(--sp-panel);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-toolbar {
+	margin-bottom: 6px;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-column-contents {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+/* Items: filled chips, the type as a small muted label. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell {
+	min-height: 0;
+	margin: 0;
+	padding: 6px 8px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-text);
+	background: var(--sp-input);
+	font-size: 12.5px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell:hover {
+	background: color-mix(in srgb, var(--sp-input) 70%, var(--sp-divider));
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-badge,
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell:hover .hu-megamenu-badge {
+	padding: 0;
+	border-radius: 0;
+	color: var(--sp-muted);
+	background: transparent;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	opacity: 1;
+	visibility: visible;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove {
+	top: 4px;
+	right: 4px;
+	color: var(--sp-icon);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell .hu-megamenu-cell-remove:hover {
+	color: var(--sp-danger, #dc2626);
+}
+
+/* Add an item: a quiet dashed slot that wakes up on hover. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 28px;
+	margin-top: 4px;
+	padding: 0;
+	border: 1px dashed var(--sp-divider);
+	border-radius: 6px;
+	background: transparent;
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item span {
+	color: var(--sp-icon);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item:hover {
+	border-color: var(--sp-blue);
+	background: var(--sp-chip);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item:hover span {
+	color: var(--sp-blue);
+}
+
+/* Menu Item / Module chooser */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell-options {
+	margin-top: 4px;
+	padding: 4px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 8px;
+	background: var(--sp-panel);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell-options-item {
+	display: block;
+	padding: 7px 10px;
+	border-radius: 6px;
+	color: var(--sp-text);
+	font-size: 12px;
+	text-decoration: none;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell-options-item:hover {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-row {
+	margin-top: 16px;
+}
+
+/* Break long item names between words (hyphenate if needed), not mid-word. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell {
+	overflow-wrap: break-word;
+	hyphens: auto;
+}
+
+/* A plain plus instead of the filled circle. */
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item .fa-plus-circle::before {
+	content: "\f067";
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item span {
+	color: var(--sp-handle-interactive);
+	font-size: 11px;
+}
+
+#helix-ultimate .hu-megamenu-step .hu-megamenu-cell > span:first-child {
+	max-width: 100%;
+	overflow-wrap: anywhere;
+}
+
+@supports (overflow-wrap: anywhere) {
+	/* Prefer whole-word breaks; split a word only when it cannot fit at all. */
+	#helix-ultimate .hu-megamenu-step .hu-megamenu-cell > span:first-child {
+		word-break: normal;
+		overflow-wrap: break-word;
+		align-self: stretch;
+	}
+}

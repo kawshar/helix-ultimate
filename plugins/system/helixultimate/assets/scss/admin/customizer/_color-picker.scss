@@ -1,0 +1,107 @@
+// Colour picker (Coloris)
+
+/* ------------------------------------------------------------------ */
+/* Colour picker (Coloris)                                             */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .clr-field,
+.hu-modal .clr-field,
+.hu-options-modal .clr-field {
+	display: block;
+	position: relative;
+	color: var(--sp-text, #111827);
+}
+
+#helix-ultimate .clr-field input,
+.hu-modal .clr-field input,
+.hu-options-modal .clr-field input {
+	width: 100%;
+	padding-left: 40px;
+	text-transform: uppercase;
+	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+}
+
+#helix-ultimate .clr-field input::placeholder,
+.hu-modal .clr-field input::placeholder,
+.hu-options-modal .clr-field input::placeholder {
+	text-transform: none;
+	font-family: var(--sp-font, sans-serif);
+}
+
+/* An empty colour shows a checkerboard swatch, meaning "inherit". */
+#helix-ultimate .clr-field button,
+.hu-modal .clr-field button,
+.hu-options-modal .clr-field button {
+	background-image: repeating-conic-gradient(#e3e8f1 0% 25%, #fff 0% 50%);
+	background-size: 10px 10px;
+}
+
+/* The swatch sits inside the field on the left. */
+#helix-ultimate .clr-field button,
+.hu-modal .clr-field button,
+.hu-options-modal .clr-field button {
+	top: 50%;
+	right: auto;
+	left: 6px;
+	width: 26px;
+	height: 26px;
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+	transform: translateY(-50%);
+}
+
+#helix-ultimate .clr-field button::after,
+.hu-modal .clr-field button::after,
+.hu-options-modal .clr-field button::after {
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+}
+
+.clr-picker {
+	border-radius: 12px;
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18), 0 0 0 1px #e3e8f1;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.clr-picker .clr-gradient {
+	border-radius: 12px 12px 0 0;
+}
+
+.clr-picker input.clr-color {
+	height: 32px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	color: #111827;
+	background: #f2f5fa;
+	font-size: 12px;
+}
+
+.clr-picker input.clr-color:focus {
+	border-color: transparent;
+	outline: 2px solid #1f3bff;
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+.clr-picker .clr-clear,
+.clr-picker .clr-close {
+	height: 28px;
+	padding: 0 12px;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.clr-picker .clr-clear {
+	color: #111827;
+	background: #f2f5fa;
+}
+
+.clr-picker .clr-close {
+	color: #fff;
+	background: #1f3bff;
+}
+
+.clr-picker .clr-close:hover {
+	background: #1629b8;
+}

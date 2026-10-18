@@ -1,0 +1,357 @@
+// Fields
+
+/* ------------------------------------------------------------------ */
+/* Fields                                                              */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .control-group .control-label,
+#helix-ultimate .control-group .control-label label,
+#helix-ultimate label.control-label {
+	color: var(--sp-muted);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-help-icon {
+	color: var(--sp-muted);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-control-help,
+#helix-ultimate .control-help {
+	color: var(--sp-muted);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-field-separator,
+#helix-ultimate hr {
+	border-color: var(--sp-divider);
+}
+
+/* Inputs: filled, no visible border until hover/focus */
+#helix-ultimate .hu-edit-panel :is(input.form-control, textarea.form-control, select.form-select, select.form-control, .chosen-container .chosen-single, .chosen-container-multi .chosen-choices, .minicolors-input),
+#helix-ultimate .hu-edit-panel input[type='text']:not(.hu-unit-field-input),
+#helix-ultimate .hu-edit-panel input[type='number']:not(.hu-unit-field-input),
+#helix-ultimate .hu-edit-panel input[type='email'],
+#helix-ultimate .hu-edit-panel input[type='url'],
+#helix-ultimate .hu-edit-panel textarea {
+	min-height: 36px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background-color: var(--sp-input);
+	box-shadow: none;
+	font-family: var(--sp-font);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-edit-panel textarea {
+	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+	line-height: 1.5;
+}
+
+#helix-ultimate .hu-edit-panel :is(input:not([type="checkbox"], [type="radio"]), textarea, select):hover:not(:disabled):not([readonly]) {
+	border-color: var(--sp-divider);
+}
+
+/* Focused fields turn white; the blue border comes from the field focus rule further down. */
+#helix-ultimate .hu-edit-panel :is(input:not([type="checkbox"], [type="radio"]), textarea, select):focus {
+	border-color: transparent;
+	background-color: var(--sp-panel);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-edit-panel ::placeholder {
+	color: var(--sp-muted);
+	opacity: 1;
+}
+
+/* Number + unit: one filled pill; the unit is plain text inside it */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group {
+	display: flex;
+	align-items: center;
+	height: 36px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background: var(--sp-input);
+}
+
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:hover {
+	border-color: var(--sp-divider);
+}
+
+/* Number + unit is one control, so it gets one focus ring around the whole pill. */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:focus-within {
+	border-color: transparent;
+	background: var(--sp-panel);
+	box-shadow: none;
+	outline: 2px solid var(--sp-blue);
+	outline-offset: 2px;
+}
+
+#helix-ultimate .hu-edit-panel .hu-unit-group input:focus,
+#helix-ultimate .hu-edit-panel .hu-unit-group input:focus-visible {
+	outline: none !important;
+	box-shadow: none;
+}
+
+/* The number input is see-through: the field's fill/white comes from the group. */
+#helix-ultimate .hu-edit-panel .hu-unit-group input.hu-unit-field-input {
+	background-color: transparent;
+}
+
+/* The pill shows the hover state; the parts inside it don't draw their own. */
+#helix-ultimate .hu-edit-panel .hu-unit-group input.hu-unit-field-input:hover {
+	border-color: transparent;
+	background-color: transparent;
+}
+
+#helix-ultimate .hu-edit-panel .hu-unit-group input.hu-unit-field-input:focus {
+	background-color: transparent;
+}
+
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input {
+	flex: 1 1 auto;
+	min-width: 0;
+	max-width: none;
+	min-height: 0;
+	height: 34px;
+	border: 0;
+	border-radius: var(--sp-radius) 0 0 var(--sp-radius);
+	color: var(--sp-text);
+	background: transparent;
+	box-shadow: none;
+	font-size: 12px;
+}
+
+/* Unit pill: plain text at the right edge; looks like a button only on hover, focus or while open. */
+/* The pill sits on top of the input's right edge, so showing / hiding it never shifts the number. */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group {
+	position: relative;
+}
+
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input {
+	padding-right: 40px;
+}
+
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill {
+	position: absolute;
+	top: 50%;
+	right: 4px;
+	z-index: 1;
+	transform: translateY(-50%);
+	height: 24px;
+	min-width: 24px;
+	padding: 0 6px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-muted);
+	background: transparent;
+	font: 500 12px/24px var(--sp-font);
+	text-align: center;
+	cursor: pointer;
+	transition: background-color 0.12s ease, box-shadow 0.12s ease, color 0.12s ease;
+}
+
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:hover,
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:focus-visible,
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-menu-open .hu-unit-pill {
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+	outline: none;
+}
+
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:focus-visible {
+	box-shadow: 0 0 0 2px var(--sp-blue);
+}
+
+/* px is silent: no pill at all. Typing a unit (1.5rem) or Alt+↑/↓ switches it, and the pill appears. */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-default-unit:not(.is-menu-open) .hu-unit-pill {
+	display: none;
+}
+
+/* Keywords (auto) have no number: the pill carries the value. */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-keyword .hu-unit-pill {
+	color: var(--sp-text);
+}
+
+/* Old markup (if a template still renders the native select). */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group select.hu-unit-select {
+	display: none;
+}
+
+/* Unit menu */
+.hu-unit-menu {
+	position: fixed;
+	z-index: 10050;
+	min-width: 64px;
+	margin: 0;
+	padding: 4px;
+	border: 1px solid var(--sp-divider, #e3e8f1);
+	border-radius: 8px;
+	background: var(--sp-panel, #fff);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+	list-style: none;
+	font: 500 12px/1 var(--sp-font, system-ui, sans-serif);
+}
+
+.hu-unit-menu [role="option"] {
+	padding: 7px 10px;
+	border-radius: 6px;
+	color: var(--sp-text, #111827);
+	cursor: pointer;
+}
+
+.hu-unit-menu [role="option"]:hover,
+.hu-unit-menu [role="option"]:focus {
+	outline: none;
+	background: var(--sp-input, #f2f5fa);
+}
+
+.hu-unit-menu [role="option"][aria-selected="true"] {
+	color: var(--sp-chip-text, #1b2fb8);
+	background: var(--sp-chip, #eef1ff);
+}
+
+.hu-unit-menu .is-keyword {
+	margin-top: 4px;
+	border-top: 1px solid var(--sp-divider, #e3e8f1);
+	border-radius: 0 0 6px 6px;
+}
+
+.hu-unit-menu .is-keyword ~ .is-keyword {
+	margin-top: 0;
+	border-top: 0;
+}
+
+/* Typography: per-device size inputs stay hidden until their device is active */
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.hu-webfont-unit:not(.active) {
+	display: none;
+}
+
+/* Typography: two columns per row fit the 272px panel */
+#helix-ultimate .hu-field-webfont .row {
+	row-gap: 4px;
+}
+
+#helix-ultimate .hu-field-webfont .row > [class*='col-'] {
+	flex: 0 0 50%;
+	max-width: 50%;
+}
+
+#helix-ultimate .hu-field-webfont .hu-webfont-preview-wrapper,
+#helix-ultimate .hu-field-webfont .hu-webfont-preview {
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: var(--sp-canvas);
+}
+
+#helix-ultimate .hu-field-webfont .control-label,
+#helix-ultimate .hu-field-webfont label {
+	color: var(--sp-muted);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+/* Switches */
+#helix-ultimate .hu-style-switcher input[type='checkbox'] {
+	width: 32px;
+	height: 18px;
+	border: 1px solid var(--sp-handle-interactive);
+	background: var(--sp-input);
+	box-shadow: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']::after {
+	top: 2px;
+	left: 2px;
+	width: 12px;
+	height: 12px;
+	background: var(--sp-handle-interactive);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']:checked {
+	border-color: var(--sp-blue);
+	background: var(--sp-blue);
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']:checked::after,
+#helix-ultimate .hu-style-switcher input[type='checkbox']:hover:checked:not(:disabled)::after,
+#helix-ultimate .hu-style-switcher input[type='checkbox']:focus:checked:not(:disabled)::after {
+	left: 16px;
+	background: #fff;
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']:hover:not(:checked):not(:disabled)::after,
+#helix-ultimate .hu-style-switcher input[type='checkbox']:focus:not(:checked):not(:disabled)::after {
+	left: 2px;
+}
+
+/* Segmented control (e.g. logo Image / Text) */
+#helix-ultimate .hu-switcher .hu-action-group {
+	padding: 3px;
+	border: 0;
+	border-radius: 10px;
+	background: var(--sp-input);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action {
+	padding: 6px 16px;
+	border-radius: 7px;
+	color: var(--sp-muted);
+	background: transparent;
+	box-shadow: none;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action:hover {
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action.active {
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action svg path {
+	fill: currentColor;
+}
+
+/* Predefined header / off-canvas pickers: selection is a 2px blue outline */
+#helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap {
+	overflow: hidden;
+	border: 1px solid var(--sp-divider);
+	border-radius: var(--sp-radius);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap::after {
+	border: 2px solid var(--sp-blue);
+	border-radius: var(--sp-radius);
+	box-shadow: none;
+}
+
+#helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li:hover:not(.active) > .img-wrap::after {
+	border-color: var(--sp-handle-interactive);
+	border-width: 1px;
+}
+
+#helix-ultimate .hu-header-list > li > .hu-predefined-headers-title,
+#helix-ultimate .hu-offcanvas-list > li > .hu-predefined-offcanvas-title {
+	color: var(--sp-muted);
+	font-size: 12px;
+	line-height: 1.3;
+}
+
+#helix-ultimate .hu-header-list > li.active > .hu-predefined-headers-title,
+#helix-ultimate .hu-offcanvas-list > li.active > .hu-predefined-offcanvas-title {
+	color: var(--sp-text);
+	font-weight: 600;
+}

@@ -1,0 +1,229 @@
+// Presets
+
+/* ------------------------------------------------------------------ */
+/* Presets: mini site previews in a two-column grid                     */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-presets {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+	margin: 0;
+}
+
+#helix-ultimate .hu-presets .hu-preset {
+	position: relative;
+	float: none;
+	width: auto;
+	height: auto;
+	margin: 0;
+	padding: 6px 6px 8px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	background: var(--sp-panel) !important; /* tiles carry an inline colour from PHP */
+	box-shadow: none;
+	cursor: pointer;
+	transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+#helix-ultimate .hu-presets .hu-preset:hover {
+	border-color: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-presets .hu-preset:focus-visible {
+	outline: 2px solid var(--sp-blue);
+	outline-offset: 2px;
+}
+
+#helix-ultimate .hu-presets .hu-preset.active {
+	border-color: var(--sp-blue);
+	box-shadow: 0 0 0 1px var(--sp-blue);
+}
+
+/* Mini site in the preset's colours: a hairline topbar, header (logo + menu),
+   an accent-tinted hero (heading + button) and body text. The accent leads;
+   the dark topbar / footer colours stay out of the way at this size. */
+#helix-ultimate .hu-preset-contents {
+	display: block;
+	order: 0;
+}
+
+#helix-ultimate .hu-presets .hu-preset > .hu-preset-title {
+	order: 1;
+}
+
+#helix-ultimate .hu-preset-mock {
+	display: flex;
+	flex-direction: column;
+	height: 76px;
+	overflow: hidden;
+	border-radius: 6px;
+	background: var(--p-bg);
+	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.07);
+}
+
+#helix-ultimate .hu-preset-mock__topbar {
+	flex: 0 0 3px;
+	background: var(--p-topbar);
+	opacity: 0.85;
+}
+
+#helix-ultimate .hu-preset-mock__header {
+	display: flex;
+	flex: 0 0 15px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 7px;
+	background: var(--p-header);
+}
+
+#helix-ultimate .hu-preset-mock__logo {
+	width: 14px;
+	height: 5px;
+	border-radius: 3px;
+	background: var(--p-logo);
+}
+
+#helix-ultimate .hu-preset-mock__menu {
+	display: flex;
+	gap: 3px;
+}
+
+#helix-ultimate .hu-preset-mock i {
+	display: block;
+	border-radius: 2px;
+	font-style: normal;
+}
+
+#helix-ultimate .hu-preset-mock__menu i {
+	width: 7px;
+	height: 2px;
+	background: var(--p-menu);
+	opacity: 0.45;
+}
+
+#helix-ultimate .hu-preset-mock__hero {
+	display: flex;
+	flex: 0 0 34px;
+	flex-direction: column;
+	justify-content: center;
+	gap: 3px;
+	margin: 0 5px;
+	padding: 0 7px;
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--p-accent) 14%, var(--p-bg));
+}
+
+#helix-ultimate .hu-preset-mock__hero i:first-child {
+	width: 60%;
+	height: 4px;
+	background: var(--p-accent);
+}
+
+#helix-ultimate .hu-preset-mock__hero i:nth-child(2) {
+	width: 42%;
+	height: 2px;
+	background: var(--p-text);
+	opacity: 0.35;
+}
+
+#helix-ultimate .hu-preset-mock__button {
+	width: 22px;
+	height: 6px;
+	margin-top: 2px;
+	border-radius: 3px;
+	background: var(--p-accent);
+}
+
+#helix-ultimate .hu-preset-mock__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	justify-content: center;
+	gap: 3px;
+	padding: 0 12px;
+}
+
+#helix-ultimate .hu-preset-mock__body i {
+	height: 2px;
+	background: var(--p-text);
+	opacity: 0.2;
+}
+
+#helix-ultimate .hu-preset-mock__body i:nth-child(2) {
+	width: 85%;
+}
+
+#helix-ultimate .hu-preset-mock__body i:nth-child(3) {
+	width: 55%;
+}
+
+/* Name row; the selected tile gets a check after its name. */
+#helix-ultimate .hu-presets .hu-preset-title {
+	position: static;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	padding: 8px 2px 0;
+	border-radius: 0;
+	color: var(--sp-text);
+	background: none;
+	font-size: 12.5px;
+	font-weight: 500;
+	line-height: 16px;
+	text-transform: none;
+}
+
+#helix-ultimate .hu-presets .hu-preset.active .hu-preset-title {
+	padding: 8px 2px 0;
+	color: var(--sp-text);
+	background: none;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-presets .hu-preset.active .hu-preset-title::after {
+	content: '';
+	flex: 0 0 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: var(--sp-blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4.5 8.2l2.3 2.3 4.7-4.9'/%3E%3C/svg%3E") center / 16px no-repeat;
+}
+
+/* Edit colours: shown on hover / keyboard focus, top-right of the preview. */
+#helix-ultimate .hu-presets .hu-edit-preset {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 6px;
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 3px rgba(17, 24, 39, 0.2);
+	font-size: 10px;
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-presets .hu-preset:hover .hu-edit-preset,
+#helix-ultimate .hu-presets .hu-preset:focus-within .hu-edit-preset,
+#helix-ultimate .hu-presets .hu-edit-preset:focus-visible {
+	opacity: 1;
+}
+
+#helix-ultimate .hu-presets .hu-edit-preset:hover {
+	color: var(--sp-blue);
+}
+
+@media (hover: none) {
+	#helix-ultimate .hu-presets .hu-edit-preset {
+		opacity: 1;
+	}
+}

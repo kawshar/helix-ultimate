@@ -1,0 +1,509 @@
+// Typography: font cards, add a font, searchable picker
+
+/* ------------------------------------------------------------------ */
+/* Typography: font cards, "Add a font" list, searchable picker         */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .typography-panel .hu-groups-container {
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .typography-panel .hu-no-group-wrap {
+	padding: 0 0 12px;
+}
+
+/* Font sections: flat, full-width, split by a divider (no card chrome). */
+#helix-ultimate .hu-typography-wrapper {
+	margin: 0;
+	padding: 12px 12px 14px;
+	border: 0;
+	border-bottom: 1px solid var(--sp-divider);
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-typography-wrapper > div {
+	padding: 0;
+}
+
+#helix-ultimate .hu-typo-card[hidden],
+#helix-ultimate .hu-typo-add[hidden],
+#helix-ultimate .hu-typo-add li[hidden] {
+	display: none !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-is-header {
+	padding: 0;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-is-header .control-group,
+#helix-ultimate .hu-typography-wrapper .hu-is-header .control-group-checkbox {
+	margin-bottom: 0;
+}
+
+#helix-ultimate .hu-typo-card .hu-is-header .control-group-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+#helix-ultimate .hu-typo-card .hu-is-header .control-label {
+	margin: 0;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+/* The enable switch is driven by the remove / add buttons instead. */
+#helix-ultimate .hu-typo-card .hu-is-header .form-check {
+	display: none;
+}
+
+#helix-ultimate .hu-typo-card .hu-is-header {
+	cursor: pointer;
+	user-select: none;
+}
+
+/* Collapse toggle (header) */
+#helix-ultimate .hu-typo-collapse {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	margin-right: -4px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+	background: transparent;
+	font-size: 10px;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-collapse:hover {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-collapse .fas {
+	transition: transform 0.15s ease;
+}
+
+#helix-ultimate .hu-typo-card.is-collapsed .hu-typo-collapse .fas {
+	transform: rotate(-90deg);
+}
+
+/* Collapsed: header + one-line summary only. */
+#helix-ultimate .hu-typo-card.is-collapsed > :not(.hu-is-header),
+#helix-ultimate .hu-typo-card.is-collapsed .hu-typo-hint,
+#helix-ultimate .hu-typo-card:not(.is-collapsed) .hu-typo-summary {
+	display: none !important;
+}
+
+#helix-ultimate .hu-typo-summary {
+	margin: 2px 0 0;
+	overflow: hidden;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	line-height: 1.4;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#helix-ultimate .hu-typo-summary:empty {
+	display: none;
+}
+
+#helix-ultimate .hu-typo-card.is-collapsed {
+	padding-bottom: 12px;
+}
+
+#helix-ultimate .hu-typo-card .control-group {
+	margin-bottom: 0;
+}
+
+/* Extra fields after the font controls (e.g. Custom's selectors). */
+#helix-ultimate .hu-typo-card > .col-12:not(.hu-is-header) + .col-12 {
+	margin-top: 12px;
+}
+
+/* Remove font (bottom of an open card) */
+#helix-ultimate .hu-typo-footer {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 12px;
+}
+
+#helix-ultimate .hu-typo-remove {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 26px;
+	margin-right: -8px;
+	padding: 0 8px;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-muted);
+	background: transparent;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-remove .fas {
+	font-size: 11px;
+}
+
+#helix-ultimate .hu-typo-remove:hover {
+	color: var(--sp-danger);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-hint {
+	margin: 2px 0 0;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	line-height: 1.4;
+}
+
+/* Field grid: Font / Weight + Size / Line height + Spacing / Color + Subset / Decoration + Alignment */
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 10px 8px;
+	padding: 10px 0 0;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont > .row {
+	display: contents;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont > .row > div {
+	width: auto;
+	max-width: none;
+	margin: 0 !important;
+	padding: 0;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper,
+#helix-ultimate .hu-typography-wrapper .hu-webfont-family {
+	grid-column: 1 / -1;
+	margin: 0 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper { order: 0; }
+#helix-ultimate .hu-typography-wrapper .hu-webfont-family { order: 1; }
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(1) { order: 2; } /* weight */
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(2) { order: 3; } /* size */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(2) { order: 4; } /* line height */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(3) { order: 5; } /* letter spacing */
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(3) { order: 6; } /* color */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(1) { order: 7; } /* subset */
+#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(1) { order: 8; }
+#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(2) { order: 9; }
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper {
+	padding: 8px 10px;
+	border-radius: var(--sp-radius);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper.is-light-text {
+	background: #1f2937;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview {
+	color: var(--sp-text);
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	background: transparent;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont label {
+	margin-bottom: 4px !important;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	line-height: 16px;
+}
+
+/* One control height for every input in the grid. */
+#helix-ultimate .hu-typography-wrapper .hu-font-picker__toggle,
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont select:not(.hu-unit-select),
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont .form-control,
+#helix-ultimate .hu-typography-wrapper .hu-unit-group {
+	height: 32px;
+	min-height: 32px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont select:not(.hu-unit-select) {
+	width: 100%;
+	padding: 0 24px 0 10px;
+	border: 1px solid transparent;
+	background-color: var(--sp-input);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-unit-field-input {
+	height: 32px;
+	min-width: 0;
+	padding: 0 36px 0 8px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-unit-group .hu-unit-pill {
+	height: 24px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-font-line-height-input {
+	width: 100%;
+	padding: 0 8px;
+}
+
+/* Decoration / alignment: four icons on one row. */
+#helix-ultimate .hu-typography-wrapper .hu-switcher {
+	display: block;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-action-group {
+	display: flex;
+	gap: 2px;
+	padding: 2px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-switcher-action {
+	display: inline-flex;
+	flex: 1 1 0;
+	align-items: center;
+	justify-content: center;
+	min-width: 0;
+	height: 28px;
+	padding: 0;
+	font-size: 12px;
+}
+
+/* Add a font: one button, a menu of the fonts that are off */
+#helix-ultimate .hu-typo-add {
+	position: relative;
+	margin: 0;
+	padding: 8px 12px 0;
+}
+
+#helix-ultimate .hu-typo-add__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	height: 36px;
+	padding: 0 12px;
+	border: 1px dashed var(--sp-handle-interactive);
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-add__toggle .fas {
+	color: var(--sp-icon);
+	font-size: 11px;
+}
+
+#helix-ultimate .hu-typo-add__toggle:hover,
+#helix-ultimate .hu-typo-add.is-open .hu-typo-add__toggle {
+	border-style: solid;
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-add__list {
+	position: absolute;
+	z-index: 20;
+	top: calc(100% + 4px);
+	right: 12px;
+	left: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 4px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 8px;
+	background: var(--sp-panel);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+	list-style: none;
+}
+
+#helix-ultimate .hu-typo-add.is-up .hu-typo-add__list {
+	top: auto;
+	bottom: calc(36px + 4px);
+}
+
+#helix-ultimate .hu-typo-add__list[hidden] {
+	display: none;
+}
+
+#helix-ultimate .hu-typo-add__item {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+	width: 100%;
+	padding: 7px 10px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-text);
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-add__item:is(:hover, :focus, :focus-visible) {
+	outline: none !important;
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-add__name {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-typo-add__inherit {
+	overflow: hidden;
+	color: var(--sp-muted);
+	font-size: 12px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* Searchable font picker */
+.hu-font-picker {
+	min-width: 0;
+	max-width: 100%;
+}
+
+.hu-font-picker__native {
+	display: none !important;
+}
+
+.hu-font-picker {
+	position: relative;
+}
+
+.hu-font-picker__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	width: 100%;
+	height: 36px;
+	padding: 0 12px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: var(--sp-input);
+	font-size: 13px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.hu-font-picker__toggle:hover {
+	border-color: var(--sp-divider);
+}
+
+.hu-font-picker.is-open .hu-font-picker__toggle {
+	border-color: var(--sp-divider);
+	background: var(--sp-panel);
+}
+
+.hu-font-picker__value {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.hu-font-picker__toggle .fa-chevron-down {
+	flex: 0 0 auto;
+	color: var(--sp-muted);
+	font-size: 10px;
+}
+
+.hu-font-picker__popover {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	right: 0;
+	z-index: 20;
+	padding: 6px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 10px;
+	background: var(--sp-panel);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+}
+
+.hu-font-picker__search-wrap {
+	position: relative;
+	margin-bottom: 6px;
+}
+
+.hu-font-picker__search-wrap .fa-search {
+	position: absolute;
+	top: 50%;
+	left: 10px;
+	color: var(--sp-muted);
+	font-size: 12px;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+.hu-font-picker input.hu-font-picker__search {
+	width: 100%;
+	height: 34px;
+	min-height: 0;
+	padding: 0 10px 0 30px;
+}
+
+.hu-font-picker__list {
+	max-height: 260px;
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+	list-style: none;
+}
+
+.hu-font-picker__group {
+	padding: 8px 8px 4px;
+	color: var(--sp-muted);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.hu-font-picker__option {
+	padding: 7px 8px;
+	border-radius: 6px;
+	color: var(--sp-text);
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.hu-font-picker__option.is-active {
+	background: var(--sp-input);
+}
+
+.hu-font-picker__option[aria-selected='true'] {
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	font-weight: 600;
+}
+
+.hu-font-picker__empty {
+	margin: 0;
+	padding: 12px 8px;
+	color: var(--sp-muted);
+	font-size: 12px;
+}
