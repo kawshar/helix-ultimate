@@ -408,6 +408,9 @@
   function calculateSiblingDistances() {
     const tree = Joomla.sortable;
     if (!tree) return;
+    const treeElement = document.querySelector(tree.options.treeSelector);
+    const pitch = treeElement && parseFloat(getComputedStyle(treeElement).getPropertyValue("--hu-branch-pitch")) || 46;
+    const minLine = pitch + 9;
     document.querySelectorAll(".hu-menu-tree-branch").forEach((branch) => {
       const level = tree.getLevel(branch) || 1;
       const path = branch.querySelector(".hu-menu-branch-path");
@@ -417,13 +420,13 @@
       if (sibling) {
         const siblingPath = sibling.querySelector(".hu-menu-branch-path");
         const distance = getDistance(branch, sibling);
-        if (siblingPath) siblingPath.style.height = `${Math.max(distance.distanceY + 8, 55)}px`;
+        if (siblingPath) siblingPath.style.height = `${Math.max(distance.distanceY + 8, minLine)}px`;
         return;
       }
       const next = branch.nextElementSibling;
       const nextPath = next && next.querySelector(".hu-menu-branch-path");
       if (next && nextPath && tree.getLevel(next) > level) {
-        nextPath.style.height = "55px";
+        nextPath.style.height = `${minLine}px`;
       }
     });
   }

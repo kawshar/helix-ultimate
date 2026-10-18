@@ -625,6 +625,11 @@ function calculateSiblingDistances(): void {
 
 	if (!tree) return;
 
+	// Row pitch from the tree's CSS (--hu-branch-pitch); 46px is the classic layout.
+	const treeElement = document.querySelector(tree.options.treeSelector);
+	const pitch = (treeElement && parseFloat(getComputedStyle(treeElement).getPropertyValue('--hu-branch-pitch'))) || 46;
+	const minLine = pitch + 9;
+
 	document.querySelectorAll<HTMLElement>('.hu-menu-tree-branch').forEach(branch => {
 		const level = tree.getLevel(branch) || 1;
 		const path = branch.querySelector<HTMLElement>('.hu-menu-branch-path');
@@ -639,7 +644,7 @@ function calculateSiblingDistances(): void {
 			const siblingPath = sibling.querySelector<HTMLElement>('.hu-menu-branch-path');
 			const distance = getDistance(branch, sibling);
 
-			if (siblingPath) siblingPath.style.height = `${Math.max(distance.distanceY + 8, 55)}px`;
+			if (siblingPath) siblingPath.style.height = `${Math.max(distance.distanceY + 8, minLine)}px`;
 			return;
 		}
 
@@ -648,7 +653,7 @@ function calculateSiblingDistances(): void {
 		const nextPath = next && next.querySelector<HTMLElement>('.hu-menu-branch-path');
 
 		if (next && nextPath && tree.getLevel(next) > level) {
-			nextPath.style.height = '55px';
+			nextPath.style.height = `${minLine}px`;
 		}
 	});
 }
