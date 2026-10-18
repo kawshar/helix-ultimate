@@ -1,0 +1,1372 @@
+/**
+ * @package Helix Ultimate Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright Copyright (c) 2010 - 2025 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
+*/
+
+/*
+ * Customizer theme, aligned with the SP Page Builder editor colour guide:
+ * cool blue-gray chrome, one blue accent, WCAG 2.1 AA.
+ *
+ * Rules: text >= 4.5:1 with no faint tier; 11px minimum, 12px for inputs;
+ * interactive edges >= 3:1; blue only for selection, focus, primary action
+ * and variables; status never by colour alone; 2px blue focus ring.
+ * Loaded after helix-ultimate.css.
+ */
+
+:root {
+	/* Surfaces */
+	--sp-panel: #ffffff;
+	--sp-input: #f2f5fa;
+	--sp-canvas: #ecf0f6;
+	--sp-divider: #e3e8f1;
+	--sp-stone: #e0e5ef;
+	--sp-handle: #c9d1df;
+	--sp-handle-interactive: #7f8ca3;
+
+	/* Text and icons */
+	--sp-text: #111827;
+	--sp-muted: #5b6980;
+	--sp-icon: #2e3a4f;
+
+	/* Accent */
+	--sp-blue: #1f3bff;
+	--sp-blue-dark: #1629b8;
+	--sp-chip: #eef1ff;
+	--sp-chip-text: #1b2fb8;
+
+	/* Status */
+	--sp-published: #1e8e5a;
+	--sp-published-text: #167a4c;
+	--sp-draft: #7f8ca3;
+	--sp-danger: #c2311e;
+
+	--sp-radius: 8px;
+	--sp-font: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+#helix-ultimate {
+	background: var(--sp-canvas);
+	color: var(--sp-text);
+	font-family: var(--sp-font);
+}
+
+/* Focus: 2px blue outline, 2px offset, on every control. Never removed. */
+#helix-ultimate :is(a, button, input, select, textarea, [tabindex], .hu-fieldset-header, .hu-group-header-box):focus-visible {
+	outline: 2px solid var(--sp-blue) !important;
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Rail                                                                */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-sidebar {
+	background: var(--sp-panel);
+	box-shadow: inset -1px 0 0 var(--sp-divider);
+}
+
+#helix-ultimate .hu-sidebar-brand,
+#helix-ultimate .hu-sidebar-footer {
+	border-color: var(--sp-divider);
+}
+
+#helix-ultimate .hu-sidebar .hu-version {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--sp-muted);
+}
+
+#helix-ultimate .hu-sidebar-nav {
+	padding: 8px 0;
+}
+
+#helix-ultimate #hu-options > div > .hu-fieldset-header::after {
+	display: none;
+}
+
+#helix-ultimate .hu-fieldset-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	margin: 2px auto;
+	padding: 0;
+	border-radius: var(--sp-radius);
+	background: transparent;
+	box-shadow: none;
+	color: var(--sp-icon);
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+#helix-ultimate .hu-fieldset-header-inner {
+	display: flex;
+	margin: 0;
+}
+
+#helix-ultimate .hu-option-icon {
+	display: block;
+	width: 18px;
+	height: 18px;
+	background-color: currentColor;
+	filter: none;
+	-webkit-mask: var(--hu-icon) center / contain no-repeat;
+	mask: var(--hu-icon) center / contain no-repeat;
+}
+
+#helix-ultimate .hu-fieldset-header:hover:not(.active) {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-fieldset-header.active {
+	background: var(--sp-input);
+	box-shadow: none;
+	color: var(--sp-text);
+}
+
+/* Devices: a vertical segmented control */
+#helix-ultimate .hu-devices {
+	gap: 2px;
+	padding: 3px;
+	border-radius: 10px;
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-device {
+	width: 30px;
+	height: 28px;
+	border-radius: 7px;
+}
+
+#helix-ultimate .hu-device svg {
+	fill: var(--sp-muted);
+}
+
+#helix-ultimate .hu-device:hover svg,
+#helix-ultimate .hu-device.active svg {
+	fill: var(--sp-text);
+}
+
+#helix-ultimate .hu-device.active {
+	background: var(--sp-panel);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+}
+
+/* Draft status: icon plus text for assistive tech, colour never alone */
+#helix-ultimate .hu-sidebar .hu-response {
+	color: var(--sp-muted);
+}
+
+#helix-ultimate .hu-sidebar .hu-done-msg .fa-check-circle {
+	color: var(--sp-published);
+}
+
+#helix-ultimate .hu-sidebar .action-reset-drafts {
+	width: 28px;
+	height: 28px;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-sidebar .action-save-template {
+	width: 32px;
+	height: 32px;
+}
+
+#helix-ultimate .hu-sidebar-exit {
+	width: 32px;
+	height: 32px;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+}
+
+#helix-ultimate .hu-sidebar-exit:hover,
+#helix-ultimate .hu-sidebar-exit:focus {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-btn {
+	border-radius: var(--sp-radius);
+	font-family: var(--sp-font);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-btn-primary,
+#helix-ultimate .btn-primary {
+	border: 0;
+	color: #fff;
+	background: var(--sp-blue);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-btn-primary::before,
+#helix-ultimate .hu-btn-primary::after {
+	display: none;
+}
+
+#helix-ultimate .hu-btn-primary:hover,
+#helix-ultimate .hu-btn-primary:focus,
+#helix-ultimate .btn-primary:hover {
+	color: #fff;
+	background: var(--sp-blue-dark);
+}
+
+#helix-ultimate .hu-btn-secondary {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-btn-secondary:hover {
+	color: var(--sp-text);
+	background: var(--sp-divider);
+}
+
+/* ------------------------------------------------------------------ */
+/* Panel                                                               */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-edit-panel {
+	background: var(--sp-panel);
+	box-shadow: inset -1px 0 0 var(--sp-divider), 8px 0 24px rgba(17, 24, 39, 0.06);
+	font-size: 13px;
+}
+
+#helix-ultimate .hu-panel-header {
+	min-height: 56px;
+	padding: 0 12px 0 16px;
+	border-bottom: 1px solid var(--sp-divider);
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	font-size: 15px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-panel-close {
+	width: 28px;
+	height: 28px;
+	border-radius: var(--sp-radius);
+	background: transparent;
+}
+
+#helix-ultimate .hu-panel-close svg {
+	fill: var(--sp-icon);
+}
+
+#helix-ultimate .hu-panel-close:hover {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-panel-close:hover svg {
+	fill: var(--sp-text);
+}
+
+#helix-ultimate .hu-groups-container {
+	background: var(--sp-panel);
+}
+
+/* Accordion groups */
+#helix-ultimate .hu-group-wrap {
+	border-bottom: 1px solid var(--sp-divider);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .hu-group-header-box {
+	padding: 14px 16px;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-group-wrap.active .hu-group-header-box {
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-group-toggle-icon {
+	font-size: 14px !important;
+	color: var(--sp-muted);
+}
+
+#helix-ultimate .active .hu-group-header-box .hu-group-toggle-icon {
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-field-list {
+	padding: 4px 16px 16px;
+	background: var(--sp-panel);
+	box-shadow: none;
+}
+
+/* Section labels without a group (e.g. Custom Code) */
+#helix-ultimate .hu-no-group-wrap {
+	padding: 16px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Fields                                                              */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .control-group .control-label,
+#helix-ultimate .control-group .control-label label,
+#helix-ultimate label.control-label {
+	color: var(--sp-muted);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-help-icon {
+	color: var(--sp-muted);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-control-help,
+#helix-ultimate .control-help {
+	color: var(--sp-muted);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-field-separator,
+#helix-ultimate hr {
+	border-color: var(--sp-divider);
+}
+
+/* Inputs: filled, no visible border until hover/focus */
+#helix-ultimate .hu-edit-panel :is(input.form-control, textarea.form-control, select.form-select, select.form-control, .chosen-container .chosen-single, .chosen-container-multi .chosen-choices, .minicolors-input),
+#helix-ultimate .hu-edit-panel input[type='text']:not(.hu-unit-field-input),
+#helix-ultimate .hu-edit-panel input[type='number']:not(.hu-unit-field-input),
+#helix-ultimate .hu-edit-panel input[type='email'],
+#helix-ultimate .hu-edit-panel input[type='url'],
+#helix-ultimate .hu-edit-panel textarea {
+	min-height: 36px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background-color: var(--sp-input);
+	box-shadow: none;
+	font-family: var(--sp-font);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-edit-panel textarea {
+	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+	line-height: 1.5;
+}
+
+#helix-ultimate .hu-edit-panel :is(input, textarea, select):hover:not(:disabled):not([readonly]) {
+	border-color: var(--sp-divider);
+}
+
+/* Focused fields turn white; the 2px blue ring comes from the focus rule at the top. */
+#helix-ultimate .hu-edit-panel :is(input, textarea, select):focus {
+	border-color: transparent;
+	background-color: var(--sp-panel);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-edit-panel ::placeholder {
+	color: var(--sp-muted);
+	opacity: 1;
+}
+
+/* Number + unit: one filled pill with the unit as a small white chip */
+#helix-ultimate .hu-unit-group {
+	display: flex;
+	align-items: center;
+	height: 36px;
+	padding: 0 4px 0 0;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-unit-group:hover {
+	border-color: var(--sp-divider);
+}
+
+/* Number + unit is one control, so it gets one focus ring around the whole pill. */
+#helix-ultimate .hu-unit-group:focus-within {
+	border-color: transparent;
+	background: var(--sp-panel);
+	box-shadow: none;
+	outline: 2px solid var(--sp-blue);
+	outline-offset: 2px;
+}
+
+#helix-ultimate .hu-edit-panel .hu-unit-group :is(input, select):focus,
+#helix-ultimate .hu-edit-panel .hu-unit-group :is(input, select):focus-visible {
+	outline: none !important;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-edit-panel .hu-unit-group input.hu-unit-field-input:focus {
+	background-color: transparent;
+}
+
+#helix-ultimate .hu-unit-group input.hu-unit-field-input {
+	min-height: 0;
+	height: 34px;
+	border: 0;
+	border-radius: var(--sp-radius) 0 0 var(--sp-radius);
+	color: var(--sp-text);
+	background: transparent;
+	box-shadow: none;
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-unit-group select.hu-unit-select {
+	height: 26px;
+	padding: 0 18px 0 8px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-muted);
+	background-color: var(--sp-panel);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+/* Typography: per-device size inputs stay hidden until their device is active */
+#helix-ultimate .hu-unit-group.hu-webfont-unit:not(.active) {
+	display: none;
+}
+
+/* Typography: two columns per row fit the 272px panel */
+#helix-ultimate .hu-field-webfont .row {
+	row-gap: 4px;
+}
+
+#helix-ultimate .hu-field-webfont .row > [class*='col-'] {
+	flex: 0 0 50%;
+	max-width: 50%;
+}
+
+#helix-ultimate .hu-field-webfont .hu-webfont-preview-wrapper,
+#helix-ultimate .hu-field-webfont .hu-webfont-preview {
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: var(--sp-canvas);
+}
+
+#helix-ultimate .hu-field-webfont .control-label,
+#helix-ultimate .hu-field-webfont label {
+	color: var(--sp-muted);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+/* Switches */
+#helix-ultimate .hu-style-switcher input[type='checkbox'] {
+	width: 32px;
+	height: 18px;
+	border: 1px solid var(--sp-handle-interactive);
+	background: var(--sp-input);
+	box-shadow: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']::after {
+	top: 2px;
+	left: 2px;
+	width: 12px;
+	height: 12px;
+	background: var(--sp-handle-interactive);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']:checked {
+	border-color: var(--sp-blue);
+	background: var(--sp-blue);
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']:checked::after,
+#helix-ultimate .hu-style-switcher input[type='checkbox']:hover:checked:not(:disabled)::after,
+#helix-ultimate .hu-style-switcher input[type='checkbox']:focus:checked:not(:disabled)::after {
+	left: 16px;
+	background: #fff;
+}
+
+#helix-ultimate .hu-style-switcher input[type='checkbox']:hover:not(:checked):not(:disabled)::after,
+#helix-ultimate .hu-style-switcher input[type='checkbox']:focus:not(:checked):not(:disabled)::after {
+	left: 2px;
+}
+
+/* Segmented control (e.g. logo Image / Text) */
+#helix-ultimate .hu-switcher .hu-action-group {
+	padding: 3px;
+	border: 0;
+	border-radius: 10px;
+	background: var(--sp-input);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action {
+	padding: 6px 16px;
+	border-radius: 7px;
+	color: var(--sp-muted);
+	background: transparent;
+	box-shadow: none;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action:hover {
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action.active {
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+}
+
+#helix-ultimate .hu-switcher .hu-switcher-action svg path {
+	fill: currentColor;
+}
+
+/* Predefined header / off-canvas pickers: selection is a 2px blue outline */
+#helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap {
+	overflow: hidden;
+	border: 1px solid var(--sp-divider);
+	border-radius: var(--sp-radius);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap::after {
+	border: 2px solid var(--sp-blue);
+	border-radius: var(--sp-radius);
+	box-shadow: none;
+}
+
+#helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li:hover:not(.active) > .img-wrap::after {
+	border-color: var(--sp-handle-interactive);
+	border-width: 1px;
+}
+
+#helix-ultimate .hu-header-list > li > .hu-predefined-headers-title,
+#helix-ultimate .hu-offcanvas-list > li > .hu-predefined-offcanvas-title {
+	color: var(--sp-muted);
+	font-size: 12px;
+	line-height: 1.3;
+}
+
+#helix-ultimate .hu-header-list > li.active > .hu-predefined-headers-title,
+#helix-ultimate .hu-offcanvas-list > li.active > .hu-predefined-offcanvas-title {
+	color: var(--sp-text);
+	font-weight: 600;
+}
+
+/* Media picker preview */
+#helix-ultimate .hu-image-holder img {
+	border-radius: var(--sp-radius);
+	background: var(--sp-canvas);
+}
+
+/* ------------------------------------------------------------------ */
+/* Typography: font cards, "Add a font" list, searchable picker         */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .typography-panel .hu-groups-container {
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .typography-panel .hu-no-group-wrap {
+	padding: 0 0 12px;
+}
+
+/* Font sections: flat, full-width, split by a divider (no card chrome). */
+#helix-ultimate .hu-typography-wrapper {
+	margin: 0;
+	padding: 12px 12px 14px;
+	border: 0;
+	border-bottom: 1px solid var(--sp-divider);
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-typography-wrapper > div {
+	padding: 0;
+}
+
+#helix-ultimate .hu-typo-card[hidden],
+#helix-ultimate .hu-typo-add[hidden],
+#helix-ultimate .hu-typo-add li[hidden] {
+	display: none !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-is-header {
+	padding: 0;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-is-header .control-group,
+#helix-ultimate .hu-typography-wrapper .hu-is-header .control-group-checkbox {
+	margin-bottom: 0;
+}
+
+#helix-ultimate .hu-typo-card .hu-is-header .control-group-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+#helix-ultimate .hu-typo-card .hu-is-header .control-label {
+	margin: 0;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+/* The enable switch is driven by the remove / add buttons instead. */
+#helix-ultimate .hu-typo-card .hu-is-header .form-check {
+	display: none;
+}
+
+#helix-ultimate .hu-typo-card .hu-is-header {
+	cursor: pointer;
+	user-select: none;
+}
+
+/* Collapse toggle (header) */
+#helix-ultimate .hu-typo-collapse {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	margin-right: -4px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+	background: transparent;
+	font-size: 10px;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-collapse:hover {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-collapse .fas {
+	transition: transform 0.15s ease;
+}
+
+#helix-ultimate .hu-typo-card.is-collapsed .hu-typo-collapse .fas {
+	transform: rotate(-90deg);
+}
+
+/* Collapsed: header + one-line summary only. */
+#helix-ultimate .hu-typo-card.is-collapsed > :not(.hu-is-header),
+#helix-ultimate .hu-typo-card.is-collapsed .hu-typo-hint,
+#helix-ultimate .hu-typo-card:not(.is-collapsed) .hu-typo-summary {
+	display: none !important;
+}
+
+#helix-ultimate .hu-typo-summary {
+	margin: 2px 0 0;
+	overflow: hidden;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	line-height: 1.4;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#helix-ultimate .hu-typo-summary:empty {
+	display: none;
+}
+
+#helix-ultimate .hu-typo-card.is-collapsed {
+	padding-bottom: 12px;
+}
+
+#helix-ultimate .hu-typo-card .control-group {
+	margin-bottom: 0;
+}
+
+/* Extra fields after the font controls (e.g. Custom's selectors). */
+#helix-ultimate .hu-typo-card > .col-12:not(.hu-is-header) + .col-12 {
+	margin-top: 12px;
+}
+
+/* Remove font (bottom of an open card) */
+#helix-ultimate .hu-typo-footer {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 12px;
+}
+
+#helix-ultimate .hu-typo-remove {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 26px;
+	margin-right: -8px;
+	padding: 0 8px;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-muted);
+	background: transparent;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-remove .fas {
+	font-size: 11px;
+}
+
+#helix-ultimate .hu-typo-remove:hover {
+	color: var(--sp-danger);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-hint {
+	margin: 2px 0 0;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	line-height: 1.4;
+}
+
+/* Field grid: Font / Weight + Size / Line height + Spacing / Color + Subset / Decoration + Alignment */
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 10px 8px;
+	padding: 10px 0 0;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont > .row {
+	display: contents;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont > .row > div {
+	width: auto;
+	max-width: none;
+	margin: 0 !important;
+	padding: 0;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper,
+#helix-ultimate .hu-typography-wrapper .hu-webfont-family {
+	grid-column: 1 / -1;
+	margin: 0 !important;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper { order: 0; }
+#helix-ultimate .hu-typography-wrapper .hu-webfont-family { order: 1; }
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(1) { order: 2; } /* weight */
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(2) { order: 3; } /* size */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(2) { order: 4; } /* line height */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(3) { order: 5; } /* letter spacing */
+#helix-ultimate .hu-typography-wrapper .row:not(.spacing-row):not(.style-alignment) > :nth-child(3) { order: 6; } /* color */
+#helix-ultimate .hu-typography-wrapper .spacing-row > :nth-child(1) { order: 7; } /* subset */
+#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(1) { order: 8; }
+#helix-ultimate .hu-typography-wrapper .style-alignment > :nth-child(2) { order: 9; }
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper {
+	padding: 8px 10px;
+	border-radius: var(--sp-radius);
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview-wrapper.is-light-text {
+	background: #1f2937;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-webfont-preview {
+	color: var(--sp-text);
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	background: transparent;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont label {
+	margin-bottom: 4px !important;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	line-height: 16px;
+}
+
+/* One control height for every input in the grid. */
+#helix-ultimate .hu-typography-wrapper .hu-font-picker__toggle,
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont select:not(.hu-unit-select),
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont .form-control,
+#helix-ultimate .hu-typography-wrapper .hu-unit-group {
+	height: 32px;
+	min-height: 32px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-field-webfont select:not(.hu-unit-select) {
+	width: 100%;
+	padding: 0 24px 0 10px;
+	border: 1px solid transparent;
+	background-color: var(--sp-input);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-unit-field-input {
+	height: 32px;
+	min-width: 0;
+	padding: 0 8px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-unit-select {
+	height: 24px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-font-line-height-input {
+	width: 100%;
+	padding: 0 8px;
+}
+
+/* Decoration / alignment: four icons on one row. */
+#helix-ultimate .hu-typography-wrapper .hu-switcher {
+	display: block;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-action-group {
+	display: flex;
+	gap: 2px;
+	padding: 2px;
+}
+
+#helix-ultimate .hu-typography-wrapper .hu-switcher-action {
+	display: inline-flex;
+	flex: 1 1 0;
+	align-items: center;
+	justify-content: center;
+	min-width: 0;
+	height: 28px;
+	padding: 0;
+	font-size: 12px;
+}
+
+/* Add a font */
+#helix-ultimate .hu-typo-add {
+	margin: 0;
+	padding: 14px 12px 0;
+}
+
+#helix-ultimate .hu-typo-add__title {
+	margin: 0 0 8px;
+	color: var(--sp-muted);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+#helix-ultimate .hu-typo-add__list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#helix-ultimate .hu-typo-add__item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px dashed var(--sp-handle-interactive);
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	text-align: left;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-typo-add__item:hover {
+	border-style: solid;
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-add__text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+#helix-ultimate .hu-typo-add__name {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-typo-add__inherit {
+	color: var(--sp-muted);
+	font-size: 12px;
+}
+
+#helix-ultimate .hu-typo-add__icon {
+	flex: 0 0 auto;
+	color: var(--sp-icon);
+	font-size: 12px;
+}
+
+/* Searchable font picker */
+.hu-font-picker {
+	min-width: 0;
+	max-width: 100%;
+}
+
+.hu-font-picker__native {
+	display: none !important;
+}
+
+.hu-font-picker {
+	position: relative;
+}
+
+.hu-font-picker__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	width: 100%;
+	height: 36px;
+	padding: 0 12px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: var(--sp-input);
+	font-size: 13px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.hu-font-picker__toggle:hover {
+	border-color: var(--sp-divider);
+}
+
+.hu-font-picker.is-open .hu-font-picker__toggle {
+	border-color: var(--sp-divider);
+	background: var(--sp-panel);
+}
+
+.hu-font-picker__value {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.hu-font-picker__toggle .fa-chevron-down {
+	flex: 0 0 auto;
+	color: var(--sp-muted);
+	font-size: 10px;
+}
+
+.hu-font-picker__popover {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	right: 0;
+	z-index: 20;
+	padding: 6px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 10px;
+	background: var(--sp-panel);
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.16);
+}
+
+.hu-font-picker__search-wrap {
+	position: relative;
+	margin-bottom: 6px;
+}
+
+.hu-font-picker__search-wrap .fa-search {
+	position: absolute;
+	top: 50%;
+	left: 10px;
+	color: var(--sp-muted);
+	font-size: 12px;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+.hu-font-picker input.hu-font-picker__search {
+	width: 100%;
+	height: 34px;
+	min-height: 0;
+	padding: 0 10px 0 30px;
+}
+
+.hu-font-picker__list {
+	max-height: 260px;
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+	list-style: none;
+}
+
+.hu-font-picker__group {
+	padding: 8px 8px 4px;
+	color: var(--sp-muted);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.hu-font-picker__option {
+	padding: 7px 8px;
+	border-radius: 6px;
+	color: var(--sp-text);
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.hu-font-picker__option.is-active {
+	background: var(--sp-input);
+}
+
+.hu-font-picker__option[aria-selected='true'] {
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	font-weight: 600;
+}
+
+.hu-font-picker__empty {
+	margin: 0;
+	padding: 12px 8px;
+	color: var(--sp-muted);
+	font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Layout builder: flat, full-width rows split by dividers              */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .layout-panel .hu-groups-container {
+	background: var(--sp-panel);
+}
+
+/* Drop the nested field wrappers' padding / negative margins. */
+#helix-ultimate .layout-panel .hu-no-group-wrap {
+	padding: 0;
+}
+
+#helix-ultimate .layout-panel .hu-no-group-wrap .control-group {
+	margin: 0;
+}
+
+#helix-ultimate .layout-panel .hu-no-group-wrap .control-group-inner {
+	margin: 0;
+	padding: 0;
+}
+
+#helix-ultimate #hu-layout-builder {
+	padding: 0 0 48px;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) {
+	margin: 0;
+	padding-bottom: 0;
+	border-bottom: 1px solid var(--sp-divider);
+}
+
+#helix-ultimate .hu-layout-section {
+	padding: 0;
+}
+
+#helix-ultimate .hu-layout-section-inner {
+	padding: 10px 12px 12px;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-layout-section.ui-sortable-helper .hu-layout-section-inner {
+	border-radius: var(--sp-radius);
+	background: var(--sp-panel);
+	box-shadow: 0 6px 16px rgba(17, 24, 39, 0.15);
+}
+
+#helix-ultimate .hu-section-settings {
+	min-height: 24px;
+	padding: 0;
+}
+
+#helix-ultimate .hu-section-title {
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-move-row {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 24px;
+	margin: 0 4px 0 -4px;
+	vertical-align: middle;
+	cursor: grab;
+}
+
+#helix-ultimate .hu-move-row svg {
+	fill: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-move-row:hover svg {
+	fill: var(--sp-icon);
+}
+
+#helix-ultimate .hu-layout-builder-action svg {
+	fill: var(--sp-icon);
+}
+
+#helix-ultimate .hu-layout-builder-action:hover svg {
+	fill: var(--sp-text);
+}
+
+#helix-ultimate .hu-row-container {
+	padding: 8px 0 0;
+}
+
+#helix-ultimate .hu-row-container > .row {
+	margin-right: -2px;
+	margin-left: -2px;
+}
+
+#helix-ultimate .hu-layout-column {
+	padding-right: 2px;
+	padding-left: 2px;
+}
+
+#helix-ultimate .hu-column {
+	height: 28px;
+	line-height: 28px;
+	padding: 0 6px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--sp-text);
+	background: var(--sp-stone);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+/* Three or more columns: tighter chips so names like "bottom2" / "Component" fit. */
+#helix-ultimate .hu-layout-column.col-4 .hu-column,
+#helix-ultimate .hu-layout-column.col-3 .hu-column,
+#helix-ultimate .hu-layout-column.col-2 .hu-column,
+#helix-ultimate .hu-layout-column.col-1 .hu-column {
+	padding: 0 5px;
+	font-size: 11.5px;
+}
+
+#helix-ultimate .hu-column-component {
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-column-options {
+	background-color: var(--sp-panel);
+	border-radius: 4px;
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
+}
+
+#helix-ultimate .hu-layout-column.ui-sortable-helper .hu-column {
+	border: 0;
+	color: var(--sp-text);
+	background: var(--sp-panel);
+	box-shadow: 0 0 0 2px var(--sp-blue), 0 6px 16px rgba(17, 24, 39, 0.15);
+}
+
+#helix-ultimate .hu-layout-column.ui-state-highlight,
+#helix-ultimate #hu-layout-builder .ui-state-highlight {
+	border: 1px dashed var(--sp-handle-interactive);
+	border-radius: var(--sp-radius);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .hu-add-row {
+	/* Sits on the divider between rows. */
+	margin-bottom: -12px;
+	color: #fff;
+	background: var(--sp-blue);
+}
+
+#helix-ultimate .hu-add-row:hover,
+#helix-ultimate .hu-add-row:focus {
+	background: var(--sp-blue-dark);
+}
+
+/* ------------------------------------------------------------------ */
+/* Colour picker (Coloris)                                             */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .clr-field,
+.hu-modal .clr-field,
+.hu-options-modal .clr-field {
+	display: block;
+	position: relative;
+	color: var(--sp-text, #111827);
+}
+
+#helix-ultimate .clr-field input,
+.hu-modal .clr-field input,
+.hu-options-modal .clr-field input {
+	width: 100%;
+	padding-left: 40px;
+	text-transform: uppercase;
+	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
+}
+
+#helix-ultimate .clr-field input::placeholder,
+.hu-modal .clr-field input::placeholder,
+.hu-options-modal .clr-field input::placeholder {
+	text-transform: none;
+	font-family: var(--sp-font, sans-serif);
+}
+
+/* An empty colour shows a checkerboard swatch, meaning "inherit". */
+#helix-ultimate .clr-field button,
+.hu-modal .clr-field button,
+.hu-options-modal .clr-field button {
+	background-image: repeating-conic-gradient(#e3e8f1 0% 25%, #fff 0% 50%);
+	background-size: 10px 10px;
+}
+
+/* The swatch sits inside the field on the left. */
+#helix-ultimate .clr-field button,
+.hu-modal .clr-field button,
+.hu-options-modal .clr-field button {
+	top: 50%;
+	right: auto;
+	left: 6px;
+	width: 26px;
+	height: 26px;
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+	transform: translateY(-50%);
+}
+
+#helix-ultimate .clr-field button::after,
+.hu-modal .clr-field button::after,
+.hu-options-modal .clr-field button::after {
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+}
+
+.clr-picker {
+	border-radius: 12px;
+	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18), 0 0 0 1px #e3e8f1;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.clr-picker .clr-gradient {
+	border-radius: 12px 12px 0 0;
+}
+
+.clr-picker input.clr-color {
+	height: 32px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	color: #111827;
+	background: #f2f5fa;
+	font-size: 12px;
+}
+
+.clr-picker input.clr-color:focus {
+	border-color: transparent;
+	outline: 2px solid #1f3bff;
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+.clr-picker .clr-clear,
+.clr-picker .clr-close {
+	height: 28px;
+	padding: 0 12px;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.clr-picker .clr-clear {
+	color: #111827;
+	background: #f2f5fa;
+}
+
+.clr-picker .clr-close {
+	color: #fff;
+	background: #1f3bff;
+}
+
+.clr-picker .clr-close:hover {
+	background: #1629b8;
+}
+
+/* ------------------------------------------------------------------ */
+/* Preview canvas                                                      */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-preview {
+	background: var(--sp-canvas);
+}
+
+#helix-ultimate #hu-template-preview {
+	box-shadow: 0 0 0 1px var(--sp-divider);
+	transition: width 0.3s linear;
+}
+
+/* Tooltips shown next to the rail (Joomla.utils.tooltip) */
+.hu-tooltip {
+	position: fixed;
+	z-index: 10000;
+	max-width: 240px;
+	padding: 5px 8px;
+	border-radius: 6px;
+	color: #fff;
+	background: #111827;
+	box-shadow: 0 4px 12px rgba(17, 24, 39, 0.2);
+	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.3;
+	pointer-events: none;
+}
+
+.hu-tooltip[hidden] {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#helix-ultimate * {
+		transition: none !important;
+		animation: none !important;
+	}
+}
+
+/* Row Options modal: delete lives here instead of on the row. */
+.hu-options-modal-footer .hu-settings-delete-row {
+	margin-left: auto;
+	color: var(--sp-danger, #dc2626);
+	background: transparent;
+}
+
+.hu-options-modal-footer .hu-settings-delete-row:hover,
+.hu-options-modal-footer .hu-settings-delete-row:focus {
+	color: #fff;
+	background: var(--sp-danger, #dc2626);
+}

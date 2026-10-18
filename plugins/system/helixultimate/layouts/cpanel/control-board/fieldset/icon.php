@@ -19,9 +19,9 @@ $iconsrc = Uri::root() . "plugins/system/helixultimate/assets/images/icons/{$fie
 
 ?>
 <div class="hu-fieldset hu-fieldset-<?php echo $fieldset->name; ?>">
-	<div class="hu-fieldset-header" data-fieldset="<?php echo strtolower($fieldset->name); ?>">
+	<div class="hu-fieldset-header" data-fieldset="<?php echo strtolower($fieldset->name); ?>" title="<?php echo htmlspecialchars(Text::_($fieldset->label), ENT_QUOTES, 'UTF-8'); ?>">
 		<div class="hu-fieldset-header-inner">
-			<img class="hu-option-icon" src="<?php echo $iconsrc; ?>" alt="<?php echo $fieldset->name; ?>" alt="<?php echo Text::_($fieldset->label); ?>" />
+			<span class="hu-option-icon" style="--hu-icon: url('<?php echo $iconsrc; ?>');" aria-hidden="true"></span>
 			<span class="hu-option-title"><?php echo Text::_($fieldset->label); ?></span>
 		</div>
 	</div>
