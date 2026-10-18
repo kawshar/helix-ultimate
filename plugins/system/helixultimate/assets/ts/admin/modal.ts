@@ -198,10 +198,22 @@ export interface SubpanelOptions {
 	backLabel?: string;
 	/** Called after the step is closed (back, Esc, panel closed or close()). */
 	onClose?: () => void;
+	/**
+	 * Widen the panel while this step is open (px), e.g. for the mega menu
+	 * builder. The panel then covers part of the preview instead of resizing
+	 * it, and goes back to its width when the step closes.
+	 */
+	width?: number;
+	/** Extra class on the step element. */
+	className?: string;
+	/** HTML for buttons at the right of the step header. */
+	headerActions?: string;
 }
 
 export interface Subpanel {
 	element: HTMLElement;
+	header: HTMLElement;
+	width?: number;
 	body: HTMLElement;
 	footer: HTMLElement | null;
 	close(): void;
@@ -217,19 +229,32 @@ const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-red
 const layerBelow = (host: HTMLElement, stack: Subpanel[]): HTMLElement | null =>
 	stack.length > 1 ? stack[stack.length - 2].element : host.querySelector<HTMLElement>(':scope > .hu-groups-container');
 
+/** The panel is as wide as the widest open step needs (or its normal width). */
+function applyWidth(host: HTMLElement, stack: Subpanel[]): void {
+	const width = Math.max(0, ...stack.map(step => step.width ?? 0));
+
+	if (width) {
+		host.style.setProperty('--hu-panel-width', `min(${width}px, calc(100vw - var(--hu-sidebar-width, 48px) - 24px))`);
+		host.classList.add('is-wide');
+	} else {
+		host.style.removeProperty('--hu-panel-width');
+		host.classList.remove('is-wide');
+	}
+}
+
 /**
  * Open a step on top of a panel. The panel's content (or the previous step)
  * slides left out of view and the step slides in from the right; Back or Esc
  * returns to the layer below. Steps can be stacked.
  */
-function openSubpanel({ host, title, body, footer, backLabel = 'Back', onClose }: SubpanelOptions): Subpanel {
+function openSubpanel({ host, title, body, footer, backLabel = 'Back', onClose, width, className, headerActions }: SubpanelOptions): Subpanel {
 	const stack = stacks.get(host) ?? [];
 	stacks.set(host, stack);
 
 	const header = host.querySelector<HTMLElement>(':scope > .hu-panel-header');
 	const element = document.createElement('section');
 
-	element.className = 'hu-subpanel';
+	element.className = `hu-subpanel${className ? ` ${className}` : ''}`;
 	element.setAttribute('role', 'region');
 	element.setAttribute('aria-label', title);
 	element.style.top = `${header ? header.offsetHeight : 0}px`;
@@ -237,6 +262,7 @@ function openSubpanel({ host, title, body, footer, backLabel = 'Back', onClose }
 		<div class="hu-subpanel-header">
 			<button type="button" class="hu-subpanel-back" aria-label="${escapeAttr(backLabel)}" title="${escapeAttr(backLabel)}">${BACK_ICON}</button>
 			<h3 class="hu-subpanel-title"></h3>
+			${headerActions ? `<div class="hu-subpanel-actions">${headerActions}</div>` : ''}
 		</div>
 		<div class="hu-subpanel-body"></div>
 		${footer ? `<div class="hu-subpanel-footer">${footer}</div>` : ''}`;
@@ -250,6 +276,8 @@ function openSubpanel({ host, title, body, footer, backLabel = 'Back', onClose }
 
 	const subpanel: Subpanel = {
 		element,
+		header: element.querySelector<HTMLElement>('.hu-subpanel-header')!,
+		width,
 		body: bodyElement,
 		footer: element.querySelector<HTMLElement>('.hu-subpanel-footer'),
 		close() {
@@ -270,6 +298,8 @@ function openSubpanel({ host, title, body, footer, backLabel = 'Back', onClose }
 			below?.classList.remove('is-behind');
 			below?.removeAttribute('inert');
 			element.classList.remove('is-active');
+			// Out of reach while it slides away.
+			element.setAttribute('inert', '');
 
 			const remove = () => element.remove();
 
@@ -282,6 +312,8 @@ function openSubpanel({ host, title, body, footer, backLabel = 'Back', onClose }
 
 			if (!stack.length) host.classList.remove('has-subpanel');
 
+			applyWidth(host, stack);
+
 			onClose?.();
 
 			// Focus goes back to the step below, if there is one.
@@ -292,6 +324,7 @@ function openSubpanel({ host, title, body, footer, backLabel = 'Back', onClose }
 	stack.push(subpanel);
 	host.classList.add('has-subpanel');
 	host.appendChild(element);
+	applyWidth(host, stack);
 
 	const below = layerBelow(host, stack);
 	below?.classList.add('is-behind');

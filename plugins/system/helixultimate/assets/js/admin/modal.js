@@ -124,12 +124,22 @@
   var stacks = /* @__PURE__ */ new WeakMap();
   var reducedMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var layerBelow = (host, stack) => stack.length > 1 ? stack[stack.length - 2].element : host.querySelector(":scope > .hu-groups-container");
-  function openSubpanel({ host, title, body, footer, backLabel = "Back", onClose }) {
+  function applyWidth(host, stack) {
+    const width = Math.max(0, ...stack.map((step) => step.width ?? 0));
+    if (width) {
+      host.style.setProperty("--hu-panel-width", `min(${width}px, calc(100vw - var(--hu-sidebar-width, 48px) - 24px))`);
+      host.classList.add("is-wide");
+    } else {
+      host.style.removeProperty("--hu-panel-width");
+      host.classList.remove("is-wide");
+    }
+  }
+  function openSubpanel({ host, title, body, footer, backLabel = "Back", onClose, width, className, headerActions }) {
     const stack = stacks.get(host) ?? [];
     stacks.set(host, stack);
     const header = host.querySelector(":scope > .hu-panel-header");
     const element = document.createElement("section");
-    element.className = "hu-subpanel";
+    element.className = `hu-subpanel${className ? ` ${className}` : ""}`;
     element.setAttribute("role", "region");
     element.setAttribute("aria-label", title);
     element.style.top = `${header ? header.offsetHeight : 0}px`;
@@ -137,6 +147,7 @@
 		<div class="hu-subpanel-header">
 			<button type="button" class="hu-subpanel-back" aria-label="${escapeAttr(backLabel)}" title="${escapeAttr(backLabel)}">${BACK_ICON}</button>
 			<h3 class="hu-subpanel-title"></h3>
+			${headerActions ? `<div class="hu-subpanel-actions">${headerActions}</div>` : ""}
 		</div>
 		<div class="hu-subpanel-body"></div>
 		${footer ? `<div class="hu-subpanel-footer">${footer}</div>` : ""}`;
@@ -146,6 +157,8 @@
     let closed = false;
     const subpanel = {
       element,
+      header: element.querySelector(".hu-subpanel-header"),
+      width,
       body: bodyElement,
       footer: element.querySelector(".hu-subpanel-footer"),
       close() {
@@ -160,6 +173,7 @@
         below2?.classList.remove("is-behind");
         below2?.removeAttribute("inert");
         element.classList.remove("is-active");
+        element.setAttribute("inert", "");
         const remove = () => element.remove();
         if (reducedMotion() || !host.classList.contains("active-panel")) {
           remove();
@@ -168,6 +182,7 @@
           setTimeout(remove, 400);
         }
         if (!stack.length) host.classList.remove("has-subpanel");
+        applyWidth(host, stack);
         onClose?.();
         if (index > 0) stack[index - 1].element.querySelector(".hu-subpanel-back")?.focus({ preventScroll: true });
       }
@@ -175,6 +190,7 @@
     stack.push(subpanel);
     host.classList.add("has-subpanel");
     host.appendChild(element);
+    applyWidth(host, stack);
     const below = layerBelow(host, stack);
     below?.classList.add("is-behind");
     below?.setAttribute("inert", "");

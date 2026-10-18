@@ -8,8 +8,11 @@
 /**
  * Mega menu builder (inside the mega menu modal).
  *
- * `run()` is called every time the modal opens; it reads the new modal's
- * settings. Event handlers are delegated and registered once.
+ * `run({ root, close })` is called every time the builder opens (as a
+ * customizer panel step, or in the classic modal); it reads the new settings
+ * from `root` (the builder's container; defaults to the open modal). `close`
+ * closes whatever holds the builder; without it the modal is closed.
+ * Event handlers are delegated and registered once.
  */
 (() => {
 	const DEFAULT_SETTINGS = {
@@ -42,6 +45,8 @@
 	];
 
 	const state = {
+		root: null,
+		close: null,
 		itemId: 0,
 		baseUrl: '',
 		settings: { ...DEFAULT_SETTINGS },
@@ -49,8 +54,19 @@
 
 	let bound = false;
 
-	const q = selector => document.querySelector(selector);
-	const qa = selector => [...document.querySelectorAll(selector)];
+	// Scoped to the builder that is open, so a step that is still closing (or
+	// any other copy of the markup) is never read by mistake.
+	const root = () => (state.root && state.root.isConnected ? state.root : document);
+	// The root itself counts too (in a panel step it is the .hu-mega-menu-builder).
+	const q = selector => {
+		const scope = root();
+		return scope !== document && scope.matches(selector) ? scope : scope.querySelector(selector);
+	};
+	const qa = selector => {
+		const scope = root();
+		const found = [...scope.querySelectorAll(selector)];
+		return scope !== document && scope.matches(selector) ? [scope, ...found] : found;
+	};
 	const popover = () => q('.hu-megamenu-popover');
 
 	const helixUrl = (action, extra = '') =>
@@ -272,6 +288,9 @@
 		}
 	}
 
+	/** Close the step or modal that holds the builder. */
+	const closeEditor = () => (state.close ? state.close() : Joomla.helixModal.close());
+
 	async function save() {
 		try {
 			const response = await post('saveMegaMenuSettings', { settings: state.settings, id: state.itemId });
@@ -280,7 +299,7 @@
 			alert('Something went wrong!');
 		}
 
-		Joomla.helixModal.close();
+		closeEditor();
 		Joomla.HelixToaster.success('Saved mega menu settings!', 'Success');
 	}
 
@@ -298,7 +317,7 @@
 
 		delegate(document, 'click', '.hu-megamenu-cancel-btn', event => {
 			event.preventDefault();
-			Joomla.helixModal.close();
+			closeEditor();
 		});
 
 		delegate(document, 'change', '.hu-megamenu-builder-megamenu', (event, input) => toggleSidebarSettings(input.checked));
@@ -419,7 +438,10 @@
 	/* Run (each time the modal opens)                                     */
 	/* ------------------------------------------------------------------ */
 
-	function run() {
+	function run(options = {}) {
+		state.close = typeof options.close === 'function' ? options.close : null;
+		state.root = options.root || document.querySelector('.hu-modal.hu-mega-menu-builder') || null;
+
 		if (!bound) {
 			bindEvents();
 			bound = true;

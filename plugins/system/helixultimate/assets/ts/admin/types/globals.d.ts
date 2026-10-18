@@ -41,7 +41,7 @@ declare global {
 		setUpShowon?(container?: ParentNode | null): void;
 		helixLayout?: HelixLayoutApi;
 		/** Mega menu builder (megamenu.js). */
-		helixMegaMenu?: { run(): void; [member: string]: unknown };
+		helixMegaMenu?: { run(options?: { root?: HTMLElement; close?: () => void }): void; [member: string]: unknown };
 		/** Reload the customizer preview (helix-ultimate.js). */
 		reloadPreview?(): void;
 		helixSwitchDevice?: (device: string) => void;

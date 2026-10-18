@@ -118,20 +118,93 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const branch = branchOf(link);
 		const parent = branch?.dataset.parent || '1';
+		const host = link.closest<HTMLElement>('.hu-edit-panel');
+		const isMega = parent === '1';
+		const itemTitle = branch?.querySelector('.hu-branch-title')?.textContent?.trim() || '';
 
 		try {
 			const response = await request<HtmlResponse>(helixUrl('generateMegaMenuBody', `&id=${itemIdOf(link)}`));
 
-			if (response.status) {
-				Joomla.helixModal.megamenu({
-					title: parent === '1' ? 'Mega Menu' : 'Settings',
-					className: 'hu-mega-menu-builder',
-					targetType: 'id',
-					target: 'megaMenuModal',
-					body: response.html,
-				});
+			if (!response.status) return;
 
+			const title = isMega ? 'Mega Menu' : 'Settings';
+
+			// No customizer panel (third-party callers): keep the modal.
+			if (!host) {
+				Joomla.helixModal.megamenu({ title, className: 'hu-mega-menu-builder', targetType: 'id', target: 'megaMenuModal', body: response.html });
 				Joomla.helixMegaMenu?.run();
+				return;
+			}
+
+			// The builder keeps its modal-era wrappers so megamenu.js and its CSS still match.
+			const body = document.createElement('div');
+			body.className = 'hu-mega-menu-builder hu-megamenu-step';
+			body.innerHTML = `<div class="hu-modal-megamenu-container">${response.html ?? ''}</div>`;
+
+			const SETTINGS_KEY = 'helixUltimate.megamenu.settingsHidden';
+			const settingsIcon =
+				'<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>';
+
+			const step = Joomla.helixSubpanel.open({
+				host,
+				title: itemTitle ? `${title}: ${itemTitle}` : title,
+				body,
+				backLabel: 'Back to menu',
+				// Root items get the mega menu grid, which needs room.
+				width: isMega ? 760 : undefined,
+				className: isMega ? 'hu-subpanel-megamenu' : 'hu-subpanel-menu-settings',
+				// Root items: the settings column can slide away to give the columns room.
+				headerActions: isMega
+					? `<button type="button" class="hu-subpanel-action hu-megamenu-settings-toggle" aria-pressed="false">${settingsIcon}<span>Settings</span></button>`
+					: undefined,
+				footer:
+					'<button type="button" class="hu-btn hu-btn-primary hu-megamenu-save-btn"><span class="fas fa-check" aria-hidden="true"></span> Save</button>' +
+					'<button type="button" class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>',
+			});
+
+			Joomla.helixMegaMenu?.run({ root: body, close: () => step.close() });
+
+			const toggle = step.header.querySelector<HTMLButtonElement>('.hu-megamenu-settings-toggle');
+			const sidebar = body.querySelector<HTMLElement>('.hu-megamenu-sidebar');
+
+			if (toggle && sidebar) {
+				sidebar.id = sidebar.id || `hu-megamenu-sidebar-${itemIdOf(link)}`;
+				toggle.setAttribute('aria-controls', sidebar.id);
+
+				const megaSwitch = body.querySelector<HTMLInputElement>('.hu-megamenu-builder-megamenu');
+				const megaOn = () => !megaSwitch || megaSwitch.checked;
+
+				// With the mega menu off the settings are the whole step, so they always show.
+				const apply = () => {
+					const hidden = megaOn() && body.classList.contains('is-settings-hidden');
+					sidebar.toggleAttribute('inert', hidden);
+					toggle.setAttribute('aria-pressed', String(!hidden));
+					toggle.title = hidden ? 'Show settings' : 'Hide settings';
+				};
+
+				const setHidden = (hidden: boolean) => {
+					body.classList.toggle('is-settings-hidden', hidden);
+					apply();
+
+					try {
+						localStorage.setItem(SETTINGS_KEY, hidden ? '1' : '0');
+					} catch (e) {
+						// Storage unavailable: the choice isn't remembered.
+					}
+				};
+
+				megaSwitch?.addEventListener('change', apply);
+
+				let hidden = true;
+
+				try {
+					hidden = localStorage.getItem(SETTINGS_KEY) !== '0';
+				} catch (e) {
+					// Keep the default.
+				}
+
+				setHidden(hidden);
+				toggle.addEventListener('click', () => setHidden(!body.classList.contains('is-settings-hidden')));
 			}
 		} catch (error) {
 			Joomla.HelixToaster.error('Something went wrong!', 'Error');
