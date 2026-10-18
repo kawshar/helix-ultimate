@@ -375,6 +375,26 @@ document.addEventListener('keydown', event => {
 	}
 });
 
+// Help text toggles inside steps (their fields are cloned, so they have no own listeners).
+document.addEventListener('click', event => {
+	const icon = event.target instanceof Element ? event.target.closest<HTMLElement>('.hu-subpanel .hu-help-icon') : null;
+
+	if (!icon) return;
+
+	event.preventDefault();
+
+	const group = icon.closest('.control-group');
+	const help = group?.querySelector<HTMLElement>('.hu-control-help');
+
+	icon.classList.toggle('active');
+
+	if (help) {
+		const opening = !help.classList.contains('show');
+		help.classList.toggle('show', opening);
+		help.style.display = opening ? 'block' : 'none';
+	}
+});
+
 const helixSubpanel = { open: openSubpanel, closeAll: closeSubpanels };
 
 export type HelixSubpanelApi = typeof helixSubpanel;

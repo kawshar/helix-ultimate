@@ -224,6 +224,19 @@
       stack[stack.length - 1].close();
     }
   });
+  document.addEventListener("click", (event) => {
+    const icon = event.target instanceof Element ? event.target.closest(".hu-subpanel .hu-help-icon") : null;
+    if (!icon) return;
+    event.preventDefault();
+    const group = icon.closest(".control-group");
+    const help = group?.querySelector(".hu-control-help");
+    icon.classList.toggle("active");
+    if (help) {
+      const opening = !help.classList.contains("show");
+      help.classList.toggle("show", opening);
+      help.style.display = opening ? "block" : "none";
+    }
+  });
   var helixSubpanel = { open: openSubpanel, closeAll: closeSubpanels };
   Joomla.helixSubpanel = helixSubpanel;
   var helixModal = { close, megamenu, frame, media, settings };

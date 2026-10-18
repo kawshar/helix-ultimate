@@ -99,7 +99,7 @@
       const value = item.dataset.path ?? "";
       const preview = item.dataset.preview ?? "";
       const target = modal.getAttribute("data-target") ?? "";
-      const input = modal.getAttribute("data-target_type") === "data" ? q(`.hu-options-modal [data-attrname="${target}"]`) : document.getElementById(target);
+      const input = modal.getAttribute("data-target_type") === "data" ? q(`:is(.hu-options-modal, .hu-subpanel.is-active:not([inert])) .hu-options-modal-content [data-attrname="${target}"]`) : document.getElementById(target);
       if (input) {
         input.value = value;
         fire(input);

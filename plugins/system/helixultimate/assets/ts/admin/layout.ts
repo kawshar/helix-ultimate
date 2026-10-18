@@ -194,18 +194,47 @@ document.addEventListener('DOMContentLoaded', () => {
 		footerButtons?: string[];
 	}
 
-	/** Open a settings modal with a copy of the hidden settings template. */
+	/** The Row / Column Options step that is open, if any. */
+	let settingsStep: ReturnType<typeof Joomla.helixSubpanel.open> | null = null;
+
+	/**
+	 * Open Row / Column Options with a copy of the hidden settings template:
+	 * as a step that slides over the Layout panel (or, without the panel, the
+	 * classic settings modal).
+	 */
 	function openSettings({ templateId, flag, title, target, activeClass, footerButtons = [] }: OpenSettingsOptions): HTMLElement {
-		Joomla.helixModal.settings({ flag, title, class: 'hu-modal-small', footerButtons });
+		const host = builder.closest<HTMLElement>('.hu-edit-panel');
+
+		settingsStep?.close();
 
 		document.querySelectorAll(`.${activeClass}`).forEach(element => element.classList.remove(activeClass));
 		target.classList.add(activeClass);
 
 		const content = document.getElementById(templateId)!.cloneNode(true) as HTMLElement;
 		content.removeAttribute('id');
-		content.classList.add('hu-options-modal-content');
+		// Kept so existing selectors (and third-party CSS) still match the settings.
+		content.classList.add('hu-options-modal-content', 'hu-layout-settings');
 
-		document.querySelector('.hu-options-modal-inner')?.replaceChildren(content);
+		const apply = `<button type="button" class="hu-btn hu-btn-primary hu-settings-apply" data-flag="${flag}"><span class="fas fa-check" aria-hidden="true"></span> Apply</button>`;
+
+		if (host) {
+			const step = Joomla.helixSubpanel.open({
+				host,
+				title,
+				body: content,
+				backLabel: 'Back to layout',
+				className: 'hu-subpanel-layout-settings',
+				footer: apply + footerButtons.join(''),
+				onClose: () => {
+					if (settingsStep === step) settingsStep = null;
+				},
+			});
+
+			settingsStep = step;
+		} else {
+			Joomla.helixModal.settings({ flag, title, class: 'hu-modal-small', footerButtons });
+			document.querySelector('.hu-options-modal-inner')?.replaceChildren(content);
+		}
 
 		content.querySelectorAll<SettingsInput>('.hu-input').forEach(input => {
 			const value = readData(target, input.dataset.attrname ?? '');
@@ -219,6 +248,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		return content;
 	}
 
+	/** The settings being edited: the open step's, or the modal's. */
+	const settingsContent = (): HTMLElement | null =>
+		settingsStep?.body.querySelector<HTMLElement>('.hu-options-modal-content') ??
+		document.querySelector<HTMLElement>('.hu-options-modal .hu-options-modal-content');
+
 	delegate(document, 'click', '.hu-row-options', (event, button) => {
 		event.preventDefault();
 
@@ -229,10 +263,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		openSettings({
 			templateId: 'hu-row-settings',
 			flag: 'row-setting',
-			title: "<span class='fas fa-cogs hu-mr-2'></span> Row Options",
+			title: `Row: ${row.querySelector('.hu-section-title')?.textContent?.trim() || 'Row Options'}`,
 			target: row,
 			activeClass: 'row-active',
-			footerButtons: ['<a href="#" class="hu-btn hu-btn-link hu-settings-delete-row"><span class="fas fa-trash-alt" aria-hidden="true"></span> Delete row</a>'],
+			footerButtons: ['<button type="button" class="hu-btn hu-btn-link hu-settings-delete-row"><span class="fas fa-trash-alt" aria-hidden="true"></span> Delete row</button>'],
 		});
 	});
 
@@ -246,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const content = openSettings({
 			templateId: 'hu-column-settings',
 			flag: 'column-setting',
-			title: "<span class='fas fa-cog'></span> Column Options",
+			title: `Column: ${column.querySelector('.hu-column-title')?.textContent?.trim() || 'Column Options'}`,
 			target: column,
 			activeClass: 'column-active',
 		});
@@ -271,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	/** Only one column can hold the component. */
-	delegate<HTMLInputElement>(document, 'change', '.hu-options-modal .hu-input-column_type', (event, checkbox) => {
+	delegate<HTMLInputElement>(document, 'change', '.hu-options-modal-content .hu-input-column_type', (event, checkbox) => {
 		const content = checkbox.closest('.hu-options-modal-content');
 		const nameGroup = content && content.querySelector<HTMLElement>('.control-group.name');
 
@@ -299,6 +333,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	const closeSettings = (): void => {
+		if (settingsStep) {
+			settingsStep.close();
+			return;
+		}
+
 		document.querySelectorAll('.hu-options-modal-overlay, .hu-options-modal').forEach(element => element.remove());
 		document.body.classList.remove('hu-options-modal-open');
 	};
@@ -307,7 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	delegate(document, 'click', '.hu-settings-apply', (event, button) => {
 		event.preventDefault();
 
-		const inputs = [...document.querySelectorAll<SettingsInput>('.hu-options-modal-content .hu-input')];
+		// Only the open settings: a step that is still sliding away has inputs too.
+		const inputs = [...(settingsContent()?.querySelectorAll<SettingsInput>('.hu-input') ?? [])];
 
 		switch (button.dataset.flag) {
 			case 'row-setting': {

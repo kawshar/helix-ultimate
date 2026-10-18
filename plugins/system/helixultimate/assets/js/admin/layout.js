@@ -100,14 +100,33 @@
       }
       [...input.parentElement?.children ?? []].filter((sibling) => sibling.classList.contains("hu-media-clear")).forEach((clear) => clear.classList.remove("hide"));
     }
+    let settingsStep = null;
     function openSettings({ templateId, flag, title, target, activeClass, footerButtons = [] }) {
-      Joomla.helixModal.settings({ flag, title, class: "hu-modal-small", footerButtons });
+      const host = builder.closest(".hu-edit-panel");
+      settingsStep?.close();
       document.querySelectorAll(`.${activeClass}`).forEach((element) => element.classList.remove(activeClass));
       target.classList.add(activeClass);
       const content = document.getElementById(templateId).cloneNode(true);
       content.removeAttribute("id");
-      content.classList.add("hu-options-modal-content");
-      document.querySelector(".hu-options-modal-inner")?.replaceChildren(content);
+      content.classList.add("hu-options-modal-content", "hu-layout-settings");
+      const apply = `<button type="button" class="hu-btn hu-btn-primary hu-settings-apply" data-flag="${flag}"><span class="fas fa-check" aria-hidden="true"></span> Apply</button>`;
+      if (host) {
+        const step = Joomla.helixSubpanel.open({
+          host,
+          title,
+          body: content,
+          backLabel: "Back to layout",
+          className: "hu-subpanel-layout-settings",
+          footer: apply + footerButtons.join(""),
+          onClose: () => {
+            if (settingsStep === step) settingsStep = null;
+          }
+        });
+        settingsStep = step;
+      } else {
+        Joomla.helixModal.settings({ flag, title, class: "hu-modal-small", footerButtons });
+        document.querySelector(".hu-options-modal-inner")?.replaceChildren(content);
+      }
       content.querySelectorAll(".hu-input").forEach((input) => {
         const value = readData(target, input.dataset.attrname ?? "");
         setInputValue(input, value);
@@ -116,6 +135,7 @@
       Joomla.initColorPicker?.();
       return content;
     }
+    const settingsContent = () => settingsStep?.body.querySelector(".hu-options-modal-content") ?? document.querySelector(".hu-options-modal .hu-options-modal-content");
     delegate(document, "click", ".hu-row-options", (event, button) => {
       event.preventDefault();
       const row = button.closest(".hu-layout-section");
@@ -123,10 +143,10 @@
       openSettings({
         templateId: "hu-row-settings",
         flag: "row-setting",
-        title: "<span class='fas fa-cogs hu-mr-2'></span> Row Options",
+        title: `Row: ${row.querySelector(".hu-section-title")?.textContent?.trim() || "Row Options"}`,
         target: row,
         activeClass: "row-active",
-        footerButtons: ['<a href="#" class="hu-btn hu-btn-link hu-settings-delete-row"><span class="fas fa-trash-alt" aria-hidden="true"></span> Delete row</a>']
+        footerButtons: ['<button type="button" class="hu-btn hu-btn-link hu-settings-delete-row"><span class="fas fa-trash-alt" aria-hidden="true"></span> Delete row</button>']
       });
     });
     delegate(document, "click", ".hu-column-options", (event, button) => {
@@ -136,7 +156,7 @@
       const content = openSettings({
         templateId: "hu-column-settings",
         flag: "column-setting",
-        title: "<span class='fas fa-cog'></span> Column Options",
+        title: `Column: ${column.querySelector(".hu-column-title")?.textContent?.trim() || "Column Options"}`,
         target: column,
         activeClass: "column-active"
       });
@@ -152,7 +172,7 @@
       syncSticky();
       if (nameSelect) nameSelect.addEventListener("change", syncSticky);
     });
-    delegate(document, "change", ".hu-options-modal .hu-input-column_type", (event, checkbox) => {
+    delegate(document, "change", ".hu-options-modal-content .hu-input-column_type", (event, checkbox) => {
       const content = checkbox.closest(".hu-options-modal-content");
       const nameGroup = content && content.querySelector(".control-group.name");
       const taken = [...builder.querySelectorAll(".hu-layout-column:not(.column-active)")].some(
@@ -175,12 +195,16 @@
       updateLayoutField();
     });
     const closeSettings = () => {
+      if (settingsStep) {
+        settingsStep.close();
+        return;
+      }
       document.querySelectorAll(".hu-options-modal-overlay, .hu-options-modal").forEach((element) => element.remove());
       document.body.classList.remove("hu-options-modal-open");
     };
     delegate(document, "click", ".hu-settings-apply", (event, button) => {
       event.preventDefault();
-      const inputs = [...document.querySelectorAll(".hu-options-modal-content .hu-input")];
+      const inputs = [...settingsContent()?.querySelectorAll(".hu-input") ?? []];
       switch (button.dataset.flag) {
         case "row-setting": {
           const row = builder.querySelector(".row-active");

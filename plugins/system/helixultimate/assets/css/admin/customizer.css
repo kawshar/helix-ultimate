@@ -2381,3 +2381,147 @@
 		transition: none;
 	}
 }
+
+/* ------------------------------------------------------------------ */
+/* Row / Column Options as a Layout panel step                          */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-subpanel-body:has(> .hu-layout-settings) {
+	padding: 0;
+}
+
+#helix-ultimate .hu-layout-settings .hu-option-group {
+	border-bottom: 1px solid var(--sp-divider);
+}
+
+#helix-ultimate .hu-layout-settings .hu-option-group-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 44px;
+	padding: 0 12px;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	user-select: none;
+}
+
+#helix-ultimate .hu-layout-settings .hu-option-group-title:hover {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-layout-settings .hu-option-group-title .fa-fw {
+	width: 16px;
+	color: var(--sp-icon);
+	font-size: 12px;
+}
+
+/* Chevron on the right, pointing down when open. */
+#helix-ultimate .hu-layout-settings .hu-option-group-title .fa-angle-right {
+	order: 2;
+	margin-left: auto;
+	color: var(--sp-icon);
+	transition: transform 0.15s ease;
+}
+
+#helix-ultimate .hu-layout-settings .hu-option-group.active .hu-option-group-title {
+	color: var(--sp-text);
+}
+
+#helix-ultimate .hu-layout-settings .hu-option-group.active .hu-option-group-title .fa-angle-right {
+	transform: rotate(90deg);
+}
+
+#helix-ultimate .hu-layout-settings .hu-option-group-list {
+	padding: 2px 12px 14px;
+}
+
+/* Fields: label above a full-width control, 12px apart. */
+#helix-ultimate .hu-layout-settings .control-group {
+	margin: 0 0 12px;
+}
+
+#helix-ultimate .hu-layout-settings .control-group:last-child {
+	margin-bottom: 0;
+}
+
+#helix-ultimate .hu-layout-settings .control-group-inner {
+	margin: 0;
+	padding: 0;
+}
+
+#helix-ultimate .hu-layout-settings .control-label,
+#helix-ultimate .hu-layout-settings .control-group > label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0 0 4px;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	font-weight: 500;
+	line-height: 16px;
+}
+
+#helix-ultimate .hu-layout-settings .hu-help-icon {
+	margin: 0;
+	color: var(--sp-icon);
+	font-size: 11px;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-layout-settings .hu-control-help {
+	margin: 4px 0 6px;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	line-height: 1.45;
+}
+
+#helix-ultimate .hu-layout-settings input.hu-input:not([type='checkbox']):not([type='hidden']),
+#helix-ultimate .hu-layout-settings select.hu-input,
+#helix-ultimate .hu-layout-settings textarea.hu-input {
+	width: 100%;
+}
+
+/* On/off settings: label left, switch right, one line. */
+#helix-ultimate .hu-layout-settings .control-group-checkbox .checkbox,
+#helix-ultimate .hu-layout-settings .control-group-checkbox .control-label {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	margin: 0;
+}
+
+#helix-ultimate .hu-layout-settings .control-group-checkbox .control-label {
+	color: var(--sp-text);
+	font-size: 12.5px;
+}
+
+#helix-ultimate .hu-layout-settings .control-group-checkbox .control-label input[type='checkbox'] {
+	margin: 0 0 0 auto;
+}
+
+/* Every field label in the step looks the same (some sit outside .control-label). */
+#helix-ultimate .hu-layout-settings label:not(.control-label):not(.form-check-label) {
+	display: block;
+	margin: 0 0 4px;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	font-weight: 500;
+	line-height: 16px;
+}
+
+/* Selects match the filled inputs. */
+#helix-ultimate .hu-layout-settings select.hu-input {
+	height: 34px;
+	padding: 0 32px 0 10px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius);
+	background-color: var(--sp-input);
+	box-shadow: none;
+	font-size: 12.5px;
+}
+
+#helix-ultimate .hu-layout-settings select.hu-input:hover {
+	border-color: var(--sp-divider);
+}
