@@ -353,3 +353,58 @@
 #helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-collapse {
 	grid-column: 2;
 }
+
+/* Fonts are flat, full-width sections split by a divider: no card chrome,
+   so the fields get the whole panel width. */
+#helix-ultimate .hu-typography-wrapper.hu-typo-card,
+#helix-ultimate .hu-typography-wrapper.hu-typo-card.is-collapsed {
+	margin: 0;
+	padding: 0 12px;
+	border: 0;
+	border-bottom: 1px solid var(--sp-divider);
+	border-radius: 0;
+	background: transparent;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header,
+#helix-ultimate .hu-typo-card > .hu-is-header:hover {
+	flex: 0 0 calc(100% + 24px);
+	width: calc(100% + 24px);
+	max-width: none;
+	margin: 0 -12px;
+	padding: 10px 12px;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header:hover {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-card > .col-12:not(.hu-is-header) {
+	padding: 0;
+}
+
+#helix-ultimate .hu-typo-card > .col-12:not(.hu-is-header) + .col-12 {
+	margin-top: 12px;
+}
+
+#helix-ultimate .hu-typo-card .hu-typo-footer {
+	margin: 8px 0 0;
+	padding: 0 0 10px;
+}
+
+#helix-ultimate .hu-typo-card .hu-typo-fields .hu-typo-inline > label {
+	padding-left: 8px;
+	font-size: 11.5px;
+}
+
+#helix-ultimate .hu-typo-card .hu-typo-fields .hu-typo-inline .hu-font-line-height-input {
+	padding: 0 8px 0 80px;
+}
+
+/* "Add a font" follows the last section. */
+#helix-ultimate .hu-typo-add {
+	padding-top: 12px;
+}

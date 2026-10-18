@@ -671,7 +671,12 @@
 		const count = columnsOf(row).length;
 		const unit = (container.getBoundingClientRect().width - gap * (count - 1)) / GRID;
 
-		handle.setPointerCapture(event.pointerId);
+		try {
+			handle.setPointerCapture(event.pointerId);
+		} catch (error) {
+			// No active pointer (e.g. a synthetic event): the move/up listeners still work.
+		}
+
 		handle.focus({ preventScroll: true });
 		row.classList.add('is-resizing');
 

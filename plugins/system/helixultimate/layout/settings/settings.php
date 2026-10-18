@@ -11,20 +11,20 @@ defined('_JEXEC') or die();
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
+/**
+ * Column width choices for one breakpoint. The values stay 1-12 (0 = inherit),
+ * which the site still prints as Bootstrap col-* classes; the labels are widths
+ * ("6/12 · 50%") instead of class names, so nothing here is Bootstrap-specific.
+ *
+ * @param	string	$device	Kept for compatibility; the labels no longer depend on it.
+ */
 function column_grid_system($device = 'lg')
 {
-	$col = array(0 => 'Inherit');
+	$col = array(0 => Text::_('HELIX_ULTIMATE_COLUMN_WIDTH_INHERIT'));
 
 	for ($i = 1; $i <= 12; $i++)
 	{
-		if ($device === 'xs')
-		{
-			$col[$i] = 'col-' . $i;
-		}
-		else
-		{
-			$col[$i] = 'col-' . $device . '-' . $i;
-		}
+		$col[$i] = $i . '/12 · ' . round($i / 12 * 100) . '%';
 	}
 
 	return $col;
@@ -441,7 +441,9 @@ class RowColumnSettings
 
 			$output .= '<div class="hu-option-group hu-option-group-' . strtolower($key2) . $active . '">';
 			$output .= '<div class="hu-option-group-title">';
-			$output .= '<span class="fas fa-angle-right" aria-hidden="true"></span>' . Text::_('HELIX_ULTIMATE_OPTION_GROUP_' . strtoupper($key2));
+			// The breakpoint widths read as "Column width", not a Bootstrap grid.
+			$groupTitle = $key2 === 'grid' ? 'HELIX_ULTIMATE_OPTION_GROUP_COLUMN_WIDTH' : 'HELIX_ULTIMATE_OPTION_GROUP_' . strtoupper($key2);
+			$output .= '<span class="fas fa-angle-right" aria-hidden="true"></span>' . Text::_($groupTitle);
 			$output .= '</div>';
 			$output .= '<div class="hu-option-group-list">';
 

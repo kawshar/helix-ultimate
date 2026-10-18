@@ -57,51 +57,171 @@
 	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
 }
 
+/* The picker itself (appended to <body>). An explicit grid, because the admin's
+   global `input[type="text"] { width: 100%; margin: 0 }` breaks Coloris's
+   margin-based layout:
+     [ colour area                ]
+     [ hue                        ]
+     [ opacity                    ]
+     [ swatch ][ hex             ]
+     [ swatches                   ]
+     [             Clear ][ Done ]   */
+.clr-picker.clr-open,
+.clr-picker[data-inline='true'] {
+	display: grid;
+}
+
 .clr-picker {
+	grid-template-columns: 12px 28px minmax(0, 1fr) auto auto 12px;
+	column-gap: 8px;
+	width: 240px;
+	padding: 0 0 12px;
+	border: 0;
 	border-radius: 12px;
+	background: var(--sp-panel, #fff);
 	box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18), 0 0 0 1px #e3e8f1;
-	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	font-family: var(--sp-font, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
 }
 
 .clr-picker .clr-gradient {
+	grid-row: 1;
+	grid-column: 1 / -1;
+	width: auto;
+	height: 140px;
+	margin: 0 0 14px;
 	border-radius: 12px 12px 0 0;
 }
 
+.clr-picker .clr-hue,
+.clr-picker .clr-alpha {
+	grid-column: 2 / 6;
+	width: auto;
+	height: 8px;
+	margin: 0 0 14px;
+	border-radius: 4px;
+}
+
+.clr-picker .clr-hue {
+	grid-row: 2;
+}
+
+.clr-picker .clr-alpha {
+	grid-row: 3;
+}
+
+.clr-picker .clr-hue div,
+.clr-picker .clr-alpha div {
+	width: 14px;
+	height: 14px;
+	margin-left: -7px;
+	box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(17, 24, 39, 0.3);
+}
+
+.clr-picker .clr-preview {
+	grid-row: 4;
+	grid-column: 2;
+	width: 28px;
+	height: 28px;
+	margin: 0;
+	border-radius: 6px;
+}
+
+.clr-picker .clr-preview::before,
+.clr-picker .clr-preview::after {
+	border-radius: 6px;
+}
+
+.clr-picker .clr-preview::after {
+	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+}
+
 .clr-picker input.clr-color {
-	height: 32px;
+	grid-row: 4;
+	grid-column: 3 / 6;
+	width: auto;
+	height: 28px;
+	min-height: 0;
+	margin: 0;
+	padding: 0 8px;
 	border: 1px solid transparent;
-	border-radius: 8px;
-	color: #111827;
-	background: #f2f5fa;
+	border-radius: 6px;
+	color: var(--sp-text, #111827);
+	background: var(--sp-input, #f2f5fa);
+	box-shadow: none;
+	font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
 	font-size: 12px;
+	text-align: left;
+	text-transform: uppercase;
 }
 
 .clr-picker input.clr-color:focus {
-	border-color: transparent;
-	outline: 2px solid #1f3bff;
-	outline-offset: 2px;
+	border-color: var(--sp-blue, #1f3bff);
+	background: var(--sp-panel, #fff);
+	outline: none;
 	box-shadow: none;
+}
+
+.clr-picker .clr-format {
+	grid-row: 5;
+	grid-column: 2 / 6;
+}
+
+.clr-picker .clr-swatches {
+	grid-row: 6;
+	grid-column: 2 / 6;
+	margin: 10px 0 0;
+}
+
+.clr-picker .clr-swatches > div {
+	justify-content: flex-start;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+}
+
+.clr-picker .clr-swatches button {
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	border-radius: 4px;
 }
 
 .clr-picker .clr-clear,
 .clr-picker .clr-close {
+	grid-row: 7;
+	align-self: center;
 	height: 28px;
+	margin: 12px 0 0;
 	padding: 0 12px;
-	border-radius: 8px;
+	border: 0;
+	border-radius: 6px;
 	font-size: 12px;
 	font-weight: 600;
+	line-height: 28px;
 }
 
 .clr-picker .clr-clear {
-	color: #111827;
-	background: #f2f5fa;
+	grid-column: 4;
+	color: var(--sp-muted, #5d6b82);
+	background: transparent;
+}
+
+.clr-picker .clr-clear:hover {
+	color: var(--sp-text, #111827);
+	background: var(--sp-input, #f2f5fa);
 }
 
 .clr-picker .clr-close {
-	color: #fff;
-	background: #1f3bff;
+	grid-column: 5;
+	color: var(--sp-chip-text, #1b2fb8);
+	background: var(--sp-chip, #eef1ff);
 }
 
 .clr-picker .clr-close:hover {
-	background: #1629b8;
+	background: color-mix(in srgb, var(--sp-chip, #eef1ff) 85%, var(--sp-chip-text, #1b2fb8));
+}
+
+.clr-picker :is(.clr-clear, .clr-close):focus-visible {
+	outline: 1px solid var(--sp-blue, #1f3bff);
+	outline-offset: 0;
 }

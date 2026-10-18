@@ -1616,53 +1616,173 @@
   box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
 }
 
+/* The picker itself (appended to <body>). An explicit grid, because the admin's
+   global `input[type="text"] { width: 100%; margin: 0 }` breaks Coloris's
+   margin-based layout:
+     [ colour area                ]
+     [ hue                        ]
+     [ opacity                    ]
+     [ swatch ][ hex             ]
+     [ swatches                   ]
+     [             Clear ][ Done ]   */
+.clr-picker.clr-open,
+.clr-picker[data-inline=true] {
+  display: grid;
+}
+
 .clr-picker {
+  grid-template-columns: 12px 28px minmax(0, 1fr) auto auto 12px;
+  column-gap: 8px;
+  width: 240px;
+  padding: 0 0 12px;
+  border: 0;
   border-radius: 12px;
+  background: var(--sp-panel, #fff);
   box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18), 0 0 0 1px #e3e8f1;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--sp-font, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
 }
 
 .clr-picker .clr-gradient {
+  grid-row: 1;
+  grid-column: 1/-1;
+  width: auto;
+  height: 140px;
+  margin: 0 0 14px;
   border-radius: 12px 12px 0 0;
 }
 
+.clr-picker .clr-hue,
+.clr-picker .clr-alpha {
+  grid-column: 2/6;
+  width: auto;
+  height: 8px;
+  margin: 0 0 14px;
+  border-radius: 4px;
+}
+
+.clr-picker .clr-hue {
+  grid-row: 2;
+}
+
+.clr-picker .clr-alpha {
+  grid-row: 3;
+}
+
+.clr-picker .clr-hue div,
+.clr-picker .clr-alpha div {
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(17, 24, 39, 0.3);
+}
+
+.clr-picker .clr-preview {
+  grid-row: 4;
+  grid-column: 2;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border-radius: 6px;
+}
+
+.clr-picker .clr-preview::before,
+.clr-picker .clr-preview::after {
+  border-radius: 6px;
+}
+
+.clr-picker .clr-preview::after {
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+}
+
 .clr-picker input.clr-color {
-  height: 32px;
+  grid-row: 4;
+  grid-column: 3/6;
+  width: auto;
+  height: 28px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
   border: 1px solid transparent;
-  border-radius: 8px;
-  color: #111827;
-  background: #f2f5fa;
+  border-radius: 6px;
+  color: var(--sp-text, #111827);
+  background: var(--sp-input, #f2f5fa);
+  box-shadow: none;
+  font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
   font-size: 12px;
+  text-align: left;
+  text-transform: uppercase;
 }
 
 .clr-picker input.clr-color:focus {
-  border-color: transparent;
-  outline: 2px solid #1f3bff;
-  outline-offset: 2px;
+  border-color: var(--sp-blue, #1f3bff);
+  background: var(--sp-panel, #fff);
+  outline: none;
   box-shadow: none;
+}
+
+.clr-picker .clr-format {
+  grid-row: 5;
+  grid-column: 2/6;
+}
+
+.clr-picker .clr-swatches {
+  grid-row: 6;
+  grid-column: 2/6;
+  margin: 10px 0 0;
+}
+
+.clr-picker .clr-swatches > div {
+  justify-content: flex-start;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.clr-picker .clr-swatches button {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border-radius: 4px;
 }
 
 .clr-picker .clr-clear,
 .clr-picker .clr-close {
+  grid-row: 7;
+  align-self: center;
   height: 28px;
+  margin: 12px 0 0;
   padding: 0 12px;
-  border-radius: 8px;
+  border: 0;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
+  line-height: 28px;
 }
 
 .clr-picker .clr-clear {
-  color: #111827;
-  background: #f2f5fa;
+  grid-column: 4;
+  color: var(--sp-muted, #5d6b82);
+  background: transparent;
+}
+
+.clr-picker .clr-clear:hover {
+  color: var(--sp-text, #111827);
+  background: var(--sp-input, #f2f5fa);
 }
 
 .clr-picker .clr-close {
-  color: #fff;
-  background: #1f3bff;
+  grid-column: 5;
+  color: var(--sp-chip-text, #1b2fb8);
+  background: var(--sp-chip, #eef1ff);
 }
 
 .clr-picker .clr-close:hover {
-  background: #1629b8;
+  background: color-mix(in srgb, var(--sp-chip, #eef1ff) 85%, var(--sp-chip-text, #1b2fb8));
+}
+
+.clr-picker :is(.clr-clear, .clr-close):focus-visible {
+  outline: 1px solid var(--sp-blue, #1f3bff);
+  outline-offset: 0;
 }
 
 /* ------------------------------------------------------------------ */
@@ -2963,6 +3083,61 @@
 
 #helix-ultimate .hu-typo-card > .hu-is-header .hu-typo-collapse {
   grid-column: 2;
+}
+
+/* Fonts are flat, full-width sections split by a divider: no card chrome,
+   so the fields get the whole panel width. */
+#helix-ultimate .hu-typography-wrapper.hu-typo-card,
+#helix-ultimate .hu-typography-wrapper.hu-typo-card.is-collapsed {
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--sp-divider);
+  border-radius: 0;
+  background: transparent;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header,
+#helix-ultimate .hu-typo-card > .hu-is-header:hover {
+  flex: 0 0 calc(100% + 24px);
+  width: calc(100% + 24px);
+  max-width: none;
+  margin: 0 -12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#helix-ultimate .hu-typo-card > .hu-is-header:hover {
+  background: var(--sp-input);
+}
+
+#helix-ultimate .hu-typo-card > .col-12:not(.hu-is-header) {
+  padding: 0;
+}
+
+#helix-ultimate .hu-typo-card > .col-12:not(.hu-is-header) + .col-12 {
+  margin-top: 12px;
+}
+
+#helix-ultimate .hu-typo-card .hu-typo-footer {
+  margin: 8px 0 0;
+  padding: 0 0 10px;
+}
+
+#helix-ultimate .hu-typo-card .hu-typo-fields .hu-typo-inline > label {
+  padding-left: 8px;
+  font-size: 11.5px;
+}
+
+#helix-ultimate .hu-typo-card .hu-typo-fields .hu-typo-inline .hu-font-line-height-input {
+  padding: 0 8px 0 80px;
+}
+
+/* "Add a font" follows the last section. */
+#helix-ultimate .hu-typo-add {
+  padding-top: 12px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -4426,4 +4601,234 @@
 #helix-ultimate .hu-device-cycle:hover {
   color: var(--sp-blue);
   background: var(--sp-input);
+}
+
+/* ------------------------------------------------------------------ */
+/* Layout panel: wider, rows and columns like the mega menu builder    */
+/* ------------------------------------------------------------------ */
+/* The rows need room for four columns with readable names. */
+#helix-ultimate:has(.hu-edit-panel.layout-panel.active-panel) {
+  --hu-panel-width: 420px;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) .hu-layout-section-inner {
+  padding: 12px 16px 14px;
+}
+
+/* Row header: grip (on hover), title, then the row's actions as square buttons. */
+#helix-ultimate .hu-section-settings {
+  min-height: 28px;
+}
+
+#helix-ultimate .hu-section-settings > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The grip takes no space: it shows on hover in the row's left margin. */
+#helix-ultimate .hu-layout-section-inner {
+  position: relative;
+}
+
+#helix-ultimate .hu-move-row {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  width: 16px;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-layout-section:hover .hu-move-row,
+#helix-ultimate .hu-move-row:focus-visible {
+  opacity: 1;
+}
+
+#helix-ultimate .hu-row-option-list {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#helix-ultimate .hu-row-option-list > li {
+  position: relative;
+  margin: 0 !important;
+}
+
+#helix-ultimate .hu-row-option-list > li > .hu-layout-builder-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--sp-radius);
+}
+
+#helix-ultimate .hu-row-option-list > li > .hu-layout-builder-action:hover {
+  background: var(--sp-input);
+}
+
+/* Columns: white cards with a hairline border; name left, width right. */
+#helix-ultimate .hu-row-container {
+  padding: 10px 0 0;
+}
+
+#helix-ultimate .hu-row-container > .row {
+  row-gap: 6px;
+  margin-right: -3px;
+  margin-left: -3px;
+}
+
+#helix-ultimate .hu-layout-column {
+  position: relative;
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
+#helix-ultimate .hu-column {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 40px;
+  line-height: 1.2;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--sp-divider);
+  border-radius: 8px;
+  color: var(--sp-text);
+  background: var(--sp-panel);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: grab;
+  transition: border-color 0.12s ease;
+}
+
+#helix-ultimate .hu-layout-column:is(.col-1, .col-2, .col-3, .col-4) .hu-column {
+  font-size: 12px;
+}
+
+#helix-ultimate .hu-column:hover {
+  border-color: var(--sp-handle-interactive);
+}
+
+#helix-ultimate .hu-column-title {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The width ("4/12") only shows while it matters: while this row is being
+   resized, or when a handle between its columns is hovered or focused. It sits
+   on the right, where the settings icon is, so nothing else moves. */
+#helix-ultimate .hu-layout-column::after {
+  content: attr(data-grid_size) "/12";
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--sp-panel);
+  background: var(--sp-blue);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-layout-section.is-resizing .hu-layout-column::after,
+#helix-ultimate .hu-layout-section:has(.hu-col-resizer:is(:hover, :focus-visible)) .hu-layout-column::after {
+  opacity: 1;
+}
+
+#helix-ultimate .hu-layout-section.is-resizing .hu-column-options,
+#helix-ultimate .hu-layout-section:has(.hu-col-resizer:is(:hover, :focus-visible)) .hu-column-options {
+  display: none;
+}
+
+/* The name makes room for the width (and truncates) instead of running under it. */
+#helix-ultimate .hu-layout-section.is-resizing .hu-column,
+#helix-ultimate .hu-layout-section:has(.hu-col-resizer:is(:hover, :focus-visible)) .hu-column {
+  padding-right: 52px;
+}
+
+#helix-ultimate .hu-layout-column.ui-sortable-helper::after {
+  opacity: 0;
+}
+
+#helix-ultimate .hu-column-options {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-layout-column:is(:hover, :focus-within) .hu-column-options {
+  opacity: 1;
+}
+
+#helix-ultimate .hu-column-options:hover {
+  background: var(--sp-input);
+}
+
+/* The component column keeps its pastel chip. */
+#helix-ultimate .hu-column.hu-column-component {
+  border-color: transparent;
+  color: var(--sp-chip-text);
+  background: var(--sp-chip);
+  font-weight: 600;
+}
+
+#helix-ultimate .hu-column.hu-column-component:hover {
+  border-color: var(--sp-blue);
+}
+
+@media (hover: none) {
+  #helix-ultimate .hu-move-row,
+  #helix-ultimate .hu-column-options {
+    opacity: 1;
+  }
+}
+/* Column resizing: the handles (see layout.ts) sit on the gaps between columns. */
+#helix-ultimate .hu-row-container {
+  position: relative;
+}
+
+#helix-ultimate .hu-row-container > .hu-col-resizers {
+  left: 0;
+  width: 100%;
+}
+
+#helix-ultimate .hu-layout-section:hover .hu-col-resizer::before {
+  opacity: 0.6;
+}
+
+#helix-ultimate .hu-layout-section .hu-col-resizer:hover::before,
+#helix-ultimate .hu-layout-section .hu-col-resizer:focus-visible::before,
+#helix-ultimate .hu-layout-section.is-resizing .hu-col-resizer::before {
+  height: 32px;
+  background: var(--sp-blue);
+  opacity: 1;
+}
+
+#helix-ultimate .hu-layout-section.is-resizing,
+#helix-ultimate .hu-layout-section.is-resizing * {
+  cursor: col-resize !important;
+  user-select: none;
 }
