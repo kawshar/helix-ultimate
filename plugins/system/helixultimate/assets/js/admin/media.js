@@ -178,7 +178,55 @@
         alert("Somethings wrong, Try again");
       }
     });
-    function uploadMedia(formData, index) {
+    const ALLOWED_UPLOADS = ["png", "jpg", "jpeg", "webp", "gif"];
+    const mediaText = (key, fallback) => {
+      const value = Joomla.Text ? Joomla.Text._(key) : "";
+      return value && value !== key ? value : fallback;
+    };
+    function canUpload(file) {
+      const extension = (file.name.split(".").pop() ?? "").toLowerCase();
+      if (extension === "svg") {
+        alert(
+          Joomla.Text._(
+            "HELIX_ULTIMATE_MEDIA_SVG_NOT_SUPPORTED_FOR_UPLOAD",
+            "SVG is not supported for upload. Upload via Joomla Media, then select the file here."
+          )
+        );
+        return false;
+      }
+      if (!ALLOWED_UPLOADS.includes(extension)) {
+        alert(Joomla.Text._("COM_SPPAGEBUILDER_MEDIA_MANAGER_FILE_NOT_SUPPORTED", "File not supported"));
+        return false;
+      }
+      return true;
+    }
+    function sendUpload(file, path, index, onProgress) {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        const xhr = new XMLHttpRequest();
+        const token = Joomla.getOptions("csrf.token");
+        formData.append("file", file);
+        formData.append("path", path);
+        formData.append("index", index);
+        xhr.open("POST", `index.php?option=com_ajax&helix=ultimate&request=task&action=upload-media&format=json&helix_id=${window.helixUltimateStyleId}`);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        if (token) xhr.setRequestHeader("X-CSRF-Token", token);
+        xhr.upload.addEventListener("progress", (event) => {
+          if (event.lengthComputable) onProgress(Math.floor(event.loaded / event.total * 100));
+        });
+        xhr.addEventListener("load", () => {
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch (error) {
+            resolve({ status: false, message: "Somethings wrong, Try again" });
+          }
+        });
+        xhr.addEventListener("error", () => reject(new Error("Network error")));
+        xhr.send(formData);
+      });
+    }
+    function uploadMedia(file, path) {
+      const index = `media-id-${Math.floor(Math.random() * 1e6) + 1}`;
       const list = q(".hu-media");
       const manager = document.getElementById("hu-media-manager");
       if (list) {
@@ -192,28 +240,14 @@
       }
       if (manager) manager.scrollTo({ top: manager.scrollHeight, behavior: "smooth" });
       const item = () => q(`.${index}`);
-      const xhr = new XMLHttpRequest();
-      const token = Joomla.getOptions("csrf.token");
-      xhr.open("POST", `index.php?option=com_ajax&helix=ultimate&request=task&action=upload-media&format=json&helix_id=${window.helixUltimateStyleId}`);
-      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-      if (token) xhr.setRequestHeader("X-CSRF-Token", token);
-      xhr.upload.addEventListener("progress", (event) => {
+      sendUpload(file, path, index, (percent) => {
         const element = item();
-        if (!element || !event.lengthComputable) return;
-        const percent = Math.floor(event.loaded / event.total * 100);
-        const bar = element.querySelector(".hu-progress-bar");
-        const label = element.querySelector(".hu-media-upload-percentage");
+        const bar = element?.querySelector(".hu-progress-bar");
+        const label = element?.querySelector(".hu-media-upload-percentage");
         if (bar) bar.style.width = `${percent}%`;
         if (label) label.textContent = `${percent}% `;
-      });
-      xhr.addEventListener("load", () => {
+      }).then((data) => {
         const element = item();
-        let data;
-        try {
-          data = JSON.parse(xhr.responseText);
-        } catch (error) {
-          data = { status: false, message: "Somethings wrong, Try again" };
-        }
         if (!element) return;
         if (data.status) {
           element.className = "hu-media-image";
@@ -224,43 +258,120 @@
           element.remove();
           alert(data.message);
         }
-      });
-      xhr.addEventListener("error", () => {
-        const element = item();
-        if (element) element.remove();
+      }).catch(() => {
+        item()?.remove();
         alert("Somethings wrong, Try again");
       });
-      xhr.send(formData);
     }
+    function syncMediaField(field) {
+      const input = field.querySelector("input[type=hidden]");
+      const picker = field.querySelector(".hu-media-picker");
+      const name = field.querySelector(".hu-media-picker__name");
+      const clear = field.querySelector(".hu-media-clear");
+      const holder = field.querySelector(".hu-image-holder");
+      const value = input?.value ?? "";
+      field.classList.toggle("is-empty", value === "");
+      field.dataset.dropLabel = mediaText("HELIX_ULTIMATE_MEDIA_DROP_HERE", "Drop to upload");
+      if (name) name.textContent = value.split("/").pop() ?? "";
+      if (clear) clear.classList.toggle("hide", value === "");
+      if (holder && value === "") holder.innerHTML = "";
+      if (picker) {
+        picker.title = value === "" ? mediaText("HELIX_ULTIMATE_MEDIA_CHOOSE", "Choose image") : mediaText("HELIX_ULTIMATE_MEDIA_REPLACE", "Replace");
+      }
+    }
+    document.querySelectorAll(".hu-media-field").forEach(syncMediaField);
+    delegate(document, "change", ".hu-media-field input[type=hidden]", (event, input) => {
+      const field = input.closest(".hu-media-field");
+      if (field) syncMediaField(field);
+    });
+    new MutationObserver((records) => {
+      records.forEach(
+        (record) => record.addedNodes.forEach((node) => {
+          if (!(node instanceof HTMLElement)) return;
+          if (node.matches(".hu-media-field")) syncMediaField(node);
+          node.querySelectorAll(".hu-media-field").forEach(syncMediaField);
+        })
+      );
+    }).observe(document.body, { childList: true, subtree: true });
+    const hasFiles = (event) => Boolean(event.dataTransfer && [...event.dataTransfer.types].includes("Files"));
+    delegate(document, "dragover", ".hu-media-field", (event, field) => {
+      if (!hasFiles(event) || field.classList.contains("is-uploading")) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+      field.classList.add("is-dragover");
+    });
+    delegate(document, "dragleave", ".hu-media-field", (event, field) => {
+      if (!field.contains(event.relatedTarget)) field.classList.remove("is-dragover");
+    });
+    delegate(document, "drop", ".hu-media-field", (event, field) => {
+      if (!hasFiles(event)) return;
+      event.preventDefault();
+      field.classList.remove("is-dragover");
+      const file = event.dataTransfer?.files[0];
+      const input = field.querySelector("input[type=hidden]");
+      if (!file || !input || field.classList.contains("is-uploading") || !canUpload(file)) return;
+      const name = field.querySelector(".hu-media-picker__name");
+      const previous = name?.textContent ?? "";
+      field.classList.add("is-uploading");
+      field.style.setProperty("--hu-media-progress", "0%");
+      if (name) name.textContent = mediaText("HELIX_ULTIMATE_MEDIA_UPLOADING", "Uploading…");
+      sendUpload(file, "/images", `media-drop-${Date.now()}`, (percent) => field.style.setProperty("--hu-media-progress", `${percent}%`)).then((data) => {
+        if (!data.status || !data.path) {
+          alert(data.message);
+          if (name) name.textContent = previous;
+          return;
+        }
+        const holder = field.querySelector(".hu-image-holder");
+        if (holder) {
+          holder.innerHTML = "";
+          const image = document.createElement("img");
+          image.src = data.src ?? "";
+          image.alt = "";
+          holder.appendChild(image);
+        }
+        input.value = data.path;
+        fire(input);
+      }).catch(() => {
+        if (name) name.textContent = previous;
+        alert("Somethings wrong, Try again");
+      }).finally(() => {
+        field.classList.remove("is-uploading");
+        syncMediaField(field);
+      });
+    });
+    delegate(document, "dragover", "#hu-media-manager", (event, manager) => {
+      if (!hasFiles(event)) return;
+      event.preventDefault();
+      manager.classList.add("is-dragover");
+    });
+    delegate(document, "dragleave", "#hu-media-manager", (event, manager) => {
+      if (!manager.contains(event.relatedTarget)) manager.classList.remove("is-dragover");
+    });
+    delegate(document, "drop", "#hu-media-manager", (event, manager) => {
+      if (!hasFiles(event)) return;
+      event.preventDefault();
+      manager.classList.remove("is-dragover");
+      const current = q(".hu-media-breadcrumb-item.active");
+      [...event.dataTransfer?.files ?? []].forEach((file) => {
+        if (canUpload(file)) uploadMedia(file, current?.dataset.path ?? "");
+      });
+    });
+    ["dragover", "drop"].forEach(
+      (type) => document.addEventListener(type, (event) => {
+        if (hasFiles(event) && !(event.target instanceof Element && event.target.closest(".hu-media-field, #hu-media-manager"))) {
+          event.preventDefault();
+        }
+      })
+    );
     delegate(document, "click", ".hu-modal-action-upload", (event) => {
       event.preventDefault();
       const input = document.getElementById("hu-file-input");
       if (input) input.click();
     });
     delegate(document, "change", "#hu-file-input", (event, input) => {
-      const allowed = ["png", "jpg", "jpeg", "webp", "gif"];
       const current = q(".hu-media-breadcrumb-item.active");
       [...input.files ?? []].forEach((file) => {
-        const extension = (file.name.split(".").pop() ?? "").toLowerCase();
-        if (extension === "svg") {
-          alert(
-            Joomla.Text._(
-              "HELIX_ULTIMATE_MEDIA_SVG_NOT_SUPPORTED_FOR_UPLOAD",
-              "SVG is not supported for upload. Upload via Joomla Media, then select the file here."
-            )
-          );
-          return;
-        }
-        if (!allowed.includes(extension)) {
-          alert(Joomla.Text._("COM_SPPAGEBUILDER_MEDIA_MANAGER_FILE_NOT_SUPPORTED", "File not supported"));
-          return;
-        }
-        const index = `media-id-${Math.floor(Math.random() * 1e6) + 1}`;
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("path", current?.dataset.path ?? "");
-        formData.append("index", index);
-        uploadMedia(formData, index);
+        if (canUpload(file)) uploadMedia(file, current?.dataset.path ?? "");
       });
       input.value = "";
     });

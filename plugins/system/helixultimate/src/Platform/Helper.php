@@ -1684,4 +1684,56 @@ class Helper
 
         return $html;
     }
+
+    /**
+     * Render the image field: a drop zone when empty, a file row (thumbnail,
+     * name to replace, remove) when set. media.js opens the media manager and
+     * handles drag-and-drop uploads.
+     *
+     * The hidden input stays right after `.hu-image-holder` and next to
+     * `.hu-media-clear`, which the media manager and the layout settings use.
+     *
+     * @param    string    $value     Stored path relative to the site root (e.g. images/logo.png).
+     * @param    array     $input     Attributes of the hidden input (name/id or class/data-attrname...).
+     * @param    array     $picker    Attributes of the picker button (data-id or data-target).
+     * @param    string    $baseUrl   Site root URL for the preview image.
+     *
+     * @return    string
+     * @since    2.2.11
+     */
+    public static function renderMediaField(string $value, array $input, array $picker, string $baseUrl): string
+    {
+        $esc = static function ($text) {
+            return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+        };
+        $attributes = static function (array $list) use ($esc) {
+            $html = '';
+
+            foreach ($list as $name => $attribute) {
+                $html .= ' ' . $name . '="' . $esc($attribute) . '"';
+            }
+
+            return $html;
+        };
+
+        $empty = $value === '';
+        $name  = $empty ? '' : basename($value);
+
+        $html  = '<div class="hu-media-field' . ($empty ? ' is-empty' : '') . '">';
+        $html .= '<div class="hu-image-holder">' . ($empty ? '' : '<img src="' . $esc($baseUrl . $value) . '" alt="">') . '</div>';
+        $html .= '<input type="hidden"' . $attributes($input + ['value' => $value]) . '>';
+        $html .= '<button type="button" class="hu-media-picker"' . $attributes($picker)
+            . ' title="' . $esc(Text::_($empty ? 'HELIX_ULTIMATE_MEDIA_CHOOSE' : 'HELIX_ULTIMATE_MEDIA_REPLACE')) . '">';
+        $html .= '<span class="hu-media-picker__empty"><span class="fas fa-image" aria-hidden="true"></span> '
+            . $esc(Text::_('HELIX_ULTIMATE_MEDIA_CHOOSE'))
+            . ' <span class="hu-media-picker__hint">' . $esc(Text::_('HELIX_ULTIMATE_MEDIA_DROP_HINT')) . '</span></span>';
+        $html .= '<span class="hu-media-picker__name">' . $esc($name) . '</span>';
+        $html .= '</button>';
+        $html .= '<button type="button" class="hu-media-clear' . ($empty ? ' hide' : '') . '" title="' . $esc(Text::_('HELIX_ULTIMATE_MEDIA_REMOVE')) . '" aria-label="' . $esc(Text::_('HELIX_ULTIMATE_MEDIA_REMOVE')) . '">'
+            . '<span class="fas fa-times" aria-hidden="true"></span></button>';
+        $html .= '<span class="hu-media-progress-bar" aria-hidden="true"></span>';
+        $html .= '</div>';
+
+        return $html;
+    }
 }

@@ -8,6 +8,7 @@
 
 defined('_JEXEC') or die();
 
+use HelixUltimate\Framework\Platform\Helper;
 use Joomla\CMS\Uri\Uri;
 
 /**
@@ -38,10 +39,12 @@ class HelixultimateFieldMedia
 			$output .= '<p class="hu-control-help">' . $attr['desc'] . '</p>';
 		}
 
-		$output .= '<div class="hu-image-holder"></div>';
-		$output .= '<input type="hidden" class="hu-input hu-input-media" data-attrname="' . $key . '" data-baseurl="' . Uri::root() . '" value="">';
-		$output .= '<a href="#" class="hu-media-picker hu-btn hu-btn-primary hu-mr-2" data-target="' . $key . '"><span class="fas fa-image" aria-hidden="true"></span> Select Media</a>';
-		$output .= '<a href="#" class="hu-media-clear hu-btn hu-btn-secondary hide"><span class="fas fa-times" aria-hidden="true"></span> Clear</a>';
+		$output .= Helper::renderMediaField(
+			'',
+			['class' => 'hu-input hu-input-media', 'data-attrname' => $key, 'data-baseurl' => Uri::root()],
+			['data-target' => $key],
+			Uri::root()
+		);
 
 		$output .= '</div>';
 

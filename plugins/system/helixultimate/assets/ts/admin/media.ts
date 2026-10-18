@@ -277,11 +277,78 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Uploads                                                             */
 	/* ------------------------------------------------------------------ */
 
+	const ALLOWED_UPLOADS = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+
+	const mediaText = (key: string, fallback: string): string => {
+		const value = Joomla.Text ? Joomla.Text._(key) : '';
+		return value && value !== key ? value : fallback;
+	};
+
 	/**
-	 * Upload one file with a progress bar. Uses XMLHttpRequest because
-	 * fetch cannot report upload progress.
+	 * Check a file before uploading; alerts and returns false when it can't be uploaded.
+	 * SVG is refused on purpose (stored XSS risk), as on the server.
 	 */
-	function uploadMedia(formData: FormData, index: string): void {
+	function canUpload(file: File): boolean {
+		const extension = (file.name.split('.').pop() ?? '').toLowerCase();
+
+		if (extension === 'svg') {
+			alert(
+				Joomla.Text._(
+					'HELIX_ULTIMATE_MEDIA_SVG_NOT_SUPPORTED_FOR_UPLOAD',
+					'SVG is not supported for upload. Upload via Joomla Media, then select the file here.'
+				)
+			);
+			return false;
+		}
+
+		if (!ALLOWED_UPLOADS.includes(extension)) {
+			alert(Joomla.Text._('COM_SPPAGEBUILDER_MEDIA_MANAGER_FILE_NOT_SUPPORTED', 'File not supported'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Upload one file to a media folder. Uses XMLHttpRequest because fetch
+	 * cannot report upload progress. Rejects on network errors only; a refused
+	 * upload resolves with `status: false` and a message.
+	 */
+	function sendUpload(file: File, path: string, index: string, onProgress: (percent: number) => void): Promise<MediaUploadResponse> {
+		return new Promise((resolve, reject) => {
+			const formData = new FormData();
+			const xhr = new XMLHttpRequest();
+			const token = Joomla.getOptions<string>('csrf.token');
+
+			formData.append('file', file);
+			formData.append('path', path);
+			formData.append('index', index);
+
+			xhr.open('POST', `index.php?option=com_ajax&helix=ultimate&request=task&action=upload-media&format=json&helix_id=${window.helixUltimateStyleId}`);
+			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+			if (token) xhr.setRequestHeader('X-CSRF-Token', token);
+
+			xhr.upload.addEventListener('progress', event => {
+				if (event.lengthComputable) onProgress(Math.floor((event.loaded / event.total) * 100));
+			});
+
+			xhr.addEventListener('load', () => {
+				try {
+					resolve(JSON.parse(xhr.responseText));
+				} catch (error) {
+					resolve({ status: false, message: 'Somethings wrong, Try again' });
+				}
+			});
+
+			xhr.addEventListener('error', () => reject(new Error('Network error')));
+
+			xhr.send(formData);
+		});
+	}
+
+	/** Upload one file into the open media manager, with a progress tile. */
+	function uploadMedia(file: File, path: string): void {
+		const index = `media-id-${Math.floor(Math.random() * 1e6) + 1}`;
 		const list = q('.hu-media');
 		const manager = document.getElementById('hu-media-manager');
 
@@ -298,57 +365,177 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (manager) manager.scrollTo({ top: manager.scrollHeight, behavior: 'smooth' });
 
 		const item = () => q(`.${index}`);
-		const xhr = new XMLHttpRequest();
-		const token = Joomla.getOptions<string>('csrf.token');
 
-		xhr.open('POST', `index.php?option=com_ajax&helix=ultimate&request=task&action=upload-media&format=json&helix_id=${window.helixUltimateStyleId}`);
-		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-		if (token) xhr.setRequestHeader('X-CSRF-Token', token);
-
-		xhr.upload.addEventListener('progress', event => {
+		sendUpload(file, path, index, percent => {
 			const element = item();
-
-			if (!element || !event.lengthComputable) return;
-
-			const percent = Math.floor((event.loaded / event.total) * 100);
-			const bar = element.querySelector<HTMLElement>('.hu-progress-bar');
-			const label = element.querySelector('.hu-media-upload-percentage');
+			const bar = element?.querySelector<HTMLElement>('.hu-progress-bar');
+			const label = element?.querySelector('.hu-media-upload-percentage');
 
 			if (bar) bar.style.width = `${percent}%`;
 			if (label) label.textContent = `${percent}% `;
-		});
+		})
+			.then(data => {
+				const element = item();
 
-		xhr.addEventListener('load', () => {
-			const element = item();
-			let data: MediaUploadResponse;
+				if (!element) return;
 
-			try {
-				data = JSON.parse(xhr.responseText);
-			} catch (error) {
-				data = { status: false, message: 'Somethings wrong, Try again' };
-			}
-
-			if (!element) return;
-
-			if (data.status) {
-				element.className = 'hu-media-image';
-				element.setAttribute('data-path', data.path ?? '');
-				element.setAttribute('data-preview', data.src ?? '');
-				element.innerHTML = data.output ?? '';
-			} else {
-				element.remove();
-				alert(data.message);
-			}
-		});
-
-		xhr.addEventListener('error', () => {
-			const element = item();
-			if (element) element.remove();
-			alert('Somethings wrong, Try again');
-		});
-
-		xhr.send(formData);
+				if (data.status) {
+					element.className = 'hu-media-image';
+					element.setAttribute('data-path', data.path ?? '');
+					element.setAttribute('data-preview', data.src ?? '');
+					element.innerHTML = data.output ?? '';
+				} else {
+					element.remove();
+					alert(data.message);
+				}
+			})
+			.catch(() => {
+				item()?.remove();
+				alert('Somethings wrong, Try again');
+			});
 	}
+
+	/* ------------------------------------------------------------------ */
+	/* Image field: drop zone when empty, file row when set                */
+	/* ------------------------------------------------------------------ */
+
+	/** Redraw a media field from its hidden input (after select, clear, upload, reset). */
+	function syncMediaField(field: HTMLElement): void {
+		const input = field.querySelector<HTMLInputElement>('input[type=hidden]');
+		const picker = field.querySelector<HTMLElement>('.hu-media-picker');
+		const name = field.querySelector('.hu-media-picker__name');
+		const clear = field.querySelector('.hu-media-clear');
+		const holder = field.querySelector('.hu-image-holder');
+		const value = input?.value ?? '';
+
+		field.classList.toggle('is-empty', value === '');
+		field.dataset.dropLabel = mediaText('HELIX_ULTIMATE_MEDIA_DROP_HERE', 'Drop to upload');
+
+		if (name) name.textContent = value.split('/').pop() ?? '';
+		if (clear) clear.classList.toggle('hide', value === '');
+		if (holder && value === '') holder.innerHTML = '';
+
+		if (picker) {
+			picker.title = value === '' ? mediaText('HELIX_ULTIMATE_MEDIA_CHOOSE', 'Choose image') : mediaText('HELIX_ULTIMATE_MEDIA_REPLACE', 'Replace');
+		}
+	}
+
+	document.querySelectorAll<HTMLElement>('.hu-media-field').forEach(syncMediaField);
+
+	// Select, clear and draft reset all fire `change` on the hidden input.
+	delegate<HTMLInputElement>(document, 'change', '.hu-media-field input[type=hidden]', (event, input) => {
+		const field = input.closest<HTMLElement>('.hu-media-field');
+		if (field) syncMediaField(field);
+	});
+
+	// Fields in settings modals are filled after they are inserted.
+	new MutationObserver(records => {
+		records.forEach(record =>
+			record.addedNodes.forEach(node => {
+				if (!(node instanceof HTMLElement)) return;
+				if (node.matches('.hu-media-field')) syncMediaField(node);
+				node.querySelectorAll<HTMLElement>('.hu-media-field').forEach(syncMediaField);
+			})
+		);
+	}).observe(document.body, { childList: true, subtree: true });
+
+	/* Drag and drop an image onto the field to upload it to /images and use it. */
+	const hasFiles = (event: DragEvent) => Boolean(event.dataTransfer && [...event.dataTransfer.types].includes('Files'));
+
+	delegate<HTMLElement, DragEvent>(document, 'dragover', '.hu-media-field', (event, field) => {
+		if (!hasFiles(event) || field.classList.contains('is-uploading')) return;
+
+		event.preventDefault();
+		if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+		field.classList.add('is-dragover');
+	});
+
+	delegate<HTMLElement, DragEvent>(document, 'dragleave', '.hu-media-field', (event, field) => {
+		if (!field.contains(event.relatedTarget as Node | null)) field.classList.remove('is-dragover');
+	});
+
+	delegate<HTMLElement, DragEvent>(document, 'drop', '.hu-media-field', (event, field) => {
+		if (!hasFiles(event)) return;
+
+		event.preventDefault();
+		field.classList.remove('is-dragover');
+
+		const file = event.dataTransfer?.files[0];
+		const input = field.querySelector<HTMLInputElement>('input[type=hidden]');
+
+		if (!file || !input || field.classList.contains('is-uploading') || !canUpload(file)) return;
+
+		const name = field.querySelector('.hu-media-picker__name');
+		const previous = name?.textContent ?? '';
+
+		field.classList.add('is-uploading');
+		field.style.setProperty('--hu-media-progress', '0%');
+		if (name) name.textContent = mediaText('HELIX_ULTIMATE_MEDIA_UPLOADING', 'Uploading…');
+
+		sendUpload(file, '/images', `media-drop-${Date.now()}`, percent => field.style.setProperty('--hu-media-progress', `${percent}%`))
+			.then(data => {
+				if (!data.status || !data.path) {
+					alert(data.message);
+					if (name) name.textContent = previous;
+					return;
+				}
+
+				const holder = field.querySelector('.hu-image-holder');
+
+				if (holder) {
+					holder.innerHTML = '';
+					const image = document.createElement('img');
+					image.src = data.src ?? '';
+					image.alt = '';
+					holder.appendChild(image);
+				}
+
+				input.value = data.path;
+				fire(input);
+			})
+			.catch(() => {
+				if (name) name.textContent = previous;
+				alert('Somethings wrong, Try again');
+			})
+			.finally(() => {
+				field.classList.remove('is-uploading');
+				syncMediaField(field);
+			});
+	});
+
+	// Dropping files onto the open media manager uploads them into the current folder.
+	delegate<HTMLElement, DragEvent>(document, 'dragover', '#hu-media-manager', (event, manager) => {
+		if (!hasFiles(event)) return;
+
+		event.preventDefault();
+		manager.classList.add('is-dragover');
+	});
+
+	delegate<HTMLElement, DragEvent>(document, 'dragleave', '#hu-media-manager', (event, manager) => {
+		if (!manager.contains(event.relatedTarget as Node | null)) manager.classList.remove('is-dragover');
+	});
+
+	delegate<HTMLElement, DragEvent>(document, 'drop', '#hu-media-manager', (event, manager) => {
+		if (!hasFiles(event)) return;
+
+		event.preventDefault();
+		manager.classList.remove('is-dragover');
+
+		const current = q('.hu-media-breadcrumb-item.active');
+
+		[...(event.dataTransfer?.files ?? [])].forEach(file => {
+			if (canUpload(file)) uploadMedia(file, current?.dataset.path ?? '');
+		});
+	});
+
+	// A file dropped next to a field must not open in the browser tab.
+	['dragover', 'drop'].forEach(type =>
+		document.addEventListener(type, event => {
+			if (hasFiles(event as DragEvent) && !(event.target instanceof Element && event.target.closest('.hu-media-field, #hu-media-manager'))) {
+				event.preventDefault();
+			}
+		})
+	);
 
 	delegate(document, 'click', '.hu-modal-action-upload', event => {
 		event.preventDefault();
@@ -358,35 +545,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	delegate<HTMLInputElement>(document, 'change', '#hu-file-input', (event, input) => {
-		const allowed = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
 		const current = q('.hu-media-breadcrumb-item.active');
 
 		[...(input.files ?? [])].forEach(file => {
-			const extension = (file.name.split('.').pop() ?? '').toLowerCase();
-
-			if (extension === 'svg') {
-				alert(
-					Joomla.Text._(
-						'HELIX_ULTIMATE_MEDIA_SVG_NOT_SUPPORTED_FOR_UPLOAD',
-						'SVG is not supported for upload. Upload via Joomla Media, then select the file here.'
-					)
-				);
-				return;
-			}
-
-			if (!allowed.includes(extension)) {
-				alert(Joomla.Text._('COM_SPPAGEBUILDER_MEDIA_MANAGER_FILE_NOT_SUPPORTED', 'File not supported'));
-				return;
-			}
-
-			const index = `media-id-${Math.floor(Math.random() * 1e6) + 1}`;
-			const formData = new FormData();
-
-			formData.append('file', file);
-			formData.append('path', current?.dataset.path ?? '');
-			formData.append('index', index);
-
-			uploadMedia(formData, index);
+			if (canUpload(file)) uploadMedia(file, current?.dataset.path ?? '');
 		});
 
 		input.value = '';
