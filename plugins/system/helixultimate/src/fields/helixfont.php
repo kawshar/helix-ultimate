@@ -302,51 +302,10 @@ class JFormFieldHelixfont extends FormField
 	 */
 	private function renderUnitField($key, $value, $active = false)
 	{
-		// By default the unit is px.
-		$unit = 'px';
-
-		if (isset($value))
-		{
-			$matches = [];
-
-			if (preg_match("@^([+-]?(?:\d+|\d*\.\d+))(px|em|rem|%)$@", $value, $matches))
-			{
-				if (count($matches) >= 3)
-				{
-					$value = $matches[1];
-
-					if (isset($matches[2]))
-					{
-						$unit = strtolower($matches[2]);
-					}
-				}
-			}
-			elseif (is_numeric($value))
-			{
-				$value = (float) $value;
-			}
-			else
-			{
-				$value = '';
-			}
-		}
-
-		$value = !isset($value) ? '' : $value;
-		$finalValue = $value !== '' ? $value . $unit : '';
-
-		$html = '';
-		$html .= '<div class="hu-input-group hu-unit-group hu-webfont-unit ' . ($active ? 'active' : '') . '">';
-		$html .= '<input type="hidden" class="hu-unit-field-value" name="' . $key . '" value="' . $finalValue . '"/>';
-		$html .= '	<input type="text" class="hu-field-dimension-width form-control hu-unit-field-input ' . $key . '" value="' . $value . '" />';
-		$html .= '	<select class="hu-unit-select">';
-		$html .= '		<option value="px" ' . ($unit === 'px' ? 'selected' : '') . '>px</option>';
-		$html .= '		<option value="em" ' . ($unit === 'em' ? 'selected' : '') . '>em</option>';
-		$html .= '		<option value="rem" ' . ($unit === 'rem' ? 'selected' : '') . '>rem</option>';
-		$html .= '		<option value="%" ' . ($unit === '%' ? 'selected' : '') . '>%</option>';
-		$html .= '	</select>';
-		$html .= '</div>';
-
-		return $html;
+		return Helper::renderUnitField($key, $value, [
+			'class'      => 'hu-webfont-unit' . ($active ? ' active' : ''),
+			'inputClass' => $key,
+		]);
 	}
 
 	private function renderFontColor($value)

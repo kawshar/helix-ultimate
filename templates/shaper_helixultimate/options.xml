@@ -28,7 +28,7 @@
 
 		<field name="logo_height" 
 			helixgroup="logo" 
-			type="helixUnit"
+			type="helixUnit" keywords="auto"
 			display="inline" 
 			default="30" 
 			label="HELIX_ULTIMATE_LOGO_HEIGHT" 
@@ -36,7 +36,7 @@
 
 		<field name="logo_height_sm" 
 			helixgroup="logo" 
-			type="helixUnit"
+			type="helixUnit" keywords="auto"
 			display="inline" 
 			className="field-hidden"
 			label="HELIX_ULTIMATE_LOGO_HEIGHT_SM" 
@@ -44,7 +44,7 @@
 
 		<field name="logo_height_xs" 
 			helixgroup="logo" 
-			type="helixUnit"
+			type="helixUnit" keywords="auto"
 			display="inline" 
 			className="field-hidden"
 			label="HELIX_ULTIMATE_LOGO_HEIGHT_XS" 
@@ -72,7 +72,7 @@
 			description="HELIX_ULTIMATE_STICKY_LOGO_DESC"
 			showon="logo_type:image[AND]logo_image!:[AND]sticky_header:1" />
 
-		<field name="sticky_logo_height" helixgroup="logo" type="helixUnit" display="inline"
+		<field name="sticky_logo_height" helixgroup="logo" type="helixUnit" keywords="auto" display="inline"
 			label="HELIX_ULTIMATE_STICKY_LOGO_HEIGHT"
 			description="HELIX_ULTIMATE_STICKY_LOGO_HEIGHT_DESC"
 			showon="logo_type:image[AND]sticky_logo!:[AND]sticky_header:1" />

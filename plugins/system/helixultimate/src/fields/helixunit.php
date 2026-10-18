@@ -8,6 +8,7 @@
 
 defined('_JEXEC') or die();
 
+use HelixUltimate\Framework\Platform\Helper;
 use Joomla\CMS\Form\FormField;
 /**
  * Form field for helix presets.
@@ -32,53 +33,13 @@ class JFormFieldHelixUnit extends FormField
 	 */
 	protected function getInput()
 	{
-		// By default the unit is px.
-		$unit = 'px';
-		$value = $this->value;
-		$name = $this->name;
-		$hint = $this->getAttribute('hint', '', 'STRING');
+		// Optional keywords without a number, e.g. keywords="auto".
+		$keywords = array_filter(array_map('trim', explode(',', strtolower((string) $this->getAttribute('keywords', '')))));
 
-		if (isset($value))
-		{
-			$matches = [];
-
-			if (preg_match("@^([+-]?(?:\d+|\d*\.\d+))(px|em|rem|%)$@", $value, $matches))
-			{
-				if (count($matches) >= 3)
-				{
-					$value = $matches[1];
-
-					if (isset($matches[2]))
-					{
-						$unit = strtolower($matches[2]);
-					}
-				}
-			}
-			elseif (is_numeric($value))
-			{
-				$value = (float) $value;
-			}
-			else
-			{
-				$value = '';
-			}
-		}
-
-		$value = !isset($value) ? '' : $value;
-		$finalValue = $value !== '' ? $value . $unit : '';
-		$output = '';
-
-		$output .= '<div class="hu-input-group hu-unit-group">';
-		$output .= '	<input type="hidden" class="hu-unit-field-value" name="' . $name . '" value="' . $finalValue . '"/>';
-		$output .= '	<input type="text" class="hu-field-dimension-width form-control hu-unit-field-input ' . $name . '" value="' . $value . '" ' . ($hint !== '' ? 'placeholder="' . $hint . '"' : '') . ' />';
-		$output .= '	<select class="hu-unit-select">';
-		$output .= '		<option value="px" ' . ($unit === 'px' ? 'selected' : '') . '>px</option>';
-		$output .= '		<option value="em" ' . ($unit === 'em' ? 'selected' : '') . '>em</option>';
-		$output .= '		<option value="rem" ' . ($unit === 'rem' ? 'selected' : '') . '>rem</option>';
-		$output .= '		<option value="%" ' . ($unit === '%' ? 'selected' : '') . '>%</option>';
-		$output .= '	</select>';
-		$output .= '</div>';
-
-		return $output;
+		return Helper::renderUnitField($this->name, $this->value, [
+			'keywords'   => $keywords,
+			'hint'       => $this->getAttribute('hint', '', 'STRING'),
+			'inputClass' => $this->name,
+		]);
 	}
 }

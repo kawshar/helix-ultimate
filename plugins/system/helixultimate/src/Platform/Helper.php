@@ -1606,4 +1606,82 @@ class Helper
 
         return true;
     }
+
+    /**
+     * Units a Helix unit field can switch between.
+     *
+     * @var    array
+     * @since  2.2.11
+     */
+    public const UNIT_FIELD_UNITS = ['px', 'rem', 'em', '%', 'vw', 'vh'];
+
+    /**
+     * Split a stored unit value ("36px", "1.5rem", "auto", "24") into number and unit.
+     *
+     * A bare number is px. A keyword is only accepted when it is in $keywords.
+     *
+     * @param    mixed    $value       The stored value.
+     * @param    array    $keywords    Allowed keywords without a number (e.g. ['auto']).
+     *
+     * @return    array    ['number' => string, 'unit' => string, 'value' => string]
+     * @since    2.2.11
+     */
+    public static function parseUnitValue($value, array $keywords = []): array
+    {
+        $value = strtolower(trim((string) $value));
+        $units = implode('|', array_map('preg_quote', self::UNIT_FIELD_UNITS));
+
+        if ($value !== '' && preg_match('@^([+-]?(?:\d+|\d*\.\d+))(' . $units . ')?$@', $value, $matches)) {
+            $unit = $matches[2] ?? '';
+            $unit = $unit !== '' ? $unit : 'px';
+
+            return ['number' => $matches[1], 'unit' => $unit, 'value' => $matches[1] . $unit];
+        }
+
+        if ($value !== '' && \in_array($value, $keywords, true)) {
+            return ['number' => '', 'unit' => $value, 'value' => $value];
+        }
+
+        return ['number' => '', 'unit' => 'px', 'value' => ''];
+    }
+
+    /**
+     * Render the shared number + unit control (fields.js turns the pill into the unit switcher).
+     *
+     * @param    string    $name       Name of the hidden input that holds "<number><unit>".
+     * @param    mixed     $value      Stored value.
+     * @param    array     $options    keywords (array), hint (string), class (extra wrapper classes),
+     *                                 inputClass (extra classes on the text input).
+     *
+     * @return    string
+     * @since    2.2.11
+     */
+    public static function renderUnitField(string $name, $value, array $options = []): string
+    {
+        $keywords = $options['keywords'] ?? [];
+        $parsed   = self::parseUnitValue($value, $keywords);
+        $esc      = static function ($text) {
+            return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+        };
+
+        $units = self::UNIT_FIELD_UNITS;
+
+        if (!\in_array($parsed['unit'], $units, true) && !\in_array($parsed['unit'], $keywords, true)) {
+            $parsed['unit'] = 'px';
+        }
+
+        $html  = '<div class="hu-input-group hu-unit-group ' . $esc($options['class'] ?? '') . '"'
+            . ' data-units="' . $esc(implode(',', $units)) . '"'
+            . ' data-keywords="' . $esc(implode(',', $keywords)) . '">';
+        $html .= '<input type="hidden" class="hu-unit-field-value" name="' . $esc($name) . '" value="' . $esc($parsed['value']) . '">';
+        $html .= '<input type="text" class="hu-field-dimension-width form-control hu-unit-field-input ' . $esc($options['inputClass'] ?? '') . '"'
+            . ' value="' . $esc($parsed['number']) . '" inputmode="decimal" autocomplete="off" spellcheck="false"'
+            . (!empty($options['hint']) ? ' placeholder="' . $esc($options['hint']) . '"' : '') . '>';
+        $html .= '<button type="button" class="hu-unit-pill" aria-haspopup="listbox" aria-expanded="false"'
+            . ' aria-label="' . $esc(Text::sprintf('HELIX_ULTIMATE_UNIT_ARIA', $parsed['unit'])) . '"'
+            . ' data-unit="' . $esc($parsed['unit']) . '">' . $esc($parsed['unit']) . '</button>';
+        $html .= '</div>';
+
+        return $html;
+    }
 }

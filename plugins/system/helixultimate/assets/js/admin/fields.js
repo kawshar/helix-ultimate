@@ -150,53 +150,311 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Unit fields                                                         */
 	/* ------------------------------------------------------------------ */
 
-	/**
-	 * On blur of the number or change of the unit, store "<value><unit>"
-	 * in the hidden field.
+	/*
+	 * One component for every number + unit field (.hu-unit-group).
+	 * The hidden .hu-unit-field-value holds "<number><unit>" (or a keyword
+	 * such as "auto") and is the source of truth; the text input and the
+	 * unit pill are redrawn from it, so draft reset / presets stay in sync.
+	 *
+	 * - px is the default and stays hidden until hover / focus.
+	 * - Other units and keywords show as a pill, which opens the unit list.
+	 * - Typing wins: "24" is px, "1.5rem" / "10%" / "auto" set that unit.
+	 * - ↑/↓ nudge by 1 (Shift: 10), Alt+↑/↓ cycles the unit.
 	 */
-	delegate(document, 'focusout', '.hu-unit-field-input', (event, input) => {
-		const group = input.parentElement;
-		const field = group.querySelector('input.hu-unit-field-value');
-		const select = group.querySelector('select.hu-unit-select');
+	const unitText = (key, fallback) => {
+		const value = Joomla.Text ? Joomla.Text._(key) : '';
+		return value && value !== key ? value : fallback;
+	};
 
-		let value = input.value.replace(/\s/g, '');
-		let unit = 'px';
+	const groupParts = group => ({
+		hidden: group.querySelector('input.hu-unit-field-value'),
+		input: group.querySelector('input.hu-unit-field-input'),
+		pill: group.querySelector('.hu-unit-pill'),
+		units: (group.dataset.units || 'px,rem,em,%,vw,vh').split(',').filter(Boolean),
+		keywords: (group.dataset.keywords || '').split(',').filter(Boolean),
+	});
 
-		if (value === '') {
-			field.value = '';
+	/** Parse typed or stored text. Returns null when it isn't valid for this field. */
+	function parseUnit(text, { units, keywords }) {
+		const value = String(text ?? '').trim().toLowerCase().replace(/\s+/g, '');
+
+		if (value === '') return { number: '', unit: '' };
+		if (keywords.includes(value)) return { number: '', unit: value };
+
+		const match = value.match(/^([+-]?(?:\d+|\d*\.\d+))([a-z%]*)$/);
+
+		if (!match) return null;
+
+		const unit = match[2] || 'px';
+
+		return units.includes(unit) ? { number: String(Number(match[1])), unit } : null;
+	}
+
+	/** Root font size and viewport of the preview, for converting between units. */
+	function previewMetrics() {
+		const frame = document.getElementById('hu-template-preview');
+		let root = 16;
+		let width = window.innerWidth;
+		let height = window.innerHeight;
+
+		try {
+			const win = frame && frame.contentWindow;
+
+			if (win && win.document.documentElement) {
+				root = parseFloat(win.getComputedStyle(win.document.documentElement).fontSize) || 16;
+				width = win.innerWidth || width;
+				height = win.innerHeight || height;
+			}
+		} catch (e) {
+			// Cross-origin preview: keep the defaults.
+		}
+
+		return { root, width, height };
+	}
+
+	const roundFor = (value, unit) => {
+		const places = unit === 'px' ? 0 : unit === 'rem' || unit === 'em' ? 3 : 2;
+		return String(Number(value.toFixed(places)));
+	};
+
+	/** Convert a number between units; keeps it as typed when no conversion exists (e.g. %). */
+	function convertUnit(number, from, to) {
+		if (number === '' || from === to) return number;
+
+		const { root, width, height } = previewMetrics();
+		const toPx = { px: 1, rem: root, em: root, vw: width / 100, vh: height / 100 };
+
+		if (!(from in toPx) || !(to in toPx)) return number;
+
+		return roundFor((parseFloat(number) * toPx[from]) / toPx[to], to);
+	}
+
+	function renderUnit(group) {
+		const parts = groupParts(group);
+		const parsed = parseUnit(parts.hidden.value, parts) || { number: '', unit: '' };
+		const unit = parsed.unit || group.dataset.unit || 'px';
+
+		group.dataset.unit = unit;
+
+		if (document.activeElement !== parts.input || parts.input.value !== parsed.number) {
+			parts.input.value = parsed.number;
+		}
+
+		parts.pill.textContent = unit;
+		parts.pill.dataset.unit = unit;
+		parts.pill.setAttribute('aria-label', unitText('HELIX_ULTIMATE_UNIT_ARIA', 'Unit, %s').replace('%s', unit));
+
+		group.classList.toggle('is-default-unit', unit === 'px');
+		group.classList.toggle('is-keyword', parts.keywords.includes(unit));
+	}
+
+	/** Store a new number / unit and notify listeners (draft tracker, live preview). */
+	function commitUnit(group, number, unit) {
+		const { hidden } = groupParts(group);
+		const isKeyword = groupParts(group).keywords.includes(unit);
+		const value = isKeyword ? unit : number === '' ? '' : `${number}${unit}`;
+
+		group.dataset.unit = unit;
+
+		if (hidden.value !== value) {
+			hidden.value = value;
+			fire(hidden);
+		}
+
+		renderUnit(group);
+	}
+
+	/** Apply what was typed: valid text wins, invalid text is reverted. */
+	function applyTypedUnit(group) {
+		const parts = groupParts(group);
+		const parsed = parseUnit(parts.input.value, parts);
+
+		if (!parsed) {
+			renderUnit(group);
 			return;
 		}
 
-		const match = value.match(/^([+-]?(?:\d+|\d*\.\d+))(px|em|rem|%)?$/i);
-
-		if (match) {
-			[, value, unit] = match;
-
-			if (unit === undefined) {
-				unit = (select && select.value) || 'px';
-			}
-		} else {
-			value = parseFloat(value) || '';
+		if (parsed.number === '' && parsed.unit === '') {
+			// Cleared: keep a non-default unit for the next number, drop keywords.
+			const unit = parts.keywords.includes(group.dataset.unit) ? 'px' : group.dataset.unit || 'px';
+			commitUnit(group, '', unit);
+			return;
 		}
 
-		input.value = value;
+		commitUnit(group, parsed.number, parsed.unit);
+	}
 
-		if (select && input.nextElementSibling === select) {
-			select.value = unit;
+	/** Switch unit, converting the number when possible. */
+	function setUnit(group, unit) {
+		const parts = groupParts(group);
+		const current = group.dataset.unit || 'px';
+		const typed = parseUnit(parts.input.value, parts);
+		const number = typed && typed.number !== '' && !parts.keywords.includes(current) ? typed.number : '';
+
+		if (parts.keywords.includes(unit)) {
+			commitUnit(group, '', unit);
+			return;
 		}
 
-		field.value = `${value}${unit}`;
-		fire(field);
+		commitUnit(group, parts.keywords.includes(current) ? '' : convertUnit(number, current, unit), unit);
+	}
+
+	document.querySelectorAll('.hu-unit-group').forEach(renderUnit);
+
+	// Value changed from elsewhere (draft reset, presets, import).
+	delegate(document, 'change', 'input.hu-unit-field-value', (event, hidden) => {
+		const group = hidden.closest('.hu-unit-group');
+		if (group) renderUnit(group);
 	});
 
-	delegate(document, 'change', 'select.hu-unit-select', (event, select) => {
-		const group = select.parentElement;
-		const input = group.querySelector('input.hu-unit-field-input');
-		const field = group.querySelector('input.hu-unit-field-value');
+	delegate(document, 'focusout', 'input.hu-unit-field-input', (event, input) => applyTypedUnit(input.closest('.hu-unit-group')));
 
-		if (input && input.value) {
-			field.value = `${input.value}${select.value || 'px'}`;
-			fire(field);
+	delegate(document, 'keydown', 'input.hu-unit-field-input', (event, input) => {
+		const group = input.closest('.hu-unit-group');
+		const parts = groupParts(group);
+
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			applyTypedUnit(group);
+			return;
+		}
+
+		if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+
+		event.preventDefault();
+
+		const direction = event.key === 'ArrowUp' ? 1 : -1;
+
+		if (event.altKey) {
+			const list = parts.units;
+			const index = list.indexOf(group.dataset.unit);
+			setUnit(group, list[(index + direction + list.length) % list.length]);
+			return;
+		}
+
+		const typed = parseUnit(input.value, parts);
+		const unit = typed && typed.unit && !parts.keywords.includes(typed.unit) ? typed.unit : parts.keywords.includes(group.dataset.unit) ? 'px' : group.dataset.unit || 'px';
+		const base = typed && typed.number !== '' ? parseFloat(typed.number) : 0;
+		const step = event.shiftKey ? 10 : 1;
+		const decimals = (String(base).split('.')[1] || '').length;
+
+		commitUnit(group, String(Number((base + direction * step).toFixed(decimals))), unit);
+	});
+
+	/* Unit menu: one listbox, positioned under the pill that opened it. */
+	let unitMenu = null;
+	let unitMenuGroup = null;
+
+	function closeUnitMenu(focusPill = false) {
+		if (!unitMenu) return;
+
+		const pill = unitMenuGroup && unitMenuGroup.querySelector('.hu-unit-pill');
+
+		unitMenu.remove();
+		unitMenu = null;
+
+		if (unitMenuGroup) unitMenuGroup.classList.remove('is-menu-open');
+		if (pill) {
+			pill.setAttribute('aria-expanded', 'false');
+			if (focusPill) pill.focus();
+		}
+
+		unitMenuGroup = null;
+	}
+
+	function openUnitMenu(group) {
+		closeUnitMenu();
+
+		const parts = groupParts(group);
+		const current = group.dataset.unit || 'px';
+		const options = [...parts.units, ...parts.keywords];
+
+		unitMenu = document.createElement('ul');
+		unitMenu.className = 'hu-unit-menu';
+		unitMenu.setAttribute('role', 'listbox');
+		unitMenu.setAttribute('aria-label', unitText('HELIX_ULTIMATE_UNIT_MENU', 'Units'));
+
+		options.forEach(unit => {
+			const item = document.createElement('li');
+			item.setAttribute('role', 'option');
+			item.tabIndex = -1;
+			item.dataset.unit = unit;
+			item.textContent = unit;
+			item.setAttribute('aria-selected', String(unit === current));
+			if (parts.keywords.includes(unit)) item.classList.add('is-keyword');
+			unitMenu.appendChild(item);
+		});
+
+		document.body.appendChild(unitMenu);
+		unitMenuGroup = group;
+		group.classList.add('is-menu-open');
+		parts.pill.setAttribute('aria-expanded', 'true');
+
+		const rect = parts.pill.getBoundingClientRect();
+		unitMenu.style.top = `${rect.bottom + 4}px`;
+		unitMenu.style.left = `${Math.max(8, rect.right - unitMenu.offsetWidth)}px`;
+
+		(unitMenu.querySelector('[aria-selected="true"]') || unitMenu.firstElementChild).focus();
+	}
+
+	delegate(document, 'click', '.hu-unit-pill', (event, pill) => {
+		event.preventDefault();
+
+		const group = pill.closest('.hu-unit-group');
+
+		if (unitMenuGroup === group) closeUnitMenu(true);
+		else openUnitMenu(group);
+	});
+
+	delegate(document, 'keydown', '.hu-unit-pill', (event, pill) => {
+		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+			event.preventDefault();
+			openUnitMenu(pill.closest('.hu-unit-group'));
 		}
 	});
+
+	document.addEventListener('click', event => {
+		if (!unitMenu) return;
+
+		const item = event.target.closest('.hu-unit-menu [role="option"]');
+
+		if (item) {
+			const group = unitMenuGroup;
+			closeUnitMenu(true);
+			setUnit(group, item.dataset.unit);
+			return;
+		}
+
+		if (!event.target.closest('.hu-unit-menu, .hu-unit-pill')) closeUnitMenu();
+	});
+
+	document.addEventListener('keydown', event => {
+		if (!unitMenu || !unitMenu.contains(document.activeElement)) return;
+
+		const items = [...unitMenu.children];
+		const index = items.indexOf(document.activeElement);
+
+		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+			event.preventDefault();
+			const next = (index + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+			items[next].focus();
+		} else if (event.key === 'Home' || event.key === 'End') {
+			event.preventDefault();
+			items[event.key === 'Home' ? 0 : items.length - 1].focus();
+		} else if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			const group = unitMenuGroup;
+			closeUnitMenu(true);
+			setUnit(group, items[index].dataset.unit);
+		} else if (event.key === 'Escape') {
+			event.preventDefault();
+			closeUnitMenu(true);
+		} else if (event.key === 'Tab') {
+			closeUnitMenu();
+		}
+	});
+
+	// A fixed menu would drift from its pill when the panel scrolls.
+	document.addEventListener('scroll', () => closeUnitMenu(), true);
+	window.addEventListener('resize', () => closeUnitMenu());
 });

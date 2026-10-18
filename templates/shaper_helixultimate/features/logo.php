@@ -135,8 +135,9 @@ class HelixUltimateFeatureLogo
 					$srcset .= Uri::root() . $retinaLogo . ' 2x';
 				}
 				$logoWithUrl = Uri::root() . $defaultLogo;
-				$attrLogoHeightRaw = $this->params->get('logo_height', '');
-				$attrLogoHeight = (int) filter_var($attrLogoHeightRaw, FILTER_SANITIZE_NUMBER_INT);
+				// The height attribute only takes pixels; other units are set in CSS below.
+				$attrLogoHeightRaw = trim((string) $this->params->get('logo_height', ''));
+				$attrLogoHeight = preg_match('@^\d+(\.\d+)?(px)?$@', $attrLogoHeightRaw) ? (int) $attrLogoHeightRaw : 0;
 			
 				// Add sticky logo class if sticky logo exists
 				$mainLogoClass = 'logo-image';
@@ -149,7 +150,7 @@ class HelixUltimateFeatureLogo
 				<img class='{$mainLogoClass} {$custom_logo_class}'
 					srcset='{$srcset}'
 					src='{$logoWithUrl}'
-					height='{$attrLogoHeight}'
+					" . ($attrLogoHeight ? "height='{$attrLogoHeight}'" : '') . "
 					alt='{$altText}'
 				/>
 				";
@@ -161,8 +162,8 @@ class HelixUltimateFeatureLogo
 				{
 					$stickyLogo = $this->params->get('sticky_logo', null);
 					$stickyLogoWithUrl = Uri::root() . $stickyLogo;
-					$attrStickyLogoHeightRaw = $this->params->get('sticky_logo_height', '');
-					$attrStickyLogoHeight = (int) filter_var($attrStickyLogoHeightRaw, FILTER_SANITIZE_NUMBER_INT);
+					$attrStickyLogoHeightRaw = trim((string) $this->params->get('sticky_logo_height', ''));
+					$attrStickyLogoHeight = preg_match('@^\d+(\.\d+)?(px)?$@', $attrStickyLogoHeightRaw) ? (int) $attrStickyLogoHeightRaw : 0;
 					
 					// Use default logo height if sticky logo height is not set
 					if (empty($attrStickyLogoHeight))
@@ -170,7 +171,7 @@ class HelixUltimateFeatureLogo
 						$attrStickyLogoHeight = $attrLogoHeight;
 					}
 					
-					$html .= "<img class='logo-image logo-sticky {$custom_logo_class}' src='{$stickyLogoWithUrl}' height='{$attrStickyLogoHeight}' alt='{$altText}' />";
+					$html .= "<img class='logo-image logo-sticky {$custom_logo_class}' src='{$stickyLogoWithUrl}'" . ($attrStickyLogoHeight ? " height='{$attrStickyLogoHeight}'" : '') . " alt='{$altText}' />";
 				}
 
 				if ($this->params->get('mobile_logo'))
@@ -203,7 +204,7 @@ class HelixUltimateFeatureLogo
 
 			if ($logo_height = $this->params->get('logo_height', ''))
 			{
-				$logo_height = preg_match("@(px|em|rem|%)$@", $logo_height) ? $logo_height : $logo_height . 'px';
+				$logo_height = preg_match("@(px|em|rem|%|vw|vh|auto)$@", $logo_height) ? $logo_height : $logo_height . 'px';
 
 				$logoStyle = '.logo-image {height:' . $logo_height . ';}';
 				$logoStyle .= '.logo-image-phone {height:' . $logo_height . ';}';
@@ -214,7 +215,7 @@ class HelixUltimateFeatureLogo
 			// Add sticky logo height if set
 			if ($sticky_logo_height = $this->params->get('sticky_logo_height', ''))
 			{
-				$sticky_logo_height = preg_match("@(px|em|rem|%)$@", $sticky_logo_height) ? $sticky_logo_height : $sticky_logo_height . 'px';
+				$sticky_logo_height = preg_match("@(px|em|rem|%|vw|vh|auto)$@", $sticky_logo_height) ? $sticky_logo_height : $sticky_logo_height . 'px';
 
 				$stickyLogoStyle = '.header-sticky .logo-sticky {height:' . $sticky_logo_height . ';}';
 
@@ -227,7 +228,7 @@ class HelixUltimateFeatureLogo
 			 */
 			if ($logo_height_sm = $this->params->get('logo_height_sm', ''))
 			{
-				$logo_height_sm = preg_match("@(px|em|rem|%)$@", $logo_height_sm) ? $logo_height_sm : $logo_height_sm . 'px';
+				$logo_height_sm = preg_match("@(px|em|rem|%|vw|vh|auto)$@", $logo_height_sm) ? $logo_height_sm : $logo_height_sm . 'px';
 
 				$logoStyleSm = '@media(max-width: 992px) {';
 				$logoStyleSm .= '.logo-image {height: ' . $logo_height_sm . ';}';
@@ -239,7 +240,7 @@ class HelixUltimateFeatureLogo
 			
 			if ($logo_height_xs = $this->params->get('logo_height_xs', ''))
 			{
-				$logo_height_xs = preg_match("@(px|em|rem|%)$@", $logo_height_xs) ? $logo_height_xs : $logo_height_xs . 'px';
+				$logo_height_xs = preg_match("@(px|em|rem|%|vw|vh|auto)$@", $logo_height_xs) ? $logo_height_xs : $logo_height_xs . 'px';
 
 				$logoStyleXs = '@media(max-width: 576px) {';
 				$logoStyleXs .= '.logo-image {height: ' . $logo_height_xs . ';}';

@@ -399,7 +399,7 @@ class HelixultimateMenu
 		// Menu_show
 		$menu_show = $this->getMenuShow($item->id);
 		$dropdown_width = $this->_params->get('dropdown_width', '240px');
-		$dropdown_width = preg_match("@(px|em|rem|%)$@", $dropdown_width) ? $dropdown_width : $dropdown_width . 'px';
+		$dropdown_width = preg_match("@(px|em|rem|%|vw|vh|auto)$@", $dropdown_width) ? $dropdown_width : $dropdown_width . 'px';
 		$dropdown_alignment = 'right';
 		$dropdown_style = 'width: ' . $dropdown_width . ';';
 		$layout = json_decode(Helper::CheckNull($this->_items[$item->id]->getParams()->get('helixultimatemenulayout')));
@@ -465,7 +465,7 @@ class HelixultimateMenu
 
 		$layout = $mega->layout ?? [];
 
-		$mega_style = 'width: ' . (preg_match("@(px|em|rem|%)$@", $mega->width) ? $mega->width : $mega->width . 'px');
+		$mega_style = 'width: ' . (preg_match("@(px|em|rem|%|vw|vh|auto)$@", $mega->width) ? $mega->width : $mega->width . 'px');
 		$mega_style .= ';';
 
 		if ($mega->menualign === 'center')
