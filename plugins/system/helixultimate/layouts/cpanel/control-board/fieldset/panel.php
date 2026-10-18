@@ -8,6 +8,7 @@
 
 defined('_JEXEC') or die();
 
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 
 extract($displayData);
@@ -56,7 +57,11 @@ $headerTitle = isset($panelHeadings[$headerTitle])
 
 <div class="hu-edit-panel <?php echo strtolower($fieldset->name); ?>-panel">
 	<div class="hu-panel-header">
-		<span><?php echo $headerTitle; ?></span>
+		<span class="hu-panel-title"><?php echo $headerTitle; ?></span>
+		<button type="button" class="hu-btn hu-btn-primary hu-panel-save action-save-template" title="<?php echo Text::_('HELIX_ULTIMATE_SAVE_CHANGES'); ?> (Ctrl/⌘ S)">
+			<span class="hu-topbar-save-spinner hidden spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			<span class="helix-topbar-save-text"><?php echo Text::_('HELIX_ULTIMATE_SAVE_CHANGES'); ?></span>
+		</button>
 		<button type="button" role="button" class="hu-btn hu-btn-round hu-btn-round-sm hu-panel-close" data-sidebarclass="<?php echo 'hu-fieldset-' . $fieldset->name; ?>">
 			<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none"><path d="M9.708.292a.999.999 0 00-1.413 0l-3.289 3.29L1.717.291A.999.999 0 00.305 1.705l3.289 3.289-3.29 3.289a.999.999 0 101.413 1.412l3.29-3.289 3.288 3.29a.999.999 0 001.413-1.413l-3.29-3.29 3.29-3.288a.999.999 0 000-1.413z"/></svg>
 		</button>

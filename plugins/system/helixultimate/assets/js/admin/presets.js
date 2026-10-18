@@ -6,7 +6,8 @@
  */
 
 /**
- * Presets: edit a preset's colours in a modal, apply or reset to default.
+ * Presets: tiles preview each palette; edit a preset's colours in a modal,
+ * apply or reset to default.
  */
 document.addEventListener('DOMContentLoaded', () => {
 	const { delegate, readData } = Joomla.utils;
@@ -40,6 +41,107 @@ document.addEventListener('DOMContentLoaded', () => {
 		}, '');
 	}
 
+	/* ------------------------------------------------------------------ */
+	/* Tiles: a mini site preview drawn from each preset's own colours      */
+	/* ------------------------------------------------------------------ */
+
+	const color = (tile, key, fallback) => tile.getAttribute(`data-${key}`) || fallback;
+
+	function renderPresetPreview(tile) {
+		const contents = tile.querySelector('.hu-preset-contents');
+
+		if (!contents) return;
+
+		const accent = color(tile, 'link_color', '#1f3bff');
+
+		contents.setAttribute('aria-hidden', 'true');
+		contents.innerHTML = `
+			<span class="hu-preset-mock">
+				<span class="hu-preset-mock__topbar"></span>
+				<span class="hu-preset-mock__header">
+					<span class="hu-preset-mock__logo"></span>
+					<span class="hu-preset-mock__menu"><i></i><i></i><i></i></span>
+				</span>
+				<span class="hu-preset-mock__hero">
+					<i></i><i></i>
+					<span class="hu-preset-mock__button"></span>
+				</span>
+				<span class="hu-preset-mock__body"><i></i><i></i><i></i></span>
+			</span>`;
+
+		const mock = contents.querySelector('.hu-preset-mock');
+		const vars = {
+			'--p-topbar': color(tile, 'topbar_bg_color', '#333'),
+			'--p-header': color(tile, 'header_bg_color', '#fff'),
+			'--p-logo': color(tile, 'logo_text_color', accent),
+			'--p-menu': color(tile, 'menu_text_color', '#252525'),
+			'--p-bg': color(tile, 'bg_color', '#fff'),
+			'--p-text': color(tile, 'text_color', '#252525'),
+			'--p-accent': accent,
+		};
+
+		Object.entries(vars).forEach(([name, value]) => mock.style.setProperty(name, value));
+		tile.style.setProperty('--p-accent', accent);
+	}
+
+	/** Tiles act as a radio group: focusable, arrow keys move, Enter / Space pick. */
+	function syncPresetState() {
+		document.querySelectorAll('.hu-presets .hu-preset').forEach(tile => {
+			const active = tile.classList.contains('active');
+			tile.setAttribute('aria-checked', String(active));
+			tile.tabIndex = active ? 0 : -1;
+		});
+	}
+
+	const presetsGrid = presetsDataElement.closest('.hu-presets');
+	const tiles = [...presetsGrid.querySelectorAll('.hu-preset')];
+
+	presetsGrid.setAttribute('role', 'radiogroup');
+	presetsGrid.setAttribute('aria-label', 'Presets');
+
+	tiles.forEach(tile => {
+		tile.setAttribute('role', 'radio');
+		tile.setAttribute('aria-label', tile.querySelector('.hu-preset-title')?.textContent.trim() || tile.dataset.preset);
+		renderPresetPreview(tile);
+
+		const edit = tile.querySelector('.hu-edit-preset');
+
+		if (edit) {
+			edit.removeAttribute('style');
+			edit.setAttribute('href', '#');
+			edit.setAttribute('aria-label', `Edit ${tile.getAttribute('aria-label')}`);
+			edit.title = 'Edit colours';
+		}
+	});
+
+	if (!tiles.some(tile => tile.classList.contains('active')) && tiles[0]) tiles[0].tabIndex = 0;
+	syncPresetState();
+
+	// helix-ultimate.js marks the clicked tile active; mirror that for assistive tech.
+	delegate(presetsGrid, 'click', '.hu-preset', () => requestAnimationFrame(syncPresetState));
+
+	presetsGrid.addEventListener('keydown', event => {
+		const tile = event.target.closest('.hu-preset');
+
+		if (!tile || event.target !== tile) return;
+
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			tile.click();
+			return;
+		}
+
+		const step = { ArrowRight: 1, ArrowDown: 2, ArrowLeft: -1, ArrowUp: -2 }[event.key];
+
+		if (!step) return;
+
+		event.preventDefault();
+
+		const next = tiles[(tiles.indexOf(tile) + step + tiles.length) % tiles.length];
+		next.click();
+		next.focus();
+	});
+
 	const closeModal = () => {
 		document.querySelectorAll('.hu-options-modal-overlay, .hu-options-modal').forEach(element => element.remove());
 		document.body.classList.remove('hu-options-modal-open');
@@ -66,10 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (presetElement) {
 			const majorColor = detectMajorColor(data);
-			const editButton = presetElement.querySelector('.hu-edit-preset');
 
 			presetElement.style.backgroundColor = majorColor;
-			if (editButton) editButton.style.color = majorColor;
+			renderPresetPreview(presetElement);
 
 			presetElement.click();
 		}

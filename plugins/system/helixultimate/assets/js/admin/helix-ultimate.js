@@ -388,50 +388,53 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Save                                                                */
 	/* ------------------------------------------------------------------ */
 
+	/** Spinner + disabled state on every Save button (one per panel header). */
 	function showSaveLoader(status) {
-		const loader = document.querySelector('.hu-topbar-save-spinner');
-
-		if (!loader) return;
-
-		loader.classList.toggle('hidden', !status);
-
-		const icon = loader.closest('.action-save-template').querySelector('svg');
-		toggle(icon, !status);
+		document.querySelectorAll('.action-save-template').forEach(button => {
+			button.disabled = status;
+			button.classList.toggle('is-saving', status);
+			button.querySelector('.hu-topbar-save-spinner')?.classList.toggle('hidden', !status);
+		});
 	}
 
-	document.querySelectorAll('.action-save-template').forEach(button => {
-		button.addEventListener(
-			'click',
-			Joomla.utils.debounce(async event => {
-				event.preventDefault();
+	const saveTemplate = Joomla.utils.debounce(async event => {
+		if (event) event.preventDefault();
 
-				showSaveLoader(true);
+		showSaveLoader(true);
 
-				// Don't show the reset button for a draft that is now saved.
-				if (delayTimeout) clearTimeout(delayTimeout);
+		// Don't show the reset button for a draft that is now saved.
+		if (delayTimeout) clearTimeout(delayTimeout);
 
-				collectComposites();
+		collectComposites();
 
-				try {
-					const data = await request(ajaxUrl('save-tmpl-style'), { method: 'POST', data: formData() });
+		try {
+			const data = await request(ajaxUrl('save-tmpl-style'), { method: 'POST', data: formData() });
 
-					if (data.status) {
-						previewFrame.contentWindow.location.reload();
-						Joomla.HelixToaster.success('Changes have been successfully saved!', 'Success');
-					} else {
-						Joomla.HelixToaster.error(data.message, 'Failed');
-					}
+			if (data.status) {
+				previewFrame.contentWindow.location.reload();
+				Joomla.HelixToaster.success('Changes have been successfully saved!', 'Success');
+			} else {
+				Joomla.HelixToaster.error(data.message, 'Failed');
+			}
 
-					hideStatus();
-					updateSetvalue();
-				} catch (error) {
-					console.error('error', error);
-					Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
-				}
+			hideStatus();
+			updateSetvalue();
+		} catch (error) {
+			console.error('error', error);
+			Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
+		}
 
-				showSaveLoader(false);
-			}, 500)
-		);
+		showSaveLoader(false);
+	}, 500);
+
+	document.querySelectorAll('.action-save-template').forEach(button => button.addEventListener('click', saveTemplate));
+
+	// Ctrl/Cmd + S saves from anywhere in the customizer, even with no panel open.
+	document.addEventListener('keydown', event => {
+		if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 's') {
+			event.preventDefault();
+			saveTemplate();
+		}
 	});
 
 	/* ------------------------------------------------------------------ */
