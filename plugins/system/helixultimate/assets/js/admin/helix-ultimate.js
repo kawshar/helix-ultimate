@@ -745,11 +745,28 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
-	/** Segmented switchers write their value into the hidden input. */
+	/**
+	 * Segmented switchers write their value into the hidden input.
+	 * The options are spans, so make them reachable and operable from the keyboard.
+	 */
 	document.querySelectorAll('.hu-switcher .hu-action-group [hu-switcher-action]').forEach(action => {
+		action.tabIndex = 0;
+		action.setAttribute('aria-pressed', String(action.classList.contains('active')));
+
+		action.addEventListener('keydown', event => {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
+				action.click();
+			}
+		});
+
 		action.addEventListener('click', () => {
-			[...action.parentElement.children].forEach(sibling => sibling.classList.remove('active'));
+			[...action.parentElement.children].forEach(sibling => {
+				sibling.classList.remove('active');
+				sibling.setAttribute('aria-pressed', 'false');
+			});
 			action.classList.add('active');
+			action.setAttribute('aria-pressed', 'true');
 
 			const input = action.closest('.hu-switcher').querySelector('input[type=hidden]');
 

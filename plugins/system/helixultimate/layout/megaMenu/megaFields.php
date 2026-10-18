@@ -157,7 +157,8 @@ class MegaFields
             ],
             'badge_position' => [
                 'type' => 'select',
-                'title' => Text::_('HELIX_ULTIMATE_MENU_BADGE_POSITION'),
+                // HELIX_ULTIMATE_MENU_BADGE_POSITION is defined twice in the language file and reads "Left".
+                'title' => Text::_('HELIX_ULTIMATE_MENU_BADGE_POSITION_LABEL'),
                 'menu-builder' => true,
                 'data' => ['itemid' => $this->itemId],
                 'options' => [

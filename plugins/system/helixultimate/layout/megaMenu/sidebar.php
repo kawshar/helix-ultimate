@@ -34,25 +34,24 @@ $item = $builder->getMenuItem();
 
     <?php echo $builder->renderFieldElement('showtitle', $fields['showtitle']); ?>
 
-    <div class="hu-d-flex hu-justify-content-between">
-        <?php if ((int) $item->parent_id === 1): ?>
-            <div class="hu-megamenu-alignment">
-                <?php echo $builder->renderFieldElement('menualign', $fields['menualign']); ?>
-            </div>
-        <?php endif ?>
-
-        <div class="hu-menuitem-dropdown-position">
-            <?php echo $builder->renderFieldElement('dropdown', $fields['dropdown']); ?>
+    <?php // One field per row: the panel is too narrow for side-by-side fields. ?>
+    <?php if ((int) $item->parent_id === 1): ?>
+        <div class="hu-megamenu-alignment">
+            <?php echo $builder->renderFieldElement('menualign', $fields['menualign']); ?>
         </div>
+    <?php endif ?>
 
-        <?php echo $builder->renderFieldElement('faicon', $fields['faicon']); ?>
+    <div class="hu-menuitem-dropdown-position">
+        <?php echo $builder->renderFieldElement('dropdown', $fields['dropdown']); ?>
     </div>
+
+    <?php echo $builder->renderFieldElement('faicon', $fields['faicon']); ?>
     <?php echo $builder->renderFieldElement('customclass', $fields['customclass']); ?>
-    <hr />
-    <div class="hu-d-flex hu-justify-content-between">
+
+    <div class="hu-megamenu-badge">
         <?php echo $builder->renderFieldElement('badge', $fields['badge']); ?>
         <?php echo $builder->renderFieldElement('badge_position', $fields['badge_position']); ?>
+        <?php echo $builder->renderFieldElement('badge_bg_color', $fields['badge_bg_color']); ?>
+        <?php echo $builder->renderFieldElement('badge_text_color', $fields['badge_text_color']); ?>
     </div>
-    <?php echo $builder->renderFieldElement('badge_bg_color', $fields['badge_bg_color']); ?>
-    <?php echo $builder->renderFieldElement('badge_text_color', $fields['badge_text_color']); ?>
 </div>
