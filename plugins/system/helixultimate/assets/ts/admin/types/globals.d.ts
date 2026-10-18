@@ -14,30 +14,13 @@
  * tightened as their files move over.
  */
 
+import type { HelixModalApi } from '../modal';
+import type { HelixToasterApi } from '../toaster';
 import type { HelixUtils } from '../utils';
 
 declare global {
 	interface JoomlaText {
 		_(key: string, fallback?: string): string;
-	}
-
-	interface HelixToasterApi {
-		success(message: string, title?: string): void;
-		error(message: string, title?: string): void;
-		[method: string]: unknown;
-	}
-
-	interface HelixModalApi {
-		close(): void;
-		settings(options?: {
-			target?: string;
-			title?: string;
-			flag?: string;
-			class?: string;
-			applyBtnClass?: string;
-			footerButtons?: string[];
-		}): void;
-		[method: string]: (...args: any[]) => unknown;
 	}
 
 	/** Menu tree from treeSortable.js. */
@@ -57,6 +40,8 @@ declare global {
 		helixModal: HelixModalApi;
 		sortable?: HelixMenuTree;
 		initColorPicker?(selector?: string | Element | Element[]): void;
+		/** `data-revealon` showon for fields rendered in modals (fields.js). */
+		setUpShowon?(container?: ParentNode | null): void;
 		helixLayout?: unknown;
 		helixMegaMenu?: unknown;
 		helixSwitchDevice?: (device: string) => void;
