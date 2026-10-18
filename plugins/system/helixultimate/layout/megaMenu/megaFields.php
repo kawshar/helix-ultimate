@@ -164,7 +164,8 @@ class MegaFields
                     'left' => Text::_('HELIX_ULTIMATE_GLOBAL_LEFT'),
                     'right' => Text::_('HELIX_ULTIMATE_GLOBAL_RIGHT'),
                 ],
-                'value' => $this->settings->badge_position ?? 'right',
+                // An empty value renders on the right on the site, so show it that way.
+                'value' => ($this->settings->badge_position ?? '') ?: 'right',
                 'internal' => true,
             ],
             'badge_bg_color' => [

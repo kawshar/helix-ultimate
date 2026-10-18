@@ -1361,8 +1361,14 @@ class Helper
     {
         $value = htmlspecialchars(trim(strip_tags((string) $value)), ENT_QUOTES, 'UTF-8');
 
-        if (preg_match('/^[0-9]+(px|%|em|rem)$/', $value)) {
+        if (preg_match('/^[0-9]+(\.[0-9]+)?(px|%|em|rem|vw|vh)$/', $value)) {
             return $value;
+        }
+
+        // Older items store a bare number, which always meant pixels; keep it
+        // instead of resetting the mega menu to the default width.
+        if (preg_match('/^[0-9]+(\.[0-9]+)?$/', $value)) {
+            return $value . 'px';
         }
 
         return '600px';
