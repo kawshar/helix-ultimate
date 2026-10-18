@@ -433,7 +433,7 @@
 }
 
 /* Number + unit: one filled pill; the unit is plain text inside it */
-#helix-ultimate .hu-unit-group {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group {
 	display: flex;
 	align-items: center;
 	height: 36px;
@@ -443,12 +443,12 @@
 	background: var(--sp-input);
 }
 
-#helix-ultimate .hu-unit-group:hover {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:hover {
 	border-color: var(--sp-divider);
 }
 
 /* Number + unit is one control, so it gets one focus ring around the whole pill. */
-#helix-ultimate .hu-unit-group:focus-within {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group:focus-within {
 	border-color: transparent;
 	background: var(--sp-panel);
 	box-shadow: none;
@@ -477,7 +477,7 @@
 	background-color: transparent;
 }
 
-#helix-ultimate .hu-unit-group input.hu-unit-field-input {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input {
 	flex: 1 1 auto;
 	min-width: 0;
 	max-width: none;
@@ -493,15 +493,15 @@
 
 /* Unit pill: plain text at the right edge; looks like a button only on hover, focus or while open. */
 /* The pill sits on top of the input's right edge, so showing / hiding it never shifts the number. */
-#helix-ultimate .hu-unit-group {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group {
 	position: relative;
 }
 
-#helix-ultimate .hu-unit-group input.hu-unit-field-input {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group input.hu-unit-field-input {
 	padding-right: 40px;
 }
 
-#helix-ultimate .hu-unit-group .hu-unit-pill {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill {
 	position: absolute;
 	top: 50%;
 	right: 4px;
@@ -520,32 +520,32 @@
 	transition: background-color 0.12s ease, box-shadow 0.12s ease, color 0.12s ease;
 }
 
-#helix-ultimate .hu-unit-group .hu-unit-pill:hover,
-#helix-ultimate .hu-unit-group .hu-unit-pill:focus-visible,
-#helix-ultimate .hu-unit-group.is-menu-open .hu-unit-pill {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:hover,
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:focus-visible,
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-menu-open .hu-unit-pill {
 	color: var(--sp-text);
 	background: var(--sp-panel);
 	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
 	outline: none;
 }
 
-#helix-ultimate .hu-unit-group .hu-unit-pill:focus-visible {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group .hu-unit-pill:focus-visible {
 	box-shadow: 0 0 0 2px var(--sp-blue);
 }
 
 /* px is silent: no pill until the field is hovered or focused (or its menu is open). */
-#helix-ultimate .hu-unit-group.is-default-unit:not(:hover):not(:focus-within):not(.is-menu-open) .hu-unit-pill {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-default-unit:not(:hover):not(:focus-within):not(.is-menu-open) .hu-unit-pill {
 	opacity: 0;
 	pointer-events: none;
 }
 
 /* Keywords (auto) have no number: the pill carries the value. */
-#helix-ultimate .hu-unit-group.is-keyword .hu-unit-pill {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.is-keyword .hu-unit-pill {
 	color: var(--sp-text);
 }
 
 /* Old markup (if a template still renders the native select). */
-#helix-ultimate .hu-unit-group select.hu-unit-select {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group select.hu-unit-select {
 	display: none;
 }
 
@@ -594,7 +594,7 @@
 }
 
 /* Typography: per-device size inputs stay hidden until their device is active */
-#helix-ultimate .hu-unit-group.hu-webfont-unit:not(.active) {
+:is(#helix-ultimate, .hu-modal, .hu-options-modal) .hu-unit-group.hu-webfont-unit:not(.active) {
 	display: none;
 }
 
