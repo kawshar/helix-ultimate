@@ -105,20 +105,112 @@
       next.click();
       next.focus();
     });
-    const closeModal = () => {
-      document.querySelectorAll(".hu-options-modal-overlay, .hu-options-modal").forEach((element) => element.remove());
-      document.body.classList.remove("hu-options-modal-open");
+    const SHORT_LABELS = {
+      topbar_bg_color: ["HELIX_ULTIMATE_PRESET_FIELD_BACKGROUND", "Background"],
+      topbar_text_color: ["HELIX_ULTIMATE_PRESET_FIELD_TEXT", "Text"],
+      header_bg_color: ["HELIX_ULTIMATE_PRESET_FIELD_BACKGROUND", "Background"],
+      logo_text_color: ["HELIX_ULTIMATE_PRESET_FIELD_LOGO", "Logo"],
+      menu_text_color: ["HELIX_ULTIMATE_PRESET_FIELD_TEXT", "Text"],
+      menu_text_hover_color: ["HELIX_ULTIMATE_PRESET_FIELD_HOVER", "Hover"],
+      menu_text_active_color: ["HELIX_ULTIMATE_PRESET_FIELD_ACTIVE", "Active"],
+      menu_dropdown_bg_color: ["HELIX_ULTIMATE_PRESET_FIELD_BACKGROUND", "Background"],
+      menu_dropdown_text_color: ["HELIX_ULTIMATE_PRESET_FIELD_TEXT", "Text"],
+      menu_dropdown_text_hover_color: ["HELIX_ULTIMATE_PRESET_FIELD_HOVER", "Hover"],
+      menu_dropdown_text_active_color: ["HELIX_ULTIMATE_PRESET_FIELD_ACTIVE", "Active"],
+      bg_color: ["HELIX_ULTIMATE_PRESET_FIELD_BACKGROUND", "Background"],
+      text_color: ["HELIX_ULTIMATE_PRESET_FIELD_TEXT", "Text"],
+      link_color: ["HELIX_ULTIMATE_PRESET_FIELD_LINK", "Link"],
+      link_hover_color: ["HELIX_ULTIMATE_PRESET_FIELD_LINK_HOVER", "Link hover"],
+      footer_bg_color: ["HELIX_ULTIMATE_PRESET_FIELD_BACKGROUND", "Background"],
+      footer_text_color: ["HELIX_ULTIMATE_PRESET_FIELD_TEXT", "Text"],
+      footer_link_color: ["HELIX_ULTIMATE_PRESET_FIELD_LINK", "Link"],
+      footer_link_hover_color: ["HELIX_ULTIMATE_PRESET_FIELD_LINK_HOVER", "Link hover"]
     };
+    const shortLabel = (field) => {
+      const entry = SHORT_LABELS[field];
+      const value = entry && Joomla.Text ? Joomla.Text._(entry[0]) : "";
+      return value && value !== entry[0] ? value : null;
+    };
+    const PRESET_GROUPS = [
+      { key: "topbar", label: ["HELIX_ULTIMATE_PRESET_GROUP_TOPBAR", "Top bar"], fields: ["topbar_bg_color", "topbar_text_color"] },
+      { key: "header", label: ["HELIX_ULTIMATE_PRESET_GROUP_HEADER", "Header"], fields: ["header_bg_color", "logo_text_color"] },
+      { key: "menu", label: ["HELIX_ULTIMATE_PRESET_GROUP_MENU", "Menu"], fields: ["menu_text_color", "menu_text_hover_color", "menu_text_active_color"] },
+      {
+        key: "dropdown",
+        label: ["HELIX_ULTIMATE_PRESET_GROUP_DROPDOWN", "Dropdown menu"],
+        fields: ["menu_dropdown_bg_color", "menu_dropdown_text_color", "menu_dropdown_text_hover_color", "menu_dropdown_text_active_color"]
+      },
+      { key: "body", label: ["HELIX_ULTIMATE_PRESET_GROUP_BODY", "Body"], fields: ["bg_color", "text_color", "link_color", "link_hover_color"] },
+      { key: "footer", label: ["HELIX_ULTIMATE_PRESET_GROUP_FOOTER", "Footer"], fields: ["footer_bg_color", "footer_text_color", "footer_link_color", "footer_link_hover_color"] }
+    ];
+    const presetText = (key, fallback) => {
+      const value = Joomla.Text ? Joomla.Text._(key) : "";
+      return value && value !== key ? value : fallback;
+    };
+    function groupPresetEditor(editor2) {
+      const rows = [...editor2.querySelectorAll(".group-style-no-group")].filter((row) => row.querySelector("input.preset-control"));
+      const byField = new Map(rows.map((row) => [row.querySelector("input.preset-control").name, row]));
+      const used = /* @__PURE__ */ new Set();
+      const sections = [];
+      PRESET_GROUPS.forEach((group) => {
+        const groupRows = group.fields.map((field) => byField.get(field)).filter((row) => Boolean(row));
+        groupRows.forEach((row) => used.add(row));
+        if (groupRows.length) sections.push({ key: group.key, label: presetText(...group.label), rows: groupRows });
+      });
+      const others = rows.filter((row) => !used.has(row));
+      if (others.length) sections.push({ key: "other", label: presetText("HELIX_ULTIMATE_PRESET_GROUP_OTHER", "Other"), rows: others });
+      const list = document.createElement("div");
+      list.className = "hu-preset-groups";
+      sections.forEach((section, index) => {
+        const details = document.createElement("details");
+        details.className = `hu-preset-group hu-preset-group-${section.key}`;
+        details.open = index === 0;
+        details.innerHTML = `
+				<summary class="hu-preset-group__summary">
+					<span class="hu-preset-group__title"></span>
+					<span class="hu-preset-group__swatches" aria-hidden="true"></span>
+					<svg class="hu-preset-group__chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+				</summary>
+				<div class="hu-preset-group__fields"></div>`;
+        details.querySelector(".hu-preset-group__title").textContent = section.label;
+        const fields = details.querySelector(".hu-preset-group__fields");
+        const swatches = details.querySelector(".hu-preset-group__swatches");
+        section.rows.forEach((row) => {
+          const input = row.querySelector("input.preset-control");
+          const label = row.querySelector(".control-label");
+          const fullLabel = (label?.dataset.fullLabel ?? label?.textContent ?? "").trim();
+          const short = section.key === "other" ? null : shortLabel(input.name);
+          if (label) {
+            label.dataset.fullLabel = fullLabel;
+            label.textContent = short ?? fullLabel;
+          }
+          if (fullLabel) input.setAttribute("aria-label", fullLabel);
+          const swatch = document.createElement("i");
+          const paint = () => swatch.style.setProperty("background-color", input.value || "transparent");
+          paint();
+          input.addEventListener("input", paint);
+          input.addEventListener("change", paint);
+          swatches.appendChild(swatch);
+          fields.appendChild(row);
+        });
+        list.appendChild(details);
+      });
+      const wrapper = editor2.firstElementChild;
+      if (wrapper) wrapper.replaceChildren(list);
+      else editor2.appendChild(list);
+    }
+    let editor = null;
     function reflectPresetChanges(data, name, originalContainer, editedContainer) {
       presetsData[name].data = data;
       dataElement.value = JSON.stringify(presetsData);
       const presetElement = document.querySelector(`.hu-preset[data-preset="${name}"]`);
       if (presetElement) {
         Object.entries(data).forEach(([key, value]) => presetElement.setAttribute(`data-${key}`, value));
+        presetElement.querySelector(".hu-edit-preset")?.setAttribute("data-preset_data", JSON.stringify({ name, data: { ...data } }));
       }
       originalContainer.replaceChildren(...editedContainer.querySelectorAll(":scope > div"));
       window.purgeCss?.();
-      closeModal();
+      editor?.close();
       if (presetElement) {
         const majorColor = detectMajorColor(data);
         presetElement.style.backgroundColor = majorColor;
@@ -133,33 +225,40 @@
       if (!name || !data) return;
       const originalContainer = document.querySelector(`.hu-preset-container#${name}`);
       if (!originalContainer) return;
+      const host = presetsGrid.closest(".hu-edit-panel");
+      if (!host) return;
+      editor?.close();
       const container = originalContainer.cloneNode(true);
       container.querySelectorAll("input").forEach((input) => input.removeAttribute("id"));
-      Joomla.helixModal.settings({
-        flag: "edit-presets",
-        title: `<span class='fas fa-cogs hu-mr-2'></span> Edit Preset: ${name}`,
-        class: `hu-modal-small edit-preset-modal modal-${name}`,
-        applyBtnClass: "hu-save-preset",
-        footerButtons: [
-          '<a href="#" class="hu-btn hu-btn-secondary helix-preset-reset hu-ml-auto"><span class="fas fa-sync-alt" aria-hidden="true"></span> Reset to Default</a>'
-        ]
-      });
       container.removeAttribute("id");
       container.removeAttribute("style");
-      container.classList.add("hu-options-modal-content");
-      const modal = document.querySelector(`.edit-preset-modal.modal-${name}`);
-      if (!modal) return;
-      modal.querySelector(".hu-options-modal-inner")?.replaceChildren(container);
+      container.classList.add("hu-preset-editor");
+      groupPresetEditor(container);
+      const tile = button.closest(".hu-preset");
+      const label = tile?.getAttribute("aria-label") || name;
+      const step = Joomla.helixSubpanel.open({
+        host,
+        title: label,
+        body: container,
+        backLabel: "Back to presets",
+        footer: '<button type="button" class="hu-btn hu-btn-primary hu-save-preset"><span class="fas fa-check" aria-hidden="true"></span> Apply</button><button type="button" class="hu-btn hu-btn-link helix-preset-reset"><span class="fas fa-sync-alt" aria-hidden="true"></span> Reset to default</button>',
+        onClose: () => {
+          if (editor === step) editor = null;
+          button.focus({ preventScroll: true });
+        }
+      });
+      editor = step;
+      Joomla.initColorPicker?.();
       container.querySelectorAll("input.preset-control").forEach((input) => {
         input.addEventListener("change", () => {
           data[input.name] = input.value;
         });
       });
-      modal.querySelector(".hu-save-preset")?.addEventListener("click", (applyEvent) => {
+      step.footer?.querySelector(".hu-save-preset")?.addEventListener("click", (applyEvent) => {
         applyEvent.preventDefault();
         reflectPresetChanges(data, name, originalContainer, container);
       });
-      modal.querySelector(".helix-preset-reset")?.addEventListener("click", (resetEvent) => {
+      step.footer?.querySelector(".helix-preset-reset")?.addEventListener("click", (resetEvent) => {
         resetEvent.preventDefault();
         if (window.confirm("Do you really want to reset your changes to default?")) {
           const defaults = JSON.parse(document.getElementById("default-values").value);

@@ -1935,3 +1935,245 @@
 		opacity: 1;
 	}
 }
+
+/* ------------------------------------------------------------------ */
+/* Panel stack: steps slide in over a panel (Joomla.helixSubpanel)     */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-edit-panel {
+	position: relative;
+}
+
+#helix-ultimate .hu-edit-panel > .hu-groups-container,
+#helix-ultimate .hu-subpanel {
+	transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.24s ease;
+}
+
+#helix-ultimate .hu-edit-panel > .hu-groups-container.is-behind,
+#helix-ultimate .hu-subpanel.is-behind {
+	transform: translateX(-24%);
+	opacity: 0;
+	pointer-events: none;
+}
+
+#helix-ultimate .hu-subpanel {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	background: var(--sp-panel);
+	transform: translateX(100%);
+}
+
+#helix-ultimate .hu-subpanel.is-active:not(.is-behind) {
+	transform: none;
+}
+
+#helix-ultimate .hu-subpanel-header {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: 4px;
+	min-height: 44px;
+	padding: 0 12px 0 6px;
+	border-bottom: 1px solid var(--sp-divider);
+}
+
+#helix-ultimate .hu-subpanel-back {
+	display: inline-flex;
+	flex: 0 0 28px;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-text);
+	background: transparent;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-subpanel-back:hover,
+#helix-ultimate .hu-subpanel-back:focus-visible {
+	background: var(--sp-input);
+	outline: none;
+}
+
+#helix-ultimate .hu-subpanel-back:focus-visible {
+	box-shadow: 0 0 0 2px var(--sp-blue);
+}
+
+#helix-ultimate .hu-subpanel-title {
+	min-width: 0;
+	margin: 0;
+	overflow: hidden;
+	color: var(--sp-text);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.3;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#helix-ultimate .hu-subpanel-body {
+	flex: 1 1 auto;
+	min-height: 0;
+	padding: 12px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+#helix-ultimate .hu-subpanel-footer {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 10px 12px;
+	border-top: 1px solid var(--sp-divider);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .hu-subpanel-footer .hu-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 32px;
+	padding: 0 12px;
+	font-size: 12.5px;
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-subpanel-footer .hu-btn-link {
+	color: var(--sp-muted);
+	background: transparent;
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-subpanel-footer .hu-btn-link:hover {
+	color: var(--sp-text);
+	background: var(--sp-input);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#helix-ultimate .hu-edit-panel > .hu-groups-container,
+	#helix-ultimate .hu-subpanel {
+		transition: none;
+	}
+}
+
+/* Preset editor: colours grouped by area; label above a full-width field */
+#helix-ultimate .hu-subpanel-body:has(.hu-preset-groups) {
+	padding: 0;
+}
+
+#helix-ultimate .hu-preset-group {
+	border-bottom: 1px solid var(--sp-divider);
+}
+
+#helix-ultimate .hu-preset-group__summary {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 44px;
+	padding: 0 12px;
+	color: var(--sp-text);
+	font-size: 13px;
+	font-weight: 600;
+	list-style: none;
+	cursor: pointer;
+	user-select: none;
+}
+
+#helix-ultimate .hu-preset-group__summary::-webkit-details-marker {
+	display: none;
+}
+
+#helix-ultimate .hu-preset-group__summary:hover {
+	background: var(--sp-input);
+}
+
+#helix-ultimate .hu-preset-group__summary:focus-visible {
+	outline: 2px solid var(--sp-blue);
+	outline-offset: -2px;
+}
+
+#helix-ultimate .hu-preset-group__title {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+/* Overlapping swatches summarise the group while it is closed. */
+#helix-ultimate .hu-preset-group__swatches {
+	display: inline-flex;
+	flex: 0 0 auto;
+}
+
+#helix-ultimate .hu-preset-group__swatches i {
+	width: 14px;
+	height: 14px;
+	margin-left: -4px;
+	border-radius: 50%;
+	box-shadow: 0 0 0 2px var(--sp-panel), inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+}
+
+#helix-ultimate .hu-preset-group__swatches i:first-child {
+	margin-left: 0;
+}
+
+#helix-ultimate .hu-preset-group__chevron {
+	flex: 0 0 auto;
+	color: var(--sp-icon);
+	transform: rotate(-90deg);
+	transition: transform 0.15s ease;
+}
+
+#helix-ultimate .hu-preset-group[open] .hu-preset-group__chevron {
+	transform: none;
+}
+
+#helix-ultimate .hu-preset-group__fields {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 2px 12px 14px;
+}
+
+#helix-ultimate .hu-preset-editor .control-group {
+	margin: 0;
+}
+
+#helix-ultimate .hu-preset-editor .control-group-inner {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+#helix-ultimate .hu-preset-editor .control-label {
+	display: block;
+	margin: 0 0 4px;
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	font-weight: 500;
+	line-height: 16px;
+}
+
+#helix-ultimate .hu-preset-editor .clr-field input {
+	width: 100%;
+	height: 32px;
+	min-height: 32px;
+	padding-left: 34px;
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+}
+
+#helix-ultimate .hu-preset-editor .clr-field button {
+	left: 6px;
+	width: 20px;
+	height: 20px;
+	border-radius: 4px;
+}

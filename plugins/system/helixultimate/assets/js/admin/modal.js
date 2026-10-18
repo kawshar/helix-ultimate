@@ -120,6 +120,96 @@
 		</div>`);
     document.body.classList.add("hu-options-modal-open");
   }
+  var BACK_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>';
+  var stacks = /* @__PURE__ */ new WeakMap();
+  var reducedMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var layerBelow = (host, stack) => stack.length > 1 ? stack[stack.length - 2].element : host.querySelector(":scope > .hu-groups-container");
+  function openSubpanel({ host, title, body, footer, backLabel = "Back", onClose }) {
+    const stack = stacks.get(host) ?? [];
+    stacks.set(host, stack);
+    const header = host.querySelector(":scope > .hu-panel-header");
+    const element = document.createElement("section");
+    element.className = "hu-subpanel";
+    element.setAttribute("role", "region");
+    element.setAttribute("aria-label", title);
+    element.style.top = `${header ? header.offsetHeight : 0}px`;
+    element.innerHTML = `
+		<div class="hu-subpanel-header">
+			<button type="button" class="hu-subpanel-back" aria-label="${escapeAttr(backLabel)}" title="${escapeAttr(backLabel)}">${BACK_ICON}</button>
+			<h3 class="hu-subpanel-title"></h3>
+		</div>
+		<div class="hu-subpanel-body"></div>
+		${footer ? `<div class="hu-subpanel-footer">${footer}</div>` : ""}`;
+    element.querySelector(".hu-subpanel-title").textContent = title;
+    const bodyElement = element.querySelector(".hu-subpanel-body");
+    bodyElement.appendChild(body);
+    let closed = false;
+    const subpanel = {
+      element,
+      body: bodyElement,
+      footer: element.querySelector(".hu-subpanel-footer"),
+      close() {
+        if (closed) return;
+        closed = true;
+        while (stack.length && stack[stack.length - 1] !== subpanel) {
+          stack[stack.length - 1].close();
+        }
+        const index = stack.indexOf(subpanel);
+        if (index > -1) stack.splice(index, 1);
+        const below2 = index > 0 ? stack[index - 1].element : host.querySelector(":scope > .hu-groups-container");
+        below2?.classList.remove("is-behind");
+        below2?.removeAttribute("inert");
+        element.classList.remove("is-active");
+        const remove = () => element.remove();
+        if (reducedMotion() || !host.classList.contains("active-panel")) {
+          remove();
+        } else {
+          element.addEventListener("transitionend", remove, { once: true });
+          setTimeout(remove, 400);
+        }
+        if (!stack.length) host.classList.remove("has-subpanel");
+        onClose?.();
+        if (index > 0) stack[index - 1].element.querySelector(".hu-subpanel-back")?.focus({ preventScroll: true });
+      }
+    };
+    stack.push(subpanel);
+    host.classList.add("has-subpanel");
+    host.appendChild(element);
+    const below = layerBelow(host, stack);
+    below?.classList.add("is-behind");
+    below?.setAttribute("inert", "");
+    element.querySelector(".hu-subpanel-back").addEventListener("click", () => subpanel.close());
+    requestAnimationFrame(() => {
+      element.classList.add("is-active");
+      element.querySelector(".hu-subpanel-back")?.focus({ preventScroll: true });
+    });
+    watchHost(host);
+    return subpanel;
+  }
+  function closeSubpanels(host) {
+    const stack = stacks.get(host);
+    if (stack && stack.length) stack[0].close();
+  }
+  var watched = /* @__PURE__ */ new WeakSet();
+  function watchHost(host) {
+    if (watched.has(host)) return;
+    watched.add(host);
+    new MutationObserver(() => {
+      if (!host.classList.contains("active-panel")) closeSubpanels(host);
+    }).observe(host, { attributes: true, attributeFilter: ["class"] });
+  }
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || document.body.classList.contains("hu-modal-open") || document.body.classList.contains("hu-options-modal-open")) return;
+    if (document.querySelector(".hu-unit-menu, .clr-picker.clr-open")) return;
+    const host = document.querySelector(".hu-edit-panel.active-panel.has-subpanel");
+    const stack = host ? stacks.get(host) : void 0;
+    if (stack && stack.length) {
+      event.preventDefault();
+      stack[stack.length - 1].close();
+    }
+  });
+  var helixSubpanel = { open: openSubpanel, closeAll: closeSubpanels };
+  Joomla.helixSubpanel = helixSubpanel;
   var helixModal = { close, megamenu, frame, media, settings };
   Joomla.helixModal = helixModal;
   document.addEventListener("keydown", (event) => {

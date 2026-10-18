@@ -15,7 +15,7 @@
  */
 
 import type { HelixLayoutApi } from '../layout';
-import type { HelixModalApi } from '../modal';
+import type { HelixModalApi, HelixSubpanelApi } from '../modal';
 import type { HelixToasterApi } from '../toaster';
 import type { HelixMenuTree } from '../treeSortable';
 import type { HelixUtils } from '../utils';
@@ -33,6 +33,8 @@ declare global {
 		utils: HelixUtils;
 		HelixToaster: HelixToasterApi;
 		helixModal: HelixModalApi;
+		/** Multi-step panels that slide in over a customizer panel (modal.js). */
+		helixSubpanel: HelixSubpanelApi;
 		sortable?: HelixMenuTree;
 		initColorPicker?(selector?: string | Element | Element[]): void;
 		/** `data-revealon` showon for fields rendered in modals (fields.js). */
