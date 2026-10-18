@@ -143,6 +143,55 @@ class Helper
     }
 
     /**
+     * Headings without their own font follow the Heading 1 font family.
+     *
+     * Returns a webfont entry (selector => font JSON) for every heading
+     * from H2 to H6 that is not enabled, carrying only H1's family and
+     * subset, so sizes and weights stay with the theme.
+     *
+     * @param    Registry    $params    The template style params.
+     *
+     * @return    array
+     * @since    2.2.11
+     */
+    public static function getInheritedHeadingFonts($params)
+    {
+        if (!$params->get('enable_h1_font'))
+        {
+            return [];
+        }
+
+        $h1 = json_decode((string) $params->get('h1_font', ''));
+
+        if (empty($h1->fontFamily))
+        {
+            return [];
+        }
+
+        $headings = [];
+
+        foreach (['h2', 'h3', 'h4', 'h5', 'h6'] as $heading)
+        {
+            if (!$params->get('enable_' . $heading . '_font'))
+            {
+                $headings[] = $heading;
+            }
+        }
+
+        if (!$headings)
+        {
+            return [];
+        }
+
+        return [
+            implode(', ', $headings) => json_encode([
+                'fontFamily' => $h1->fontFamily,
+                'fontSubset' => $h1->fontSubset ?? '',
+            ]),
+        ];
+    }
+
+    /**
      * Get Helix Template version.
      *
      * @return    string    The version number.

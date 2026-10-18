@@ -42,18 +42,14 @@ function addGoogleFont($fonts)
 		{
 			$font = json_decode($font ?? "");
 
-			if (!in_array($font->fontFamily, $systemFonts))
+			// Load each Google font once, but still write the CSS for every selector.
+			if (!in_array($font->fontFamily, $systemFonts) && !in_array($font->fontFamily, $fontCheck))
 			{
-
-				if (in_array($font->fontFamily, $fontCheck)) {
-					continue;
-				}
-
 				$fontCheck[] = $font->fontFamily;
-				
+
 				$fontUrl = '//fonts.googleapis.com/css?family=' . $font->fontFamily . ':100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i';
 
-				if (!empty(trim($font->fontSubset)))
+				if (!empty(trim($font->fontSubset ?? '')))
 				{
 					$fontUrl .= '&subset=' . $font->fontSubset;
 				}
@@ -169,6 +165,9 @@ if ($helixPlugin->params->get('enable_h6_font'))
 {
 	$webfonts['h6'] = $helixPlugin->params->get('h6_font');
 }
+
+// Headings without their own font use the Heading 1 font family.
+$webfonts += Helper::getInheritedHeadingFonts($helixPlugin->params);
 
 if ($helixPlugin->params->get('enable_navigation_font'))
 {

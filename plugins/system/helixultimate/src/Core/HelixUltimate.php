@@ -302,6 +302,9 @@ class HelixUltimate
 			$webfonts['h6'] = $this->params->get('h6_font');
 		}
 
+		// Headings without their own font use the Heading 1 font family.
+		$webfonts += Helper::getInheritedHeadingFonts($this->params);
+
 		if ($this->params->get('enable_navigation_font'))
 		{
 			$webfonts['.sp-megamenu-parent > li > a, .sp-megamenu-parent > li > span, .sp-megamenu-parent .sp-dropdown li.sp-menu-item > a'] = $this->params->get('navigation_font');
