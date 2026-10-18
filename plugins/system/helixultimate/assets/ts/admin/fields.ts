@@ -170,7 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	 *
 	 * - px is the default and stays hidden until hover / focus.
 	 * - Other units and keywords show as a pill, which opens the unit list.
-	 * - Typing wins: "24" is px, "1.5rem" / "10%" / "auto" set that unit.
+	 * - Typing wins: "1.5rem" / "24px" / "10%" / "auto" set that unit; a bare
+	 *   number keeps the field's current unit (px for a new field).
 	 * - ↑/↓ nudge by 1 (Shift: 10), Alt+↑/↓ cycles the unit.
 	 */
 
@@ -200,8 +201,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		keywords: (group.dataset.keywords || '').split(',').filter(Boolean),
 	});
 
-	/** Parse typed or stored text. Returns null when it isn't valid for this field. */
-	function parseUnit(text: string | null | undefined, { units, keywords }: Pick<UnitParts, 'units' | 'keywords'>): ParsedUnit | null {
+	/**
+	 * Parse typed or stored text. Returns null when it isn't valid for this field.
+	 * A number without a unit gets `fallbackUnit` (px for stored values).
+	 */
+	function parseUnit(
+		text: string | null | undefined,
+		{ units, keywords }: Pick<UnitParts, 'units' | 'keywords'>,
+		fallbackUnit = 'px'
+	): ParsedUnit | null {
 		const value = String(text ?? '').trim().toLowerCase().replace(/\s+/g, '');
 
 		if (value === '') return { number: '', unit: '' };
@@ -211,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (!match) return null;
 
-		const unit = match[2] || 'px';
+		const unit = match[2] || fallbackUnit;
 
 		return units.includes(unit) ? { number: String(Number(match[1])), unit } : null;
 	}
@@ -289,10 +297,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		renderUnit(group);
 	}
 
+	/** The unit a bare typed number means: the one the field shows now (keywords fall back to px). */
+	function typingUnit(group: HTMLElement, parts: UnitParts): string {
+		const current = group.dataset.unit || 'px';
+		return parts.keywords.includes(current) ? 'px' : current;
+	}
+
 	/** Apply what was typed: valid text wins, invalid text is reverted. */
 	function applyTypedUnit(group: HTMLElement): void {
 		const parts = groupParts(group);
-		const parsed = parseUnit(parts.input.value, parts);
+		const parsed = parseUnit(parts.input.value, parts, typingUnit(group, parts));
 
 		if (!parsed) {
 			renderUnit(group);
@@ -313,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function setUnit(group: HTMLElement, unit: string): void {
 		const parts = groupParts(group);
 		const current = group.dataset.unit || 'px';
-		const typed = parseUnit(parts.input.value, parts);
+		const typed = parseUnit(parts.input.value, parts, typingUnit(group, parts));
 		const number = typed && typed.number !== '' && !parts.keywords.includes(current) ? typed.number : '';
 
 		if (parts.keywords.includes(unit)) {
@@ -375,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 
-		const typed = parseUnit(input.value, parts);
+		const typed = parseUnit(input.value, parts, typingUnit(group, parts));
 		const unit =
 			typed && typed.unit && !parts.keywords.includes(typed.unit)
 				? typed.unit

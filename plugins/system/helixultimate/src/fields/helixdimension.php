@@ -7,6 +7,7 @@
  */
 
 use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Language\Text;
 
 defined('_JEXEC') or die();
 
@@ -33,37 +34,20 @@ class JFormFieldHelixdimension extends FormField
 	 */
 	public function getInput()
 	{
-		$unit = $this->getAttribute('unit', 'px');
-		list($width, $height) = explode('x', strtolower($this->value));
+		$parts = explode('x', strtolower((string) $this->value)) + ['', ''];
+		$width  = htmlspecialchars(trim($parts[0]), ENT_QUOTES, 'UTF-8');
+		$height = htmlspecialchars(trim($parts[1]), ENT_QUOTES, 'UTF-8');
+		$label  = htmlspecialchars(Text::_($this->getAttribute('label', '')), ENT_QUOTES, 'UTF-8');
 
-		// Output
-		$output = '';
-
-		$output .= '<div class="row">';
-
-		$output .= '<div class="col-6">';
-		$output .= '<div class="hu-d-flex hu-align-items-center">';
-		$output .= '<span class="hu-mr-1">W</span>';
-		$output .= '<div class="hu-input-group">';
-		$output .= '<input type="text" class="hu-field-dimension-width form-control" value="' . $width . '" /><span class="hu-input-group-text">' . $unit . '</span>';
-		$output .= '</div>';
-		$output .= '</div>';
+		// One compact control: [width] × [height]. Sizes are always px, so no unit is shown.
+		$output = '<div class="hu-dimension">';
+		$output .= '<input type="text" inputmode="numeric" class="hu-field-dimension-width form-control" value="' . $width . '" aria-label="' . $label . ': ' . Text::_('HELIX_ULTIMATE_DIMENSION_WIDTH') . '" />';
+		$output .= '<span class="hu-dimension-x" aria-hidden="true">&times;</span>';
+		$output .= '<input type="text" inputmode="numeric" class="hu-field-dimension-height form-control" value="' . $height . '" aria-label="' . $label . ': ' . Text::_('HELIX_ULTIMATE_DIMENSION_HEIGHT') . '" />';
 		$output .= '</div>';
 
-		$output .= '<div class="col-6">';
-		$output .= '<div class="hu-d-flex hu-align-items-center">';
-		$output .= '<span class="hu-mr-1">H</span>';
-		$output .= '<div class="hu-input-group">';
-		$output .= '<input type="text" class="hu-field-dimension-height form-control" value="' . $height . '" /><span class="hu-input-group-text">' . $unit . '</span>';
-		$output .= '</div>';
-		$output .= '</div>';
-		$output .= '</div>';
-
-		$output .= '</div>';
-
-		$output .= '<input type="hidden" name="' . $this->name . '" id="' . $this->id . '" class="hu-field-dimension-input ' . $this->class . '" value="' . $this->value . '" />';
+		$output .= '<input type="hidden" name="' . $this->name . '" id="' . $this->id . '" class="hu-field-dimension-input ' . $this->class . '" value="' . htmlspecialchars((string) $this->value, ENT_QUOTES, 'UTF-8') . '" />';
 
 		return $output;
-
 	}
 }

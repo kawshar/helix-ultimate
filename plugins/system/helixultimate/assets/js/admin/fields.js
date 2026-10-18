@@ -111,13 +111,13 @@
       units: (group.dataset.units || "px,rem,em,%,vw,vh").split(",").filter(Boolean),
       keywords: (group.dataset.keywords || "").split(",").filter(Boolean)
     });
-    function parseUnit(text, { units, keywords }) {
+    function parseUnit(text, { units, keywords }, fallbackUnit = "px") {
       const value = String(text ?? "").trim().toLowerCase().replace(/\s+/g, "");
       if (value === "") return { number: "", unit: "" };
       if (keywords.includes(value)) return { number: "", unit: value };
       const match = value.match(/^([+-]?(?:\d+|\d*\.\d+))([a-z%]*)$/);
       if (!match) return null;
-      const unit = match[2] || "px";
+      const unit = match[2] || fallbackUnit;
       return units.includes(unit) ? { number: String(Number(match[1])), unit } : null;
     }
     function previewMetrics() {
@@ -171,9 +171,13 @@
       }
       renderUnit(group);
     }
+    function typingUnit(group, parts) {
+      const current = group.dataset.unit || "px";
+      return parts.keywords.includes(current) ? "px" : current;
+    }
     function applyTypedUnit(group) {
       const parts = groupParts(group);
-      const parsed = parseUnit(parts.input.value, parts);
+      const parsed = parseUnit(parts.input.value, parts, typingUnit(group, parts));
       if (!parsed) {
         renderUnit(group);
         return;
@@ -188,7 +192,7 @@
     function setUnit(group, unit) {
       const parts = groupParts(group);
       const current = group.dataset.unit || "px";
-      const typed = parseUnit(parts.input.value, parts);
+      const typed = parseUnit(parts.input.value, parts, typingUnit(group, parts));
       const number = typed && typed.number !== "" && !parts.keywords.includes(current) ? typed.number : "";
       if (parts.keywords.includes(unit)) {
         commitUnit(group, "", unit);
@@ -233,7 +237,7 @@
         setUnit(group, list[(index + direction + list.length) % list.length]);
         return;
       }
-      const typed = parseUnit(input.value, parts);
+      const typed = parseUnit(input.value, parts, typingUnit(group, parts));
       const unit = typed && typed.unit && !parts.keywords.includes(typed.unit) ? typed.unit : parts.keywords.includes(current) ? "px" : current;
       const base = typed && typed.number !== "" ? parseFloat(typed.number) : 0;
       const step = event.shiftKey ? 10 : 1;

@@ -270,7 +270,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		// `change` also covers values set by a picker (e.g. Coloris) without a blur.
+		// Dimension parts are tracked through their hidden "WxH" input instead.
 		form.querySelectorAll(`${textFields}, textarea`).forEach(field => {
+			if (field.matches('.hu-field-dimension-width, .hu-field-dimension-height')) return;
+
 			['blur', 'change'].forEach(type =>
 				field.addEventListener(type, () => {
 					if (isTrackable(field.closest('.controls'))) triggerDraftChange(field, field.value);
@@ -703,7 +706,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	/** Fields that are read-only unless another field matches: `data-enableon`. */
 	function handleEnableOn() {
-		document.querySelectorAll('.control-group[data-enableon]').forEach(group => {
+		// The attribute sits on the field's wrapper (group-style-*), not always on .control-group.
+		document.querySelectorAll('[data-enableon]').forEach(group => {
 			const [name, value] = group.dataset.enableon.split(':');
 			const enabled = fieldMatches(name, value);
 
@@ -714,7 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	handleEnableOn();
 
-	new Set([...document.querySelectorAll('.control-group[data-enableon]')].map(group => group.dataset.enableon.split(':')[0])).forEach(name => {
+	new Set([...document.querySelectorAll('[data-enableon]')].map(group => group.dataset.enableon.split(':')[0])).forEach(name => {
 		const field = document.querySelector(`[name=${name}]`);
 		if (field) field.addEventListener('change', handleEnableOn);
 	});
@@ -726,17 +730,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		parts[index] = input.value === '' ? '0' : input.value;
 		hidden.value = `${parts[0]}x${parts[1]}`;
+		hidden.dispatchEvent(new Event('change', { bubbles: true }));
 	};
 
 	document.querySelectorAll('.hu-field-dimension-width').forEach(input => {
 		if (input.closest('.controls').querySelector('.hu-field-dimension-input')) {
-			input.addEventListener('keyup', () => updateDimension(input, 0));
+			input.addEventListener('input', () => updateDimension(input, 0));
 		}
 	});
 
 	document.querySelectorAll('.hu-field-dimension-height').forEach(input => {
 		if (input.closest('.controls').querySelector('.hu-field-dimension-input')) {
-			input.addEventListener('keyup', () => updateDimension(input, 1));
+			input.addEventListener('input', () => updateDimension(input, 1));
 		}
 	});
 
