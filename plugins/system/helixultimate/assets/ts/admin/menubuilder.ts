@@ -265,6 +265,28 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	// The mega menu builder sorts sub items inside a column; it saves the same way.
+	Joomla.helixMenuTree = {
+		async saveOrder(itemIds: string[]): Promise<void> {
+			if (!itemIds.length) return;
+
+			try {
+				await request(`${config.base}/administrator/index.php?option=com_menus&view=items&task=items.saveOrderAjax&tmpl=component`, {
+					method: 'POST',
+					data: param({ cid: itemIds, order: itemIds.map((id, index) => index + 1) }),
+					responseType: 'text',
+				});
+			} catch (error) {
+				console.error('Could not save the menu order', error);
+				Joomla.HelixToaster.error('Something went wrong!', 'Error');
+				return;
+			}
+
+			// Redraw the tree so it shows the new order (this also reloads the preview).
+			await fetchMenuItems(menuType);
+		},
+	};
+
 	document.addEventListener('sortCompleted', async event => {
 		const { item } = (event as CustomEvent<{ item: HTMLElement }>).detail;
 		const parent = Joomla.sortable ? Joomla.sortable.getParent(item) : null;

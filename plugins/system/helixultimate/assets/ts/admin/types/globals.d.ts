@@ -40,6 +40,11 @@ declare global {
 		/** `data-revealon` showon for fields rendered in modals (fields.js). */
 		setUpShowon?(container?: ParentNode | null): void;
 		helixLayout?: HelixLayoutApi;
+		/** Menu tree actions other builders share (menubuilder.ts). */
+		helixMenuTree?: {
+			/** Save the order of a parent's sub items (ids in their new order), then reload the tree. */
+			saveOrder(itemIds: string[]): Promise<void>;
+		};
 		/** Mega menu builder (megamenu.js). */
 		helixMegaMenu?: { run(options?: { root?: HTMLElement; close?: () => void }): void; [member: string]: unknown };
 		/** Reload the customizer preview (helix-ultimate.js). */

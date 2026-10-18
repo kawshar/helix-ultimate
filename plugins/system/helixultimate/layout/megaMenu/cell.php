@@ -18,7 +18,7 @@ extract($displayData);
 $badgeText = $cell->type === 'module' ? 'Module' : 'Menu';
 ?>
 
-<div class="hu-megamenu-cell" data-rowid="<?php echo $rowId; ?>" data-columnid="<?php echo $columnId; ?>" data-cellid="<?php echo $cellId; ?>">
+<div class="hu-megamenu-cell" data-rowid="<?php echo $rowId; ?>" data-columnid="<?php echo $columnId; ?>" data-cellid="<?php echo $cellId; ?>" data-type="<?php echo $cell->type === 'module' ? 'module' : 'menu_item'; ?>" data-item-id="<?php echo (int) ($cell->item_id ?? 0); ?>">
 	<span><?php echo $builder->getTitle($cell); ?></span>
 	<small class="hu-badge hu-badge-info hu-megamenu-badge"><?php echo $badgeText; ?></small>
 	<button class="hu-btn hu-btn-link hu-megamenu-cell-remove">

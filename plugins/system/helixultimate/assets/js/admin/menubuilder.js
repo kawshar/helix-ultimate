@@ -165,6 +165,23 @@
         console.error("Could not save the menu order", error);
       }
     }
+    Joomla.helixMenuTree = {
+      async saveOrder(itemIds) {
+        if (!itemIds.length) return;
+        try {
+          await request(`${config.base}/administrator/index.php?option=com_menus&view=items&task=items.saveOrderAjax&tmpl=component`, {
+            method: "POST",
+            data: param({ cid: itemIds, order: itemIds.map((id, index) => index + 1) }),
+            responseType: "text"
+          });
+        } catch (error) {
+          console.error("Could not save the menu order", error);
+          Joomla.HelixToaster.error("Something went wrong!", "Error");
+          return;
+        }
+        await fetchMenuItems(menuType);
+      }
+    };
     document.addEventListener("sortCompleted", async (event) => {
       const { item } = event.detail;
       const parent = Joomla.sortable ? Joomla.sortable.getParent(item) : null;
