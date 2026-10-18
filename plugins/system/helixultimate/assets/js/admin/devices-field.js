@@ -1,68 +1,36 @@
-jQuery(document).ready(function ($) {
-	let $wrapper = $('.helix-field');
-	let $input = $wrapper.find('input');
-	let settings = Joomla.getOptions('data') || {};
+/**
+ * @package Helix Ultimate Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright Copyright (c) 2010 - 2025 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
+ */
 
-	if ($wrapper.length > 0) {
-		$wrapper.find('.helix-devices .device-btn').on('click', function (e) {
-			e.preventDefault();
+/**
+ * Devices field: buttons that store a device (`xs`, `sm`, `md`) and switch
+ * the preview to it.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+	document.querySelectorAll('.helix-field').forEach(wrapper => {
+		const input = wrapper.querySelector('input');
+		const buttons = wrapper.querySelectorAll('.helix-devices .device-btn');
 
-			let deviceValue = $(this).data('device');
-			switchBetweenDevices(deviceValue);
+		buttons.forEach(button => {
+			button.addEventListener('click', event => {
+				event.preventDefault();
 
-			$input.val(deviceValue).trigger('change');
+				const device = button.dataset.device;
 
-			// Clear the active class previously added
-			clearActiveClass();
+				if (Joomla.helixSwitchDevice) {
+					Joomla.helixSwitchDevice(device);
+				}
 
-			// Add active class on the current button
-			$(this).addClass('active');
+				if (input) {
+					input.value = device;
+					Joomla.utils.fire(input);
+				}
+
+				buttons.forEach(other => other.classList.toggle('active', other === button));
+			});
 		});
-	}
-
-	function clearActiveClass() {
-		$wrapper.find('.helix-devices .device-btn').each(function () {
-			if ($(this).hasClass('active')) {
-				$(this).removeClass('active');
-			}
-		});
-	}
-
-	/**
-	 * Function to switch between various devices
-	 *
-	 * @param {string} device 	Device type i.e. `desktop`, `tablet`, `mobile`
-	 */
-	function switchBetweenDevices(device) {
-		const widthMap = {
-			lg: '100%',
-			md: `${settings.breakpoints.tablet}px`,
-			sm: `${settings.breakpoints.mobile}px`,
-		};
-
-		const deviceMap = {
-			md: 'desktop',
-			sm: 'tablet',
-			xs: 'mobile',
-			desktop: 'desktop',
-			tablet: 'tablet',
-			mobile: 'mobile',
-		};
-
-		$(`.hu-device[data-device=${deviceMap[device]}]`)
-			.parent()
-			.find('.active')
-			.removeClass('active');
-		$(`.hu-device[data-device=${deviceMap[device]}]`).addClass('active');
-
-		const $iframe = $('#hu-template-preview');
-
-		$iframe.animate(
-			{
-				width: widthMap[device],
-			},
-			500,
-			'linear'
-		);
-	}
+	});
 });

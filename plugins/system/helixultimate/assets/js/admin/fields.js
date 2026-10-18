@@ -1,270 +1,202 @@
-jQuery(function ($) {
-	$('.hu-input-color').each(function () {
-		$(this).addClass('minicolors');
-	});
+/**
+ * @package Helix Ultimate Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright Copyright (c) 2010 - 2025 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
+ */
 
-	$('.hu-menu-builder .minicolors').each(function () {
-		$(this).minicolors({
-			control: 'hue',
-			position: 'bottom',
-			theme: 'bootstrap',
-			keywords: 'transparent, initial, inherit',
-			letterCase: 'uppercase',
-			opacity: true,
+document.addEventListener('DOMContentLoaded', () => {
+	const { fire, delegate, readData } = Joomla.utils;
+
+	/** Alignment switcher writes its value into the hidden input. */
+	document.querySelectorAll('.hu-field-alignment .hu-switcher-action').forEach(action => {
+		action.addEventListener('click', event => {
+			event.preventDefault();
+
+			[...action.parentElement.children].forEach(sibling => sibling.classList.remove('active'));
+			action.classList.add('active');
+
+			const input = action.closest('.hu-field-alignment').querySelector('input[type=hidden]');
+
+			if (input) {
+				input.value = readData(action, 'value');
+				fire(input);
+			}
 		});
 	});
 
-	$('.hu-field-alignment .hu-switcher-action').on('click', function (e) {
-		e.preventDefault();
+	/* ------------------------------------------------------------------ */
+	/* Menu items selector                                                 */
+	/* ------------------------------------------------------------------ */
 
-		const $siblings = $(this).siblings();
-		if ($siblings.hasClass('active')) {
-			$siblings.removeClass('active');
-		}
+	const hierarchyInput = element => element.closest('.hu-menu-hierarchy-container').querySelector('input[type=hidden]');
 
-		$(this).addClass('active');
-		const $inputField = $(this).closest('.hu-field-alignment').find('input[type=hidden]');
-		$inputField.val($(this).data('value')).trigger('change');
-	});
+	// "Select all" checks every item in its list.
+	delegate(document, 'change', '.hu-menu-hierarchy-container .hu-menu-item-selector.select-all', (event, selectAll) => {
+		const list = selectAll.closest('.hu-menu-hierarchy-list');
+		const value = [];
 
-	/**
-	 * Menu Items selector
-	 *
-	 */
+		list.querySelectorAll('.hu-menu-hierarchy-item:not(.level-0) input[type=checkbox]').forEach(checkbox => {
+			checkbox.checked = selectAll.checked;
 
-	// Select all
-	$(document).on('change', '.hu-menu-hierarchy-container .hu-menu-item-selector.select-all', function (e) {
-		e.preventDefault();
-		const $parent = $(this).closest('.hu-menu-hierarchy-list');
-		const $siblings = $parent.find('.hu-menu-hierarchy-item:not(.level-0)');
-		const $inputField = $(this).closest('.hu-menu-hierarchy-container').find('input[type=hidden]');
-
-		let checked = $(this).prop('checked');
-		let value = [];
-
-		if (!checked) if (value.length > 0) value = [];
-
-		$siblings.each(function () {
-			const $input = $(this).find('input[type=checkbox]');
-			$input.prop('checked', checked);
-			const v = $input.val();
-			if (checked) if (value.indexOf(v) === -1) value.push(v);
+			if (selectAll.checked && !value.includes(checkbox.value)) {
+				value.push(checkbox.value);
+			}
 		});
 
-		$inputField.val(JSON.stringify(value)).trigger('change');
+		const input = hierarchyInput(selectAll);
+		input.value = JSON.stringify(value);
+		fire(input);
 	});
 
-	$(document).on('change', '.hu-menu-hierarchy-container .hu-menu-item-selector:not(.level-0)', function (e) {
-		e.preventDefault();
-		const $inputField = $(this).closest('.hu-menu-hierarchy-container').find('input[type=hidden]');
-		const $selectAllInputField = $(this).closest('.hu-menu-hierarchy-list').find('input[type=checkbox].select-all');
-		const elements = $selectAllInputField.data('elements');
+	delegate(document, 'change', '.hu-menu-hierarchy-container .hu-menu-item-selector:not(.level-0)', (event, checkbox) => {
+		const input = hierarchyInput(checkbox);
+		const selectAll = checkbox.closest('.hu-menu-hierarchy-list').querySelector('input[type=checkbox].select-all');
+		const elements = readData(selectAll, 'elements') || [];
 
-		let value = $inputField.val();
+		let value = input.value;
 		value = (value.length && JSON.parse(value)) || [];
 
-		const val = $(this).val();
-
-		if ($(this).prop('checked')) {
-			if (value.indexOf(val) === -1) value.push(val);
+		if (checkbox.checked) {
+			if (!value.includes(checkbox.value)) value.push(checkbox.value);
 		} else {
-			let index = value.indexOf(val);
-			if (index > -1) {
-				value.splice(index, 1);
-			}
+			value = value.filter(item => item !== checkbox.value);
 		}
 
-		if (value.length === elements.length) {
-			$selectAllInputField.prop('checked', true);
-		} else {
-			$selectAllInputField.prop('checked', false);
-		}
-		$inputField.val(JSON.stringify(value)).trigger('change');
+		selectAll.checked = value.length === elements.length;
+
+		input.value = JSON.stringify(value);
+		fire(input);
 	});
 
+	/* ------------------------------------------------------------------ */
+	/* Showon for modal fields: `data-revealon`                            */
+	/* ------------------------------------------------------------------ */
+
 	/**
-	 * Method to check condition and change the target visibility
-	 * @param {jQuery}  target
-	 * @param {Boolean} animate
+	 * Check the target's conditions and show or hide it.
+	 *
+	 * @param {HTMLElement} target
+	 * @param {HTMLElement|Document} context
 	 */
-	function linkedoptions(target, animate, $context) {
-		var showfield = true,
-			jsondata = target.data('revealon') || [],
-			itemval,
-			condition,
-			fieldName,
-			$fields;
+	function linkedoptions(target, context) {
+		const conditions = readData(target, 'revealon') || [];
+		let showfield = true;
 
-		// Check if target conditions are satisfied
-		for (var j = 0, lj = jsondata.length; j < lj; j++) {
-			condition = jsondata[j] || {};
-			fieldName = condition.field;
-			$fields = $context.find('[name="' + fieldName + '"], [name="' + fieldName + '[]"]');
+		conditions.forEach((condition, j) => {
+			const fields = context.querySelectorAll(`[name="${condition.field}"], [name="${condition.field}[]"]`);
 
-			condition['valid'] = 0;
+			condition.valid = 0;
 
-			// Test in each of the elements in the field array if condition is valid
-			$fields.each(function () {
-				var $field = $(this);
+			fields.forEach(field => {
+				let values;
 
-				// If checkbox or radio box the value is read from properties
-				if (['checkbox', 'radio'].indexOf($field.attr('type')) !== -1) {
-					itemval = ($field.prop('checked') >> 0).toString();
+				if (['checkbox', 'radio'].includes(field.type)) {
+					values = [String(Number(field.checked))];
+				} else if (field.tagName === 'SELECT' && field.multiple) {
+					values = [...field.selectedOptions].map(option => option.value);
 				} else {
-					// select lists, textarea etc. Note that multiple-select list returns an Array here
-					// se we can always tream 'itemval' as an array
-					itemval = $field.val();
-					// a multi-select <select> $field  will return null when no elements are selected so we need to define itemval accordingly
-					if (itemval == null && $field.prop('tagName').toLowerCase() == 'select') {
-						itemval = [];
-					}
+					values = [field.value];
 				}
 
-				// Convert to array to allow multiple values in the field (e.g. type=list multiple)
-				// and normalize as string
-				if (!(typeof itemval === 'object')) {
-					itemval = JSON.parse('["' + itemval + '"]');
-				}
-
-				for (var i in itemval) {
-					if (!itemval.propertyIsEnumerable(i)) {
-						continue;
-					}
-
-					if (jsondata[j]['sign'] == '=' && jsondata[j]['values'].indexOf(itemval[i]) !== -1) {
-						jsondata[j]['valid'] = 1;
-					}
-
-					if (jsondata[j]['sign'] == '!=' && jsondata[j]['values'].indexOf(itemval[i]) === -1) {
-						jsondata[j]['valid'] = 1;
-					}
-				}
+				values.forEach(value => {
+					if (condition.sign === '=' && condition.values.includes(value)) condition.valid = 1;
+					if (condition.sign === '!=' && !condition.values.includes(value)) condition.valid = 1;
+				});
 			});
 
-			if (condition['op'] === '') {
-				if (condition['valid'] === 0) {
-					showfield = false;
-				}
-			} else {
-				if (condition['op'] === 'AND' && condition['valid'] + jsondata[j - 1]['valid'] < 2) {
-					showfield = false;
-					condition['valid'] = 0;
-				}
-
-				if (condition['op'] === 'OR' && condition['valid'] + jsondata[j - 1]['valid'] > 0) {
-					showfield = true;
-					condition['valid'] = 1;
-				}
+			if (condition.op === '') {
+				if (condition.valid === 0) showfield = false;
+			} else if (condition.op === 'AND' && condition.valid + conditions[j - 1].valid < 2) {
+				showfield = false;
+				condition.valid = 0;
+			} else if (condition.op === 'OR' && condition.valid + conditions[j - 1].valid > 0) {
+				showfield = true;
+				condition.valid = 1;
 			}
-		}
+		});
 
-		if (target.is('option')) {
-			target.toggle(showfield);
-			target.attr('disabled', showfield ? false : true);
-
-			var parent = target.parent();
-			if ($('#' + parent.attr('id') + '_chzn').length) {
-				parent.trigger('liszt:updated');
-				parent.trigger('chosen:updated');
-			}
-		}
-
-		animate =
-			animate &&
-			!target.hasClass('no-animation') &&
-			!target.hasClass('no-animate') &&
-			!target.find('.no-animation, .no-animate').length;
-
-		if (animate) {
-			showfield ? target.slideDown() : target.slideUp();
+		if (target.tagName === 'OPTION') {
+			target.hidden = !showfield;
+			target.disabled = !showfield;
 			return;
 		}
 
-		target.toggle(showfield);
+		target.style.display = showfield ? '' : 'none';
 	}
 
 	/**
-	 * Method for setup the 'showon' feature, for the fields in given container
+	 * Set up `data-revealon` fields inside a container.
+	 *
 	 * @param {HTMLElement} container
 	 */
 	Joomla.setUpShowon = function (container) {
 		container = container || document;
-		var $showonFields = $(container).find('[data-revealon]');
 
-		for (var is = 0, ls = $showonFields.length; is < ls; is++) {
-			(function () {
-				var $target = $($showonFields[is]),
-					jsondata = $target.data('revealon') || [],
-					field,
-					$fields = $();
+		container.querySelectorAll('[data-revealon]').forEach(target => {
+			const conditions = readData(target, 'revealon') || [];
 
-				// Collect an all referenced elements
-				for (var ij = 0, lj = jsondata.length; ij < lj; ij++) {
-					field = jsondata[ij]['field'];
-					$fields = $fields.add($('[name="' + field + '"], [name="' + field + '[]"]'));
-				}
+			linkedoptions(target, container);
 
-				// Check current condition for element
-				linkedoptions($target, true, container);
-
-				// Attach events to referenced element, to check condition on change and keyup
-				$fields.on('change keyup', function () {
-					linkedoptions($target, true, container);
+			conditions.forEach(condition => {
+				document.querySelectorAll(`[name="${condition.field}"], [name="${condition.field}[]"]`).forEach(field => {
+					['change', 'keyup'].forEach(type => field.addEventListener(type, () => linkedoptions(target, container)));
 				});
-			})();
-		}
+			});
+		});
 	};
 
+	/* ------------------------------------------------------------------ */
+	/* Unit fields                                                         */
+	/* ------------------------------------------------------------------ */
+
 	/**
-	 * Unit field change handling.
-	 * On change of the unit selector or on blur of the
-	 * input field will change the value and store to the hidden field.
+	 * On blur of the number or change of the unit, store "<value><unit>"
+	 * in the hidden field.
 	 */
-	$(document).on('blur', '.hu-unit-field-input', function (e) {
-		e.preventDefault();
+	delegate(document, 'focusout', '.hu-unit-field-input', (event, input) => {
+		const group = input.parentElement;
+		const field = group.querySelector('input.hu-unit-field-value');
+		const select = group.querySelector('select.hu-unit-select');
 
-		let value = $(this).val(),
-			unit = 'px',
-			$field = $(this).parent().find('input.hu-unit-field-value');
-
-		/** Remove all the spaced from the value. */
-		value = value.replace(/\s/g, '');
+		let value = input.value.replace(/\s/g, '');
+		let unit = 'px';
 
 		if (value === '') {
-			$field.val('');
+			field.value = '';
 			return;
 		}
 
-		const regex = /^([+-]?(?:\d+|\d*\.\d+))(px|em|rem|%)?$/i;
-		const match = value.match(regex);
+		const match = value.match(/^([+-]?(?:\d+|\d*\.\d+))(px|em|rem|%)?$/i);
 
-		/**
-		 * Check if the input value is valid or not.
-		 * If valid then
-		 */
-		if (match && match.length > 0) {
-			[_, value, unit] = match;
+		if (match) {
+			[, value, unit] = match;
+
 			if (unit === undefined) {
-				unit = $(this).parent().find('select.hu-unit-select').val() || 'px';
+				unit = (select && select.value) || 'px';
 			}
 		} else {
 			value = parseFloat(value) || '';
 		}
 
-		$(this).val(value);
-		$(this).next('select.hu-unit-select').val(unit);
-		$field.val(`${value}${unit}`).trigger('change');
+		input.value = value;
+
+		if (select && input.nextElementSibling === select) {
+			select.value = unit;
+		}
+
+		field.value = `${value}${unit}`;
+		fire(field);
 	});
 
-	$(document).on('change', 'select.hu-unit-select', function (e) {
-		e.preventDefault();
-		let unit = $(this).val() || 'px',
-			$input = $(this).parent().find('input.hu-unit-field-input'),
-			value = $input.val(),
-			$field = $(this).parent().find('input.hu-unit-field-value');
+	delegate(document, 'change', 'select.hu-unit-select', (event, select) => {
+		const group = select.parentElement;
+		const input = group.querySelector('input.hu-unit-field-input');
+		const field = group.querySelector('input.hu-unit-field-value');
 
-		if (!!value) {
-			$field.val(`${value}${unit}`).trigger('change');
+		if (input && input.value) {
+			field.value = `${input.value}${select.value || 'px'}`;
+			fire(field);
 		}
 	});
 });

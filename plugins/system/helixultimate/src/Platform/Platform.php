@@ -222,17 +222,13 @@ class Platform
 		$helixDocument->addInlineScript('var helixUltimateStyleId = ' . $style_id . ';');
 
 		/** System defined assets */
-		$helixDocument->useScript('jquery')
-			->useScript('jquery-noconflict')
-			->useScript('jquery-migrate')
-			->registerAndUseScript('cms', '', ['version' => 'auto', 'relative' => true])
+		$helixDocument->registerAndUseScript('cms', '', ['version' => 'auto', 'relative' => true])
 			->registerAndUseScript('script.bootstrap', '', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('style.bootstrap', $helix_assets_url . '/css/bootstrap.min.css', ['version' => 'auto', 'relative' => true])
-			->useScript('keepalive')
-			->registerAndUseScript('script.chosen', '', ['version' => 'auto', 'relative' => true])
-			->registerAndUseScript('script.colorPicker', '', ['version' => 'auto', 'relative' => true]);
+			->useScript('keepalive');
 
-		HTMLHelper::_('jquery.token');
+		// CSRF token for the customizer's fetch requests (read as Joomla.getOptions('csrf.token')).
+		HTMLHelper::_('form.csrf');
 
 		if (JoomlaBridge::getVersion('major') >= 4)
 		{
@@ -241,31 +237,33 @@ class Platform
 
 		
 		/** Framework defined assets */
-		$helixDocument->registerAndUseStyle('style.chosen', '', ['version' => 'auto', 'relative' => true])
-			->registerAndUseStyle('style.colorPicker', '', ['version' => 'auto', 'relative' => true])
-			->registerAndUseStyle('helix.jquery.ui', $helix_assets_url . '/css/admin/jquery-ui.min.css', ['version' => 'auto', 'relative' => true])
+		$helixDocument->registerAndUseStyle('helix.coloris', $helix_assets_url . '/css/libs/coloris.min.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('helix.ultimate', $helix_assets_url . '/css/admin/helix-ultimate.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('helix.modal', $helix_assets_url . '/css/admin/modal.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('helix.fontAwesome', Uri::root() . 'templates/' . $template->template . '/css/font-awesome.min.css')
 			->registerAndUseStyle('helix.device-field', $helix_assets_url . '/css/admin/devices-field.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('style.helix.menuBuilder', $helix_assets_url . '/css/admin/menu-builder.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('style.helix.megaMenu', $helix_assets_url . '/css/admin/megamenu.css', ['version' => 'auto', 'relative' => true])
-			->registerAndUseStyle('style.helix.toaster', $helix_assets_url . '/css/admin/toaster.css', ['version' => 'auto', 'relative' => false]);
+			->registerAndUseStyle('style.helix.toaster', $helix_assets_url . '/css/admin/toaster.css', ['version' => 'auto', 'relative' => false])
+			// Customizer theme (SP Page Builder colour guide); must load after the builder styles.
+			->registerAndUseStyle('helix.customizer', $helix_assets_url . '/css/admin/customizer.css', ['version' => 'auto', 'relative' => true], [], ['helix.ultimate', 'helix.modal', 'style.helix.menuBuilder', 'style.helix.megaMenu']);
 
-		$helixDocument->registerAndUseScript('helix.jquery.ui', $helix_assets_url . '/js/admin/jquery-ui.min.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
-			->registerAndUseScript('helix.toaster', $helix_assets_url . '/js/admin/toaster.js', ['version' => 'auto', 'relative' => false], ['defer' => false])
+		$helixDocument->registerAndUseScript('helix.toaster', $helix_assets_url . '/js/admin/toaster.js', ['version' => 'auto', 'relative' => false], ['defer' => false])
 			->registerAndUseScript('helix.utils', $helix_assets_url . '/js/admin/utils.js', ['version' => 'auto', 'relative' => true], ['defer' => false])
+			->registerAndUseScript('helix.coloris', $helix_assets_url . '/js/libs/coloris.min.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.fields', $helix_assets_url . '/js/admin/fields.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.ultimate', $helix_assets_url . '/js/admin/helix-ultimate.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.webFont', $helix_assets_url . '/js/admin/webfont.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.modal', $helix_assets_url . '/js/admin/modal.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
-			->registerAndUseScript('helix.layout', $helix_assets_url . '/js/admin/layout.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
+			->registerAndUseScript('helix.sortable', $helix_assets_url . '/js/libs/sortable.min.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
+			->registerAndUseScript('helix.layout', $helix_assets_url . '/js/admin/layout.js', ['version' => 'auto', 'relative' => true], ['defer' => true], ['helix.sortable'])
 			->registerAndUseScript('helix.media', $helix_assets_url . '/js/admin/media.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.device-field', $helix_assets_url . '/js/admin/devices-field.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.presets', $helix_assets_url . '/js/admin/presets.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.treeSortable', $helix_assets_url . '/js/admin/treeSortable.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
 			->registerAndUseScript('helix.menubuilder', $helix_assets_url . '/js/admin/menubuilder.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
-			->registerAndUseScript('helix.megamenu', $helix_assets_url . '/js/admin/megamenu.js', ['version' => 'auto', 'relative' => true], ['defer' => true]);
+			->registerAndUseScript('helix.megamenu', $helix_assets_url . '/js/admin/megamenu.js', ['version' => 'auto', 'relative' => true], ['defer' => true])
+			->registerAndUseScript('helix.typography', $helix_assets_url . '/js/admin/typography.js', ['version' => 'auto', 'relative' => true], ['defer' => true], ['helix.webFont']);
 
 		// Pass important data to Joomla variable for javascript
 		$meta = array(
@@ -289,5 +287,23 @@ class Platform
 		Text::script('HELIX_ULTIMATE_SELECT_ICON_LABEL');
 		Text::script('HELIX_ULTIMATE_MEDIA_SVG_NOT_SUPPORTED_FOR_UPLOAD');
 		Text::script('COM_SPPAGEBUILDER_MEDIA_MANAGER_FILE_NOT_SUPPORTED');
+
+		// Typography panel
+		Text::script('HELIX_ULTIMATE_SELECT');
+		Text::script('HELIX_ULTIMATE_FONT_SEARCH');
+		Text::script('HELIX_ULTIMATE_FONT_NO_RESULTS');
+		Text::script('HELIX_ULTIMATE_TYPO_ADD_TITLE');
+		Text::script('HELIX_ULTIMATE_TYPO_REMOVE');
+		Text::script('HELIX_ULTIMATE_TYPO_TOGGLE');
+		Text::script('HELIX_ULTIMATE_TYPO_INHERITS_DEFAULT');
+		Text::script('HELIX_ULTIMATE_TYPO_INHERITS_NONE');
+		Text::script('HELIX_ULTIMATE_TYPO_INHERITS_H1');
+		Text::script('HELIX_ULTIMATE_TYPO_INHERITS_BODY');
+		Text::script('HELIX_ULTIMATE_TYPO_HINT_BODY');
+		Text::script('HELIX_ULTIMATE_TYPO_HINT_H1');
+		Text::script('HELIX_ULTIMATE_TYPO_HINT_HEADING_H1');
+		Text::script('HELIX_ULTIMATE_TYPO_HINT_HEADING_BODY');
+		Text::script('HELIX_ULTIMATE_TYPO_HINT_NAV');
+		Text::script('HELIX_ULTIMATE_TYPO_HINT_CUSTOM');
 	}
 }

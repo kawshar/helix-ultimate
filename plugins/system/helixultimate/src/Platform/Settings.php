@@ -14,7 +14,7 @@ use HelixUltimate\Framework\Platform\Helper;
 use HelixUltimate\Framework\System\HelixCache;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
-use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\Registry\Registry;
 
@@ -109,11 +109,6 @@ class Settings
 		$this->helix	= $this->input->get('helix', '', 'STRING');
 		$this->request	= $this->input->get('request', '', 'STRING');
 
-		if ($this->option === 'com_ajax' && $this->helix === 'ultimate' && $this->id !== 0)
-		{
-			HTMLHelper::_('jquery.framework');
-			HTMLHelper::_('script', 'jui/cms.js', array('version' => 'auto', 'relative' => true));
-		}
 	}
 
 	/**
@@ -184,6 +179,12 @@ class Settings
 					if ($fieldType === 'checkbox' && strval($field['default'] ?? '') === '0')
 					{
 						$field['default'] = '';
+					}
+
+					// Joomla's colour field loads the jQuery minicolors picker; use the Coloris based one.
+					if ($fieldType === 'color')
+					{
+						$field['type'] = 'helixcolor';
 					}
 				}
 			}
@@ -303,6 +304,14 @@ class Settings
 		}
 
 		$presetForm->loadFile($presetFormPath);
+
+		// Joomla's colour field loads the jQuery minicolors picker; use the Coloris based one.
+		FormHelper::addFieldPath(JPATH_PLUGINS . '/system/helixultimate/src/fields');
+
+		foreach ($presetForm->getXml()->xpath('//field[@type="color"]') ?: [] as $colorField)
+		{
+			$colorField['type'] = 'helixcolor';
+		}
 
 		if (!empty($presetData['data']))
 		{

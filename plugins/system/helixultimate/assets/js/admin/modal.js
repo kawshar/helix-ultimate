@@ -5,250 +5,156 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
  */
 
-jQuery(function ($) {
-	$.fn.extend({
-		closeModal() {
-			$('.hu-modal-overlay, .hu-modal').fadeOut().remove();
-			$('body').removeClass('hu-modal-open');
-			return this;
-		},
-	});
+/**
+ * Helix modals: media manager, options (row/column/preset settings),
+ * mega menu and iframe modals.
+ */
+(() => {
+	const escapeAttr = value => String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
-	$.fn.helixUltimateMegamenuModal = function (options) {
-		options = $.extend(
-			{
-				title: 'Mega Menu',
-				className: '',
-				targetType: 'id',
-				target: '',
-				body: '',
-				footer: '',
-			},
-			options
-		);
-
-		$('.hu-modal-overlay, .hu-modal').remove();
-
-		const { title, className, targetType, target, body, footer } = options;
-
-		let megaMenuModal = '<div class="hu-modal-overlay"></div>';
-		megaMenuModal +=
-			'<div class="hu-modal ' +
-			className +
-			'" data-target_type="' +
-			targetType +
-			'" data-target="' +
-			target +
-			'" style="display:none;">';
-
-		megaMenuModal += '<div class="hu-modal-header">';
-
-		
-		megaMenuModal += '<h4 class="hu-modal-header-title">' + title + '</h4>';
-		megaMenuModal +=
-			'<a href="#" class="action-hu-modal-close"><span class="fas fa-times" aria-hidden="true"></span></a>';
-		megaMenuModal += '</div>';
-
-		megaMenuModal += '<div class="hu-modal-inner">';
-		megaMenuModal += '<div class="hu-modal-content">';
-
-		if (body) {
-			megaMenuModal += '<div class="hu-modal-megamenu-container">';
-			megaMenuModal += body;
-			megaMenuModal += '</div>';
-		}
-
-		megaMenuModal += '</div>';
-		megaMenuModal += '</div>';
-
-		megaMenuModal += '<div class="hu-modal-footer footer-right">';
-		megaMenuModal +=
-			'<button class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>';
-		megaMenuModal +=
-			'<button class="hu-btn hu-btn-primary hu-megamenu-save-btn">Save</button>';
-		megaMenuModal += '</div>';
-
-		megaMenuModal += '</div>';
-		const $modal = $('body').addClass('hu-modal-open');
-		$modal.append(megaMenuModal);
-		$modal.find('.hu-modal').fadeIn(300);
+	const removeModals = (selector = '.hu-modal-overlay, .hu-modal') => {
+		document.querySelectorAll(selector).forEach(element => element.remove());
 	};
 
-	$.fn.helixUltimateFrameModal = function (options) {
-		options = $.extend(
-			{
-				title: 'Helix Ultimate',
-				className: '',
-				targetType: '',
-				target: '',
-				footer: '',
-				frameUrl: '',
-			},
-			options
-		);
+	const append = html => {
+		document.body.insertAdjacentHTML('beforeend', html);
+	};
 
+	const closeButton = className => `<a href="#" class="${className}"><span class="fas fa-times" aria-hidden="true"></span></a>`;
+
+	/** Close the media / mega menu / frame modal. */
+	function close() {
+		removeModals();
+		document.body.classList.remove('hu-modal-open');
+	}
+
+	/** Mega menu settings modal. */
+	function megamenu(options = {}) {
+		const { title = 'Mega Menu', className = '', targetType = 'id', target = '', body = '' } = options;
+
+		removeModals();
+
+		append(`
+			<div class="hu-modal-overlay"></div>
+			<div class="hu-modal ${escapeAttr(className)}" data-target_type="${escapeAttr(targetType)}" data-target="${escapeAttr(target)}">
+				<div class="hu-modal-header">
+					<h4 class="hu-modal-header-title">${title}</h4>
+					${closeButton('action-hu-modal-close')}
+				</div>
+				<div class="hu-modal-inner">
+					<div class="hu-modal-content">
+						${body ? `<div class="hu-modal-megamenu-container">${body}</div>` : ''}
+					</div>
+				</div>
+				<div class="hu-modal-footer footer-right">
+					<button class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>
+					<button class="hu-btn hu-btn-primary hu-megamenu-save-btn">Save</button>
+				</div>
+			</div>`);
+
+		document.body.classList.add('hu-modal-open');
+	}
+
+	/** Modal that shows a page in an iframe. */
+	function frame(options = {}) {
+		const { title = 'Helix Ultimate', className = '', targetType = '', target = '', frameUrl = '' } = options;
+
+		removeModals();
+
+		append(`
+			<div class="hu-modal-overlay"></div>
+			<div class="hu-modal ${escapeAttr(className)}" data-target_type="${escapeAttr(targetType)}" data-target="${escapeAttr(target)}">
+				<div class="hu-modal-header">
+					<h4 class="hu-modal-header-title">${title}</h4>
+					${closeButton('action-hu-modal-close')}
+				</div>
+				<div class="hu-modal-inner">
+					<div class="hu-modal-content">
+						${frameUrl ? `<div class="hu-modal-frame-container"><iframe src="${escapeAttr(frameUrl)}" width="100%" height="100%"></iframe></div>` : ''}
+					</div>
+				</div>
+				<div class="hu-modal-footer footer-right">
+					<button class="hu-btn hu-btn-link hu-cancel-btn">Cancel</button>
+					<button class="hu-btn hu-btn-primary hu-save-btn">
+						<div class="hu-spinner hidden spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>
+						Save
+					</button>
+				</div>
+			</div>`);
+
+		document.body.classList.add('hu-modal-open');
+	}
+
+	/** Media manager modal. Content is loaded by media.js. */
+	function media(options = {}) {
+		const { target_type = '', target = '' } = options;
+
+		removeModals();
+
+		append(`
+			<div class="hu-modal-overlay"></div>
+			<div class="hu-modal" data-target_type="${escapeAttr(target_type)}" data-target="${escapeAttr(target)}">
+				<div class="hu-modal-header">
+					<input type="file" id="hu-file-input" accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" style="display:none;" multiple>
+					<div class="hu-modal-breadcrumbs"></div>
+					<div class="hu-modal-actions-left">
+						<a href="#" class="hu-btn hu-btn-primary hu-modal-action-select hu-mr-2"><span class="fas fa-check" aria-hidden="true"></span> Select</a>
+						<a href="#" class="hu-btn hu-btn-secondary hu-modal-action-cancel hu-mr-2"><span class="fas fa-times" aria-hidden="true"></span> Cancel</a>
+						<a href="#" class="hu-btn hu-btn-danger hu-btn-last hu-modal-action-delete"><span class="fas fa-minus-circle" aria-hidden="true"></span> Delete</a>
+					</div>
+					<div class="hu-modal-actions-right">
+						<a href="#" class="hu-btn hu-btn-primary hu-modal-action-upload hu-mr-2"><span class="fas fa-upload" aria-hidden="true"></span> Upload</a>
+						<a href="#" class="hu-btn hu-btn-secondary hu-btn-last hu-modal-action-new-folder"><span class="fas fa-plus" aria-hidden="true"></span> New Folder</a>
+						${closeButton('action-hu-modal-close')}
+					</div>
+				</div>
+				<div class="hu-modal-inner">
+					<div class="hu-modal-preloader"><span class="fas fa-circle-notch fa-pulse fa-spin fa-3x fa-fw" aria-hidden="true"></span></div>
+				</div>
+			</div>`);
+
+		document.body.classList.add('hu-modal-open');
+	}
+
+	/** Settings modal used by the layout builder and presets. */
+	function settings(options = {}) {
 		const {
-			title,
-			target,
-			targetType,
-			body,
-			footer,
-			frameUrl,
-			className,
+			target = '',
+			title = 'Options',
+			flag = '',
+			class: className = '',
+			applyBtnClass = 'hu-settings-apply',
+			footerButtons = [],
 		} = options;
 
-		$('.hu-modal-overlay, .hu-modal').remove();
+		removeModals('.hu-options-modal-overlay, .hu-options-modal');
 
-		let frameModal = '<div class="hu-modal-overlay"></div>';
-		frameModal +=
-			'<div class="hu-modal ' +
-			className +
-			'" data-target_type="' +
-			targetType +
-			'" data-target="' +
-			target +
-			'" style="display:none;">';
+		append(`
+			<div class="hu-options-modal-overlay"></div>
+			<div class="hu-options-modal ${escapeAttr(className)}" data-target="#${escapeAttr(target)}">
+				<div class="hu-options-modal-header">
+					<span class="hu-options-modal-header-title">${title}</span>
+					${closeButton('action-hu-options-modal-close')}
+				</div>
+				<div class="hu-options-modal-inner">
+					<div class="hu-options-modal-content"></div>
+				</div>
+				<div class="hu-options-modal-footer">
+					<a href="#" class="hu-btn hu-btn-primary ${escapeAttr(applyBtnClass)}" data-flag="${escapeAttr(flag)}"><span class="fas fa-check"></span> Apply</a>
+					${footerButtons.join('')}
+				</div>
+			</div>`);
 
-		frameModal += '<div class="hu-modal-header">';
+		document.body.classList.add('hu-options-modal-open');
+	}
 
-		frameModal += '<h4 class="hu-modal-header-title">' + title + '</h4>';
-		frameModal +=
-			'<a href="#" class="action-hu-modal-close"><span class="fas fa-times" aria-hidden="true"></span></a>';
-		frameModal += '</div>';
+	Joomla.helixModal = { close, megamenu, frame, media, settings };
 
-		frameModal += '<div class="hu-modal-inner">';
-		frameModal += '<div class="hu-modal-content">';
-
-		if (frameUrl) {
-			frameModal += '<div class="hu-modal-frame-container">';
-			frameModal +=
-				'<iframe src="' +
-				frameUrl +
-				'" width="100%" height="100%"></iframe>';
-			frameModal += '</div>';
+	// Escape closes the media / mega menu / frame modal.
+	document.addEventListener('keydown', event => {
+		if (event.key === 'Escape' && document.body.classList.contains('hu-modal-open')) {
+			close();
 		}
+	});
 
-		frameModal += '</div>';
-		frameModal += '</div>';
-
-		frameModal += '<div class="hu-modal-footer footer-right">';
-		frameModal += '<button class="hu-btn hu-btn-link hu-cancel-btn">Cancel</button>';
-		frameModal += '<button class="hu-btn hu-btn-primary hu-save-btn">';
-		frameModal += '<div class="hu-spinner hidden spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>';
-		frameModal += ' Save';
-		frameModal += '</button>';
-		frameModal += '</div>';
-		frameModal += '</div>';
-
-		frameModal += '</div>';
-		const $modal = $('body').addClass('hu-modal-open');
-		$modal.append(frameModal);
-		$modal.find('.hu-modal').fadeIn(300);
-	};
-
-	$.fn.helixUltimateModal = function (options) {
-		var options = $.extend(
-			{
-				target_type: '',
-				target: '',
-			},
-			options
-		);
-
-		$('.hu-modal-overlay, .hu-modal').remove();
-
-		var mediaModal = '<div class="hu-modal-overlay"></div>';
-		mediaModal +=
-			'<div class="hu-modal" data-target_type="' +
-			options.target_type +
-			'" data-target="' +
-			options.target +
-			'">';
-
-		mediaModal += '<div class="hu-modal-header">';
-		mediaModal +=
-			'<input type="file" id="hu-file-input" accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" style="display:none;" multiple>';
-			
-		mediaModal += '<div class="hu-modal-breadcrumbs"></div>';
-
-		mediaModal += '<div class="hu-modal-actions-left">';
-		mediaModal +=
-			'<a href="#" class="hu-btn hu-btn-primary hu-modal-action-select hu-mr-2"><span class="fas fa-check" aria-hidden="true"></span> Select</a>';
-		mediaModal +=
-			'<a href="#" class="hu-btn hu-btn-secondary hu-modal-action-cancel hu-mr-2"><span class="fas fa-times" aria-hidden="true"></span> Cancel</a>';
-		mediaModal +=
-			'<a href="#" class="hu-btn hu-btn-danger hu-btn-last hu-modal-action-delete"><span class="fas fa-minus-circle" aria-hidden="true"></span> Delete</a>';
-		mediaModal += '</div>';
-
-		mediaModal += '<div class="hu-modal-actions-right">';
-		mediaModal +=
-			'<a href="#" class="hu-btn hu-btn-primary hu-modal-action-upload hu-mr-2"><span class="fas fa-upload" aria-hidden="true"></span> Upload</a>';
-		mediaModal +=
-			'<a href="#" class="hu-btn hu-btn-secondary hu-btn-last hu-modal-action-new-folder"><span class="fas fa-plus" aria-hidden="true"></span> New Folder</a>';
-		mediaModal +=
-		'<a href="#" class="action-hu-modal-close"><span class="fas fa-times" aria-hidden="true"></span></a>';
-		mediaModal += '</div>';
-		mediaModal += '</div>';
-
-		mediaModal += '<div class="hu-modal-inner">';
-		mediaModal +=
-			'<div class="hu-modal-preloader"><span class="fas fa-circle-notch fa-pulse fa-spin fa-3x fa-fw" aria-hidden="true"></span></div>';
-		mediaModal += '</div>';
-		mediaModal += '</div>';
-
-		$('body').addClass('hu-modal-open').append(mediaModal);
-	};
-
-	$.fn.helixUltimateOptionsModal = function (options) {
-		var options = $.extend(
-			{
-				target: '',
-				title: 'Options',
-				flag: '',
-				class: '',
-				applyBtnClass: 'hu-settings-apply',
-				footerButtons: [],
-			},
-			options
-		);
-
-		$('.hu-options-modal-overlay, .hu-options-modal').remove();
-
-		var optionsModal = '<div class="hu-options-modal-overlay"></div>';
-		optionsModal +=
-			'<div class="hu-options-modal ' +
-			options.class +
-			'" data-target="#' +
-			options.target +
-			'">';
-
-		optionsModal += '<div class="hu-options-modal-header">';
-		optionsModal +=
-			'<span class="hu-options-modal-header-title">' +
-			options.title +
-			'</span>';
-		optionsModal +=
-			'<a href="#" class="action-hu-options-modal-close"><span class="fas fa-times" aria-hidden="true"></span></a>';
-		optionsModal += '</div>';
-
-		optionsModal += '<div class="hu-options-modal-inner">';
-		optionsModal += '<div class="hu-options-modal-content">';
-		optionsModal += '</div>';
-		optionsModal += '</div>';
-
-		optionsModal += '<div class="hu-options-modal-footer">';
-		optionsModal += `<a href="#" class="hu-btn hu-btn-primary ${options.applyBtnClass}" data-flag="${options.flag}"><span class="fas fa-check"></span> Apply</a>`;
-		// optionsModal +=
-		// 	'<a href="#" class="hu-btn hu-btn-secondary hu-settings-cancel"><span class="fas fa-times"></span> Cancel</a>';
-
-		if (options.footerButtons.length) {
-			optionsModal += options.footerButtons.map(button => button);
-		}
-
-		optionsModal += '</div>';
-
-		optionsModal += '</div>';
-
-		$('body').addClass('hu-options-modal-open').append(optionsModal);
-	};
-});
+})();

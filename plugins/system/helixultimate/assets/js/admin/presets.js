@@ -5,203 +5,127 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
  */
 
-jQuery(function ($) {
-	let $presetsDataElement = $('.hu-presets #presets-data');
-	let $presetsDivElement = $(
-		'.hu-presets .hu-preset'
-	);
+/**
+ * Presets: edit a preset's colours in a modal, apply or reset to default.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+	const { delegate, readData } = Joomla.utils;
 
-	// All the presets data
-	let presetsData = $presetsDataElement.val();
+	const presetsDataElement = document.querySelector('.hu-presets #presets-data');
+
+	if (!presetsDataElement) return;
+
+	let presetsData = presetsDataElement.value;
 
 	if (typeof presetsData === 'string' && presetsData.length) {
 		presetsData = JSON.parse(presetsData);
 	}
 
+	/** The colour used most often in a preset paints its tile. */
 	function detectMajorColor(presetData) {
-		let colorsFrequency = Object.values(presetData).reduce(function (
-			accumulator,
-			color
-		) {
+		const frequency = Object.values(presetData).reduce((accumulator, color) => {
 			accumulator[color] = (accumulator[color] || 0) + 1;
 			return accumulator;
-		},
-		{});
+		}, {});
 
 		let max = 0;
-		return Object.entries(colorsFrequency).reduce(function (
-			major,
-			[color, frequency]
-		) {
-			if (frequency >= max) {
-				max = frequency;
+
+		return Object.entries(frequency).reduce((major, [color, count]) => {
+			if (count >= max) {
+				max = count;
 				major = color;
 			}
 
 			return major;
-		},
-		'');
+		}, '');
 	}
 
-	function reflectPresetChanges(
-		data,
-		name,
-		$presetContainerOriginal,
-		$presetContainer
-	) {
-		// Change the presets data with updated data
+	const closeModal = () => {
+		document.querySelectorAll('.hu-options-modal-overlay, .hu-options-modal').forEach(element => element.remove());
+		document.body.classList.remove('hu-options-modal-open');
+	};
+
+	function reflectPresetChanges(data, name, originalContainer, editedContainer) {
 		presetsData[name].data = data;
-		console.log(data);
+		presetsDataElement.value = JSON.stringify(presetsData);
 
-		// Update the input field #presets-data
-		$presetsDataElement.val(JSON.stringify(presetsData));
+		const presetElement = document.querySelector(`.hu-preset[data-preset="${name}"]`);
 
-		// Update the attributes of the .hu-preset
-		$presetsDivElement.each(function () {
-			let self = this;
-			if ($(this).data('preset') === name) {
-				Object.entries(data).forEach(function ([key, value]) {
-					$(self).attr(`data-${key}`, value);
-					$(self).data(key, value);
-				});
-			}
-		});
+		if (presetElement) {
+			Object.entries(data).forEach(([key, value]) => presetElement.setAttribute(`data-${key}`, value));
+		}
 
 		/**
-		 * Replace the original preset container
-		 * with the cloned, updated container because,
-		 * next time when we shall reopen the modal
-		 * then we can get the last changes.
+		 * Keep the edited fields as the new original, so the next time the
+		 * modal opens it shows the last changes.
 		 */
-		$presetContainerOriginal.html($presetContainer.find('> div'));
+		originalContainer.replaceChildren(...editedContainer.querySelectorAll(':scope > div'));
+
 		window.purgeCss();
+		closeModal();
 
-		/**
-		 * Close the modal
-		 */
-		$(
-			'.hu-options-modal-overlay, .hu-options-modal'
-		).remove();
-		$('body').removeClass('hu-options-modal-open');
+		if (presetElement) {
+			const majorColor = detectMajorColor(data);
+			const editButton = presetElement.querySelector('.hu-edit-preset');
 
-		let majorColor = detectMajorColor(data);
-		let $presetElement = $(`.hu-preset[data-preset=${name}]`);
+			presetElement.style.backgroundColor = majorColor;
+			if (editButton) editButton.style.color = majorColor;
 
-		$presetElement.css({
-			'background-color': majorColor,
-		});
-
-		$presetElement
-			.find('.hu-edit-preset')
-			.css({ color: majorColor });
-
-		$(`.hu-preset[data-preset=${name}]`).click();
+			presetElement.click();
+		}
 	}
 
-	$(document).on('click', '.hu-edit-preset', function (e) {
-		e.preventDefault();
-		e.stopPropagation();
+	delegate(document, 'click', '.hu-edit-preset', (event, button) => {
+		event.preventDefault();
+		event.stopPropagation();
 
-		let presetData = $(this).data('preset_data') || '';
-		let { name, data } = presetData;
+		const { name, data } = readData(button, 'preset_data') || {};
+		const originalContainer = document.querySelector(`.hu-preset-container#${name}`);
 
-		/**
-		 * Clone the preset container for displaying
-		 * into the settings modal.
-		 */
-		let $presetContainerOriginal = $(
-			`.hu-preset-container#${name}`
-		);
-		let $presetContainer = $presetContainerOriginal.clone(true);
+		if (!originalContainer) return;
 
-		/**
-		 * Remove all the ids from the cloned elements input fields
-		 * for solving the non-unique id problem.
-		 */
-		$presetContainer.each(function () {
-			$(this).find('input').removeAttr('id');
-		});
+		// Edit a copy, so cancelling leaves the original untouched.
+		const container = originalContainer.cloneNode(true);
 
-		/**
-		 * Initiate the modal
-		 */
-		$(this).helixUltimateOptionsModal({
+		// Avoid duplicate ids between the copy and the original.
+		container.querySelectorAll('input').forEach(input => input.removeAttribute('id'));
+
+		Joomla.helixModal.settings({
 			flag: 'edit-presets',
 			title: `<span class='fas fa-cogs hu-mr-2'></span> Edit Preset: ${name}`,
 			class: `hu-modal-small edit-preset-modal modal-${name}`,
 			applyBtnClass: 'hu-save-preset',
 			footerButtons: [
-				`<a href="#" class="hu-btn hu-btn-secondary helix-preset-reset hu-ml-auto"><span class="fas fa-sync-alt" aria-hidden="true"></span> Reset to Default</a>`,
+				'<a href="#" class="hu-btn hu-btn-secondary helix-preset-reset hu-ml-auto"><span class="fas fa-sync-alt" aria-hidden="true"></span> Reset to Default</a>',
 			],
 		});
 
-		/**
-		 * Add the cloned container into
-		 * the modal inner body
-		 */
-		$('.hu-options-modal-inner').html(
-			$presetContainer
-				.removeAttr('id')
-				.removeAttr('style')
-				.addClass('hu-options-modal-content')
-		);
+		container.removeAttribute('id');
+		container.removeAttribute('style');
+		container.classList.add('hu-options-modal-content');
 
-		let $colorInputs = $presetContainer.find('input.preset-control');
+		const modal = document.querySelector(`.edit-preset-modal.modal-${name}`);
+		modal.querySelector('.hu-options-modal-inner').replaceChildren(container);
 
-		/**
-		 * Get the changed input value
-		 * and update the data object.
-		 * So, after that the data object will be updated
-		 */
-		$colorInputs.each(function () {
-			$(this).on('change', function (e) {
-				e.preventDefault();
-				let prop = $(this).attr('name');
-				let value = $(this).val();
-
-				data[prop] = value;
+		// Collect the edited colours.
+		container.querySelectorAll('input.preset-control').forEach(input => {
+			input.addEventListener('change', () => {
+				data[input.name] = input.value;
 			});
 		});
 
-		let $applyBtn = $(`.edit-preset-modal.modal-${name}`).find(
-			'.hu-save-preset'
-		);
+		modal.querySelector('.hu-save-preset').addEventListener('click', applyEvent => {
+			applyEvent.preventDefault();
+			reflectPresetChanges(data, name, originalContainer, container);
+		});
 
-		let $resetBtn = $(`.edit-preset-modal.modal-${name}`).find(
-			'.helix-preset-reset'
-		);
+		modal.querySelector('.helix-preset-reset').addEventListener('click', resetEvent => {
+			resetEvent.preventDefault();
 
-		if ($applyBtn.length) {
-			/**
-			 * On click Apply button
-			 */
-			$applyBtn.on('click', function (e) {
-				e.preventDefault();
-				reflectPresetChanges(
-					data,
-					name,
-					$presetContainerOriginal,
-					$presetContainer
-				);
-			});
-
-			$resetBtn.on('click', function (e) {
-				e.preventDefault();
-
-				let confirm = window.confirm(
-					'Do you really want to reset your changes to default?'
-				);
-
-				if (confirm) {
-					let resetData = JSON.parse($('#default-values').val());
-					reflectPresetChanges(
-						resetData[name],
-						name,
-						$presetContainerOriginal,
-						$presetContainer
-					);
-				}
-			});
-		}
+			if (window.confirm('Do you really want to reset your changes to default?')) {
+				const defaults = JSON.parse(document.getElementById('default-values').value);
+				reflectPresetChanges(defaults[name], name, originalContainer, container);
+			}
+		});
 	});
 });

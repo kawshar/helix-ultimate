@@ -106,7 +106,7 @@ class JFormFieldHelixfont extends FormField
 
 		/** Preview Row */
 		$html .= '<div class="hu-webfont-preview-wrapper">';
-		$html .= '<div class="hu-webfont-preview">1 2 3 4 5 6 7 8 9 0 Grumpy wizards make toxic brew for the evil Queen and Jack.</div>';
+		$html .= '<div class="hu-webfont-preview">' . htmlspecialchars(Text::_('HELIX_ULTIMATE_FONT_PREVIEW_TEXT'), ENT_QUOTES, 'UTF-8') . '</div>';
 		$html .= '</div>';
 
 		/** Start Fonts List row */
@@ -355,7 +355,7 @@ class JFormFieldHelixfont extends FormField
 		$html = '';
 		$html .= '<div class="hu-font-color">';
 		$html .= '<label class="hu-mb-2">' . Text::_('HELIX_ULTIMATE_FONT_COLOR') . '</label>';
-		$html .= '<input type="text" class="form-control hu-font-color-input minicolors" placeholder="Font Color" value="' . $color . '" />';
+		$html .= '<input type="text" class="form-control hu-font-color-input" placeholder="' . Text::_('HELIX_ULTIMATE_FONT_COLOR_INHERIT') . '" value="' . htmlspecialchars($color, ENT_QUOTES, 'UTF-8') . '" />';
 		$html .= '</div>';
 
 		return $html;

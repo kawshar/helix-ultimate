@@ -5,634 +5,434 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
  */
 
-jQuery(function ($) {
-	/** Show/hide the column layout */
-	$(document).on('click', '.hu-add-columns', function (event) {
-		event.preventDefault();
-		event.stopPropagation();
+/**
+ * Layout builder: rows and columns, their settings and grid patterns.
+ *
+ * Row and column settings live in `data-*` attributes on `.hu-layout-section`
+ * and `.hu-layout-column`; `Joomla.helixLayout.serialize()` turns them into the
+ * layout JSON stored in the `#layout` field.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+	const { fire, delegate, readData, show, hide, toggle } = Joomla.utils;
 
-		$(this).closest('li').find('.hu-column-list').slideToggle(300);
-	});
+	const builder = document.getElementById('hu-layout-builder');
 
-	/** Close the hu-column-list on select. */
-	$(document).on('click', '.hu-column-layout:not(.hu-layout-custom-btn)', function () {
-		$(this).closest('.hu-column-list').slideUp(300);
-	});
+	if (!builder) return;
 
-	// Sortable
-	$.fn.rowSortable = function () {
-		let originalIndex = -1,
-			currentIndex = -1;
-		$(this)
-			.sortable({
-				placeholder: 'ui-state-highlight',
-				forcePlaceholderSize: true,
-				axis: 'x',
-				opacity: 1,
-				tolerance: 'pointer',
-				start(_, ui) {
-					$('.hu-layout-section [data-hu-layout-row]').find('.ui-state-highlight').addClass($(ui.item).attr('class'));
-					$('.hu-layout-section [data-hu-layout-row]')
-						.find('.ui-state-highlight')
-						.css('height', $(ui.item).outerHeight());
-					originalIndex = ui.item.index();
-				},
-				stop(_, ui) {
-					currentIndex = ui.item.index();
+	const COLUMN_OPTIONS_ICON =
+		'<a class="hu-column-options" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="3" fill="none"><path fill="#020B53" fill-rule="evenodd" d="M3 1.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm6 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM13.5 3a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd" opacity=".4"/></svg></a>';
 
-					if (originalIndex !== currentIndex) {
-						updateLayoutField();
-						Joomla.HelixToaster.success('Columns position changed!', 'Layout Settings');
-					}
-				},
-			})
-			.disableSelection();
+	/* ------------------------------------------------------------------ */
+	/* Serialising                                                         */
+	/* ------------------------------------------------------------------ */
+
+	/** Settings of a row or column, without leftovers from the old jQuery UI sortable. */
+	const settingsOf = element => {
+		const settings = readData(element);
+
+		delete settings.sortableitem;
+		delete settings.sortableItem;
+
+		return settings;
 	};
 
-	jqueryUiLayout();
+	/** Build the layout JSON from the rows and columns. */
+	function serialize() {
+		return [...builder.querySelectorAll('.hu-layout-section')].map(row => {
+			const active = row.querySelector('.hu-column-layout.active');
+			const layoutData = active ? readData(active, 'layout') : 12;
 
-	function jqueryUiLayout() {
-		let originalIndex = -1,
-			currentIndex = -1;
-		$('#hu-layout-builder')
-			.sortable({
-				placeholder: 'ui-state-highlight',
-				forcePlaceholderSize: true,
-				axis: 'y',
-				opacity: 1,
-				tolerance: 'pointer',
-				start(_, ui) {
-					originalIndex = ui.item.index();
-				},
-				stop(_, ui) {
-					currentIndex = ui.item.index();
-					if (originalIndex !== currentIndex) {
-						updateLayoutField();
-						Joomla.HelixToaster.success('Rows position changed!', 'Layout Settings');
-					}
-				},
-			})
-			.disableSelection();
-
-		$('.hu-layout-section').find('[data-hu-layout-row]').rowSortable();
+			return {
+				type: 'row',
+				layout: layoutData != 12 ? String(layoutData).split(',').join('') : 12,
+				settings: settingsOf(row),
+				attr: [...row.querySelectorAll('.hu-layout-column')].map(column => ({
+					type: 'sp_col',
+					settings: settingsOf(column),
+				})),
+			};
+		});
 	}
 
-	// setInputValue Callback Function
-	$.fn.setInputValue = function (options) {
-		if (this.attr('type') == 'checkbox') {
-			if (options.field == '1') {
-				this.attr('checked', 'checked');
-			} else {
-				this.removeAttr('checked');
-			}
-		} else if (this.hasClass('input-select')) {
-			this.val(options.field);
-			this.trigger('liszt:updated');
-			this.trigger('chosen:updated');
-		} else if (this.hasClass('input-media')) {
-			if (options.field) {
-				$imgParent = this.parent('.media');
-				$imgParent.find('img.media-preview').each(function () {
-					$(this).attr('src', layoutbuilder_base + options.field);
-				});
-			}
-			this.val(options.field);
-		} else {
-			this.val(options.field);
+	Joomla.helixLayout = { serialize };
+
+	function updateLayoutField() {
+		const input = document.getElementById('layout');
+
+		if (input) {
+			input.value = JSON.stringify(serialize());
+			fire(input);
+		}
+	}
+
+	/** Store a setting on a row or column. */
+	const setData = (element, key, value) => element.setAttribute(`data-${key}`, value ?? '');
+
+	/* ------------------------------------------------------------------ */
+	/* Drag and drop (SortableJS)                                          */
+	/* ------------------------------------------------------------------ */
+
+	const sortables = new WeakSet();
+
+	function makeSortable(container, options, message) {
+		if (!container || sortables.has(container) || !window.Sortable) return;
+
+		sortables.add(container);
+
+		Sortable.create(container, {
+			animation: 150,
+			// Pointer-event dragging: consistent across browsers and styleable.
+			forceFallback: true,
+			fallbackOnBody: true,
+			ghostClass: 'ui-state-highlight',
+			chosenClass: 'hu-sortable-chosen',
+			dragClass: 'hu-sortable-drag',
+			preventOnFilter: false,
+			...options,
+			onEnd(event) {
+				if (event.oldIndex !== event.newIndex) {
+					updateLayoutField();
+					Joomla.HelixToaster.success(message, 'Layout Settings');
+				}
+			},
+		});
+	}
+
+	function initSortables() {
+		// Rows drag by their header bar, so dragging a column never moves the row.
+		makeSortable(
+			builder,
+			{ draggable: '.hu-layout-section', handle: '.hu-section-settings', filter: '.hu-row-option-list', direction: 'vertical' },
+			'Rows position changed!'
+		);
+
+		builder.querySelectorAll('.hu-layout-section [data-hu-layout-row]').forEach(row => {
+			makeSortable(row, { draggable: '.hu-layout-column', filter: '.hu-column-options', direction: 'horizontal' }, 'Columns position changed!');
+		});
+	}
+
+	initSortables();
+
+	/* ------------------------------------------------------------------ */
+	/* Settings modals                                                     */
+	/* ------------------------------------------------------------------ */
+
+	/** Fill a modal field from a stored setting. */
+	function setInputValue(input, value) {
+		if (input.type === 'checkbox') {
+			input.checked = value == '1';
+			return;
 		}
 
-		if (this.data('attrname') == 'column_type') {
-			if (this.val() == 'component') {
-				$('.form-group.name').hide();
-			}
+		// Keep the template default when nothing is stored.
+		if (value === undefined) return;
+
+		input.value = value;
+	}
+
+	const getInputValue = input => (input.type === 'checkbox' ? (input.checked ? '1' : '0') : input.value);
+
+	/** Show the stored image of a media setting. */
+	function showMediaPreview(input, value) {
+		if (!input.classList.contains('hu-input-media') || !value) return;
+
+		const holder = input.previousElementSibling;
+
+		if (holder && holder.classList.contains('hu-image-holder')) {
+			holder.innerHTML = '';
+			const image = document.createElement('img');
+			image.src = (input.dataset.baseurl || '') + value;
+			image.alt = '';
+			holder.appendChild(image);
 		}
-	};
 
-	// callback function, return checkbox value
-	$.fn.getInputValue = function () {
-		if (this.attr('type') == 'checkbox') {
-			return this.prop('checked') ? '1' : '0';
-		} else {
-			return this.val();
-		}
-	};
+		[...input.parentElement.children]
+			.filter(sibling => sibling.classList.contains('hu-media-clear'))
+			.forEach(clear => clear.classList.remove('hide'));
+	}
 
-	// color picker initialize
-	$.fn.initColorPicker = function () {
-		Joomla.initColorPicker(this.find('.minicolors'));
-	};
+	/** Open a settings modal with a copy of the hidden settings template. */
+	function openSettings({ templateId, flag, title, target, activeClass, footerButtons = [] }) {
+		Joomla.helixModal.settings({ flag, title, class: 'hu-modal-small', footerButtons });
 
-	// Open Row settings Modal
-	$(document).on('click', '.hu-row-options', function (event) {
+		document.querySelectorAll(`.${activeClass}`).forEach(element => element.classList.remove(activeClass));
+		target.classList.add(activeClass);
+
+		const content = document.getElementById(templateId).cloneNode(true);
+		content.removeAttribute('id');
+		content.classList.add('hu-options-modal-content');
+
+		document.querySelector('.hu-options-modal-inner').replaceChildren(content);
+
+		content.querySelectorAll('.hu-input').forEach(input => {
+			const value = readData(target, input.dataset.attrname);
+
+			setInputValue(input, value);
+			showMediaPreview(input, value);
+		});
+
+		Joomla.initColorPicker();
+
+		return content;
+	}
+
+	delegate(document, 'click', '.hu-row-options', (event, button) => {
 		event.preventDefault();
-		$(this).helixUltimateOptionsModal({
+
+		openSettings({
+			templateId: 'hu-row-settings',
 			flag: 'row-setting',
 			title: "<span class='fas fa-cogs hu-mr-2'></span> Row Options",
-			class: 'hu-modal-small',
+			target: button.closest('.hu-layout-section'),
+			activeClass: 'row-active',
+			footerButtons: ['<a href="#" class="hu-btn hu-btn-link hu-settings-delete-row"><span class="fas fa-trash-alt" aria-hidden="true"></span> Delete row</a>'],
 		});
-
-		$('.hu-layout-section').removeClass('row-active');
-		$parent = $(this).closest('.hu-layout-section');
-		$parent.addClass('row-active');
-
-		$('#hu-row-settings')
-			.find('select.hu-input')
-			.each(function () {
-				$(this).chosen('destroy');
-			});
-
-		var $clone = $('#hu-row-settings').clone(true);
-		$clone.find('.hu-input-color').each(function () {
-			$(this).addClass('minicolors');
-		});
-
-		$clone.find('select.hu-input').each(function () {
-			$(this).chosen({ width: '100%' });
-		});
-
-		$clone = $('.hu-options-modal-inner').html($clone.removeAttr('id').addClass('hu-options-modal-content'));
-
-		$clone.find('.hu-input').each(function () {
-			var $that = $(this),
-				attrValue = $parent.data($that.data('attrname'));
-
-			$that.setInputValue({ field: attrValue });
-			if ($that.hasClass('hu-input-media')) {
-				if (attrValue) {
-					$that.prev('.hu-image-holder').html('<img src="' + $that.data('baseurl') + attrValue + '" alt="">');
-
-					let $clear = $that.siblings('.hu-media-clear');
-
-					if ($clear.hasClass('hide')) {
-						$clear.removeClass('hide');
-					}
-				}
-			}
-		});
-
-		$clone.initColorPicker();
 	});
 
-	// Open Column settings Modal
-	$(document).on('click', '.hu-column-options', function (event) {
+	delegate(document, 'click', '.hu-column-options', (event, button) => {
 		event.preventDefault();
-		$(this).helixUltimateOptionsModal({
+
+		const column = button.closest('.hu-layout-column');
+		const content = openSettings({
+			templateId: 'hu-column-settings',
 			flag: 'column-setting',
 			title: "<span class='fas fa-cog'></span> Column Options",
-			class: 'hu-modal-small',
+			target: column,
+			activeClass: 'column-active',
 		});
 
-		$('.hu-layout-column').removeClass('column-active');
-		$parent = $(this).closest('.hu-layout-column');
-		$parent.addClass('column-active');
+		// "Sticky" only applies to the left and right sidebars.
+		const nameSelect = content.querySelector('select[data-attrname="name"]');
+		const sticky = content.querySelector('.hu-input-sticky_position');
 
-		$('#hu-column-settings')
-			.find('select.hu-input')
-			.each(function () {
-				$(this).chosen('destroy');
-			});
+		const syncSticky = () => {
+			const sidebar = nameSelect && ['left', 'right'].includes(nameSelect.value);
+			const group = sticky && sticky.closest('.control-group');
 
-		var $clone = $('#hu-column-settings').clone(true);
-		$clone.find('.hu-input-color').each(function () {
-			$(this).addClass('minicolors');
-		});
+			if (!group) return;
 
-		$clone = $('.hu-options-modal-inner').html($clone.removeAttr('id').addClass('hu-options-modal-content'));
+			if (!sidebar) sticky.checked = false;
+			toggle(group, sidebar);
+		};
 
-		var removeSticky = true;
+		syncSticky();
 
-		$clone.find('.hu-input').each(function () {
-			var $that = $(this),
-				attrName = $that.data('attrname'),
-				attrValue = $parent.data($that.data('attrname'));
-			$that.setInputValue({ field: attrValue });
-
-			if ((attrName == 'name' && attrValue == 'right') || (attrName == 'name' && attrValue == 'left')) {
-				removeSticky = false;
-			}
-
-			if (removeSticky) {
-				if (attrName == 'sticky_position') {
-					if ($that.prop('checked')) {
-						$that.prop('checked', false);
-					}
-					$that.closest('.control-group').hide();
-				}
-			}
-		});
-
-		$clone.find('select.hu-input').each(function () {
-			$(this).chosen({ width: '100%' });
-		});
-
-		$clone.initColorPicker();
-
-		var $chosenSelect = $('select[data-attrname="name"]').chosen();
-		// Add change event listener to the Chosen select
-		$chosenSelect.on('change', function () {
-			var selectedValue = $(this).val();
-
-			if (selectedValue == 'right' || selectedValue == 'left') {
-				$(this).closest('.control-group').next().show();
-			} else {
-				$(this).closest('.control-group').next().hide();
-				$(this).closest('.control-group').next().find('.hu-input-sticky_position').prop('checked', false);
-			}
-		});
+		if (nameSelect) nameSelect.addEventListener('change', syncSticky);
 	});
 
-	$('.hu-input-column_type').change(function (event) {
-		var $parent = $(this).closest('.hu-modal-content'),
-			flag = false;
+	/** Only one column can hold the component. */
+	delegate(document, 'change', '.hu-options-modal .hu-input-column_type', (event, checkbox) => {
+		const content = checkbox.closest('.hu-options-modal-content');
+		const nameGroup = content && content.querySelector('.control-group.name');
 
-		$('#hu-layout-builder')
-			.find('.hu-layout-column')
-			.not('.column-active')
-			.each(function (index, val) {
-				if ($(this).data('column_type') == '1') {
-					flag = true;
-					return false;
-				}
-			});
+		const taken = [...builder.querySelectorAll('.hu-layout-column:not(.column-active)')].some(
+			column => readData(column, 'column_type') == '1'
+		);
 
-		if (flag) {
+		if (taken) {
 			alert('Component Area Taken');
-			$(this).prop('checked', false);
-			$parent.children('.control-group.name').slideDown('400');
-			return false;
+			checkbox.checked = false;
+			show(nameGroup);
+			return;
 		}
 
-		if ($(this).attr('checked')) {
-			$('.hu-layout-column.column-active').find('.hu-column').addClass('hu-column-component');
-			$parent.children('.control-group.name').slideUp('400');
+		if (checkbox.checked) {
+			const active = builder.querySelector('.hu-layout-column.column-active .hu-column');
+			if (active) active.classList.add('hu-column-component');
+			hide(nameGroup);
 		} else {
-			$('#hu-layout-builder').find('.hu-column-component').removeClass('hu-column-component');
-			$parent.children('.control-group.name').slideDown('400');
+			builder.querySelectorAll('.hu-column-component').forEach(column => column.classList.remove('hu-column-component'));
+			show(nameGroup);
 		}
 
 		updateLayoutField();
 	});
 
-	// Save Row Column Settings
-	$(document).on('click', '.hu-settings-apply', function (event) {
+	const closeSettings = () => {
+		document.querySelectorAll('.hu-options-modal-overlay, .hu-options-modal').forEach(element => element.remove());
+		document.body.classList.remove('hu-options-modal-open');
+	};
+
+	/** Apply row / column settings. */
+	delegate(document, 'click', '.hu-settings-apply', (event, button) => {
 		event.preventDefault();
 
-		var flag = $(this).data('flag');
+		const inputs = [...document.querySelectorAll('.hu-options-modal-content .hu-input')];
 
-		switch (flag) {
-			case 'row-setting':
-				$('.hu-options-modal-content')
-					.find('.hu-input')
-					.each(function () {
-						var $this = $(this),
-							$parent = $('.row-active'),
-							$attrname = $this.data('attrname');
-						$parent.removeData($attrname);
+		switch (button.dataset.flag) {
+			case 'row-setting': {
+				const row = builder.querySelector('.row-active');
 
-						if ($attrname == 'name') {
-							var nameVal = $this.val();
+				inputs.forEach(input => {
+					const name = input.dataset.attrname;
 
-							if (nameVal == '' || nameVal == null) {
-								$('.row-active .hu-section-title').text('Section Header');
-							} else {
-								$('.row-active .hu-section-title').text($this.val());
-							}
-						}
+					if (name === 'name') {
+						row.querySelector('.hu-section-title').textContent = input.value || 'Section Header';
+					}
 
-						$parent.data($attrname, $this.getInputValue());
-					});
-
-				$('.hu-options-modal-overlay, .hu-options-modal').remove();
-				$('body').removeClass('hu-options-modal-open');
+					setData(row, name, getInputValue(input));
+				});
 				break;
+			}
 
-			case 'column-setting':
-				var component = false;
+			case 'column-setting': {
+				const column = builder.querySelector('.column-active');
+				let component = false;
 
-				$('.hu-options-modal-content')
-					.find('.hu-input')
-					.each(function () {
-						var $this = $(this),
-							$parent = $('.column-active'),
-							$attrname = $this.data('attrname'),
-							dataVal = $this.val();
+				inputs.forEach(input => {
+					const name = input.dataset.attrname;
+					const title = column.querySelector('.hu-column-title');
 
-						$parent.removeData($attrname);
+					if (name === 'column_type' && input.checked) {
+						component = true;
+						title.textContent = 'Component';
+					} else if (name === 'name' && !component) {
+						title.textContent = input.value || 'none';
+					}
 
-						if ($attrname == 'column_type' && $(this).attr('checked')) {
-							component = true;
-							$('.column-active .hu-column-title').text('Component');
-						} else if ($attrname == 'name' && component != true) {
-							if (dataVal == '' || dataVal == undefined) {
-								dataVal = 'none';
-							}
-							$('.column-active .hu-column-title').text(dataVal);
-						}
-
-						$parent.data($attrname, $this.getInputValue());
-					});
-				$('.hu-options-modal-overlay, .hu-options-modal').remove();
-				$('body').removeClass('hu-options-modal-open');
+					setData(column, name, getInputValue(input));
+				});
 				break;
+			}
+
 			case 'menu-row-setting':
 			case 'menu-col-setting':
-				$('.hu-options-modal-overlay, .hu-options-modal').remove();
-				$('body').removeClass('hu-options-modal-open');
 				break;
+
 			default:
 				alert('You are doing somethings wrongs. Try again');
 		}
 
+		closeSettings();
 		updateLayoutField();
 		Joomla.HelixToaster.success('Changes applied successfully!', 'Layout Settings');
 	});
 
-	// Cancel Modal
-	$(document).on('click', '.hu-settings-cancel, .action-hu-options-modal-close', function (event) {
+	delegate(document, 'click', '.hu-settings-cancel, .action-hu-options-modal-close', event => {
 		event.preventDefault();
-		$('.hu-options-modal-overlay, .hu-options-modal').remove();
-		$('body').removeClass('hu-options-modal-open');
+		closeSettings();
 	});
 
-	// Column Layout Arrange
-	$(document).on('click', '.hu-column-layout', function (event) {
+	/* ------------------------------------------------------------------ */
+	/* Grid patterns                                                       */
+	/* ------------------------------------------------------------------ */
+
+	delegate(document, 'click', '.hu-add-columns', (event, button) => {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const list = button.closest('li').querySelector('.hu-column-list');
+		toggle(list, getComputedStyle(list).display === 'none', 'block');
+	});
+
+	delegate(document, 'click', '.hu-layout-custom-btn', (event, button) => {
 		event.preventDefault();
 
-		var $that = $(this),
-			colType = $that.data('type'),
-			column;
+		const custom = button.closest('.hu-column-list').querySelector('.hu-layout-custom');
+		toggle(custom, getComputedStyle(custom).display === 'none', 'block');
+	});
 
-		if ($that.hasClass('active') && colType != 'custom') {
-			return;
-		}
+	/**
+	 * Rebuild a row's columns for a new grid pattern (e.g. ["4", "8"]).
+	 * Existing columns keep their settings; extra ones are removed.
+	 */
+	function applyGrid(row, sizes) {
+		const container = row.querySelector('[data-hu-layout-row]');
+		const columns = [...container.querySelectorAll('.hu-layout-column')];
 
-		if (colType === 'custom') {
-			return;
-		}
+		sizes.forEach((size, index) => {
+			size = String(size).trim();
 
-		var $parent = $that.closest('.hu-column-list'),
-			$gparent = $that.closest('.hu-layout-section'),
-			oldLayoutData = $parent.find('.active').data('layout'),
-			oldLayout = ['12'],
-			layoutData = $that.data('layout'),
-			newLayout = ['12'];
+			let column = columns[index];
 
-		if (oldLayoutData != 12) {
-			oldLayout = oldLayoutData.split('+');
-		}
-
-		if (layoutData != 12) {
-			newLayout = layoutData.split('+');
-		}
-
-		var col = [],
-			colAttr = [];
-
-		$gparent.find('.hu-layout-column').each(function (i, val) {
-			col[i] = $(this).html();
-			var colData = $(this).data();
-
-			if (typeof colData == 'object') {
-				colAttr[i] = $(this).data();
-			} else {
-				colAttr[i] = '';
+			if (!column) {
+				column = document.createElement('div');
+				column.innerHTML = `<div class="hu-column"><span class="hu-column-title">none</span>${COLUMN_OPTIONS_ICON}</div>`;
+				setData(column, 'column_type', 0);
+				setData(column, 'name', 'none');
+				container.appendChild(column);
 			}
+
+			column.className = `hu-layout-column col-${size}`;
+			setData(column, 'grid_size', size);
 		});
 
-		$parent.find('.active').removeClass('active');
-		$that.addClass('active');
+		columns.slice(sizes.length).forEach(column => column.remove());
 
-		var new_item = '';
-
-		for (var i = 0; i < newLayout.length; i++) {
-			var dataAttr = '';
-			if (typeof colAttr[i] != 'object') {
-				colAttr[i] = {
-					grid_size: newLayout[i].trim(),
-					column_type: 0,
-					name: 'none',
-				};
-			} else {
-				colAttr[i].grid_size = newLayout[i].trim();
-			}
-			$.each(colAttr[i], function (index, value) {
-				dataAttr += ' data-' + index + '="' + value + '"';
-			});
-
-			new_item += '<div class="hu-layout-column col-' + newLayout[i].trim() + '" ' + dataAttr + '>';
-			if (col[i]) {
-				new_item += col[i];
-			} else {
-				new_item += '<div class="hu-column">';
-				new_item += '<span class="hu-column-title">none</span>';
-				new_item +=
-					'<a class="hu-column-options" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="3" fill="none"><path fill="#020B53" fill-rule="evenodd" d="M3 1.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm6 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM13.5 3a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd" opacity=".4"/></svg></a>';
-				new_item += '</div>';
-			}
-			new_item += '</div>';
-		}
-
-		$old_column = $gparent.find('.hu-layout-column');
-		$gparent.find('[data-hu-layout-row]').append(new_item);
-
-		$old_column.remove();
-		jqueryUiLayout();
-
-		Joomla.HelixToaster.success(
-			'Grid pattern updated to <strong>' + newLayout.join('+') + '</strong>',
-			'Layout Settings',
-		);
+		Joomla.HelixToaster.success(`Grid pattern updated to <strong>${sizes.join('+')}</strong>`, 'Layout Settings');
 		updateLayoutField();
+	}
+
+	const setActiveLayout = (list, layoutButton) => {
+		list.querySelectorAll('.hu-column-layout.active').forEach(item => item.classList.remove('active'));
+		layoutButton.classList.add('active');
+	};
+
+	delegate(document, 'click', '.hu-column-layout', (event, layoutButton) => {
+		event.preventDefault();
+
+		if (layoutButton.dataset.type === 'custom') return;
+
+		const list = layoutButton.closest('.hu-column-list');
+		const layout = String(readData(layoutButton, 'layout'));
+
+		hide(list);
+
+		if (layoutButton.classList.contains('active')) return;
+
+		setActiveLayout(list, layoutButton);
+		applyGrid(layoutButton.closest('.hu-layout-section'), layout == 12 ? ['12'] : layout.split('+'));
 	});
 
-	$(document).on('click', '.hu-layout-custom-btn', function (event) {
-		event.preventDefault();
-		const $custom = $(this).closest('.hu-column-list').find('.hu-layout-custom');
-		$custom.slideToggle(300);
-	});
-
-	$(document).on('click', '.hu-layout-custom-apply', function (event) {
+	delegate(document, 'click', '.hu-layout-custom-apply', (event, button) => {
 		event.preventDefault();
 
-		let $that = $(this).closest('.hu-column-list').find('.hu-layout-custom-btn');
+		const list = button.closest('.hu-column-list');
+		const customButton = list.querySelector('.hu-layout-custom-btn');
+		const pattern = button.closest('div').querySelector('input').value || '12';
+		const sizes = pattern.split('+');
+		const total = sizes.reduce((sum, size) => sum + Number(size), 0);
 
-		let $parent = $that.closest('.hu-column-list'),
-			$gparent = $that.closest('.hu-layout-section'),
-			oldLayoutData = $parent.find('.active').data('layout'),
-			oldLayout = ['12'],
-			layoutData = (column = $(this).closest('div').find('input').val() || '12'),
-			newLayout = ['12'];
-
-		if (oldLayoutData != 12) {
-			oldLayout = oldLayoutData.split('+');
-		}
-
-		if (layoutData != 12) {
-			newLayout = layoutData.split('+');
-		}
-
-		var colArray = column.split('+');
-
-		var colSum = colArray.reduce(function (a, b) {
-			return Number(a) + Number(b);
-		});
-
-		if (colSum == 12) {
-			newLayout = colArray;
-			$that.data('layout', column).attr('data-layout', column);
-		} else {
+		if (total !== 12) {
 			alert('Invalid grid pattern!');
 			return;
 		}
 
-		var col = [],
-			colAttr = [];
-
-		$gparent.find('.hu-layout-column').each(function (i, val) {
-			col[i] = $(this).html();
-			var colData = $(this).data();
-
-			if (typeof colData == 'object') {
-				colAttr[i] = $(this).data();
-			} else {
-				colAttr[i] = '';
-			}
-		});
-
-		$parent.find('.active').removeClass('active');
-		$that.addClass('active');
-
-		let new_item = '';
-
-		for (let i = 0; i < newLayout.length; i++) {
-			let dataAttr = '';
-			if (typeof colAttr[i] != 'object') {
-				colAttr[i] = {
-					grid_size: newLayout[i].trim(),
-					column_type: 0,
-					name: 'none',
-				};
-			} else {
-				colAttr[i].grid_size = newLayout[i].trim();
-			}
-			$.each(colAttr[i], function (index, value) {
-				dataAttr += ' data-' + index + '="' + value + '"';
-			});
-
-			new_item += '<div class="hu-layout-column col-' + newLayout[i].trim() + '" ' + dataAttr + '>';
-			if (col[i]) {
-				new_item += col[i];
-			} else {
-				new_item += '<div class="hu-column">';
-				new_item += '<span class="hu-column-title">none</span>';
-				new_item +=
-					'<a class="hu-column-options" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="3" fill="none"><path fill="#020B53" fill-rule="evenodd" d="M3 1.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm6 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM13.5 3a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd" opacity=".4"/></svg></a>';
-				new_item += '</div>';
-			}
-			new_item += '</div>';
-		}
-
-		$old_column = $gparent.find('.hu-layout-column');
-		$gparent.find('[data-hu-layout-row]').append(new_item);
-
-		$old_column.remove();
-		jqueryUiLayout();
-
-		Joomla.HelixToaster.success(
-			'Grid pattern updated to <strong>' + newLayout.join('+') + '</strong>',
-			'Layout Settings',
-		);
-		updateLayoutField();
-
-		$that.closest('.hu-column-list').slideUp(300);
+		customButton.setAttribute('data-layout', pattern);
+		setActiveLayout(list, customButton);
+		applyGrid(button.closest('.hu-layout-section'), sizes);
+		hide(list);
 	});
 
-	// add row
-	$(document).on('click', '.hu-add-row', function (event) {
+	/* ------------------------------------------------------------------ */
+	/* Rows                                                                */
+	/* ------------------------------------------------------------------ */
+
+	delegate(document, 'click', '.hu-add-row', (event, button) => {
 		event.preventDefault();
 
-		var $parent = $(this).closest('.hu-layout-section'),
-			$rowClone = $('#hu-layout-section').clone(true);
+		const row = document.getElementById('hu-layout-section').cloneNode(true);
 
-		$rowClone.addClass('hu-layout-section').removeAttr('id');
-		$($rowClone).insertAfter($parent);
+		row.classList.add('hu-layout-section');
+		row.removeAttribute('id');
+		button.closest('.hu-layout-section').after(row);
 
-		jqueryUiLayout();
+		initSortables();
 		Joomla.HelixToaster.success('New row added!', 'Layout Settings');
 		updateLayoutField();
 	});
 
-	// Remove Row
-	$(document).on('click', '.hu-remove-row', function (event) {
+	/** Delete the row whose Row Options modal is open. */
+	delegate(document, 'click', '.hu-settings-delete-row', event => {
 		event.preventDefault();
 
-		if (confirm('Click Ok button to delete Row, Cancel to leave.') == true) {
-			$(this)
-				.closest('.hu-layout-section')
-				.slideUp(500, function () {
-					$(this).remove();
-					Joomla.HelixToaster.error('Row is removed!', 'Layout Settings');
-					updateLayoutField();
-				});
-		}
-	});
+		const row = builder.querySelector('.hu-layout-section.row-active');
 
-	// Remove Media
-	$(document).on('click', '.remove-media', function () {
-		var $that = $(this),
-			$imgParent = $that.parent('.media');
+		if (!row || !confirm('Click Ok button to delete Row, Cancel to leave.')) return;
 
-		$imgParent.find('img.media-preview').each(function () {
-			$(this).attr('src', '');
-			$(this).closest('.image-preview').css('display', 'none');
-		});
+		row.remove();
+		closeSettings();
+		Joomla.HelixToaster.error('Row is removed!', 'Layout Settings');
 		updateLayoutField();
 	});
-
-	// Generate Layout JSON
-	function getGeneratedLayout() {
-		var item = [];
-		$('#hu-layout-builder')
-			.find('.hu-layout-section')
-			.each(function (index) {
-				var $row = $(this),
-					rowIndex = index,
-					rowObj = $row.data();
-				delete rowObj.sortableItem;
-
-				var activeLayout = $row.find('.hu-column-layout.active'),
-					layoutArray = activeLayout.data('layout'),
-					layout = 12;
-
-				if (layoutArray != 12) {
-					layout = layoutArray.split(',').join('');
-				}
-
-				item[rowIndex] = {
-					type: 'row',
-					layout: layout,
-					settings: rowObj,
-					attr: [],
-				};
-
-				// Find Column Elements
-				$row.find('.hu-layout-column').each(function (index) {
-					var $column = $(this),
-						colIndex = index,
-						colObj = $column.data();
-					delete colObj.sortableItem;
-
-					item[rowIndex].attr[colIndex] = {
-						type: 'sp_col',
-						settings: colObj,
-					};
-				});
-			});
-
-		return item;
-	}
-
-	function updateLayoutField() {
-		$('#layout').val(JSON.stringify(getGeneratedLayout())).trigger('change');
-	}
 });

@@ -1,409 +1,205 @@
 /**
- * Tree sortable jQuery library using jQuery UI sortable.
+ * Menu tree sorting on SortableJS.
+ *
+ * The tree is a flat list; each branch has a `hu-branch-level-N` class.
+ * Dragging up or down moves a branch (with its children); dragging left or
+ * right changes its level, within the levels its neighbours allow.
  *
  * @package TreeSortable
  * @license MIT
  * @author Sajeeb Ahamed
  */
 
-var $ = jQuery;
-
-var treeSortable = {
-	options: {
+(() => {
+	const options = {
 		depth: 20,
 		treeSelector: '#hu-menu-tree',
 		branchSelector: '.hu-menu-tree-branch',
 		dragHandlerSelector: '.hu-branch-drag-handler',
-		placeholderName: 'hu-sortable-placeholder',
 		childrenBusSelector: '.hu-menu-children-bus',
 		levelPrefix: 'hu-branch-level',
 		maxLevel: 10,
-	},
-	run() {
-		this.jQuerySupplements();
-		this.initSorting();
-	},
-	getTreeEdge() {
-		return $(treeSortable.options.treeSelector).offset().left;
-	},
-	pxToNumber(str) {
-		return new RegExp('px$', 'i').test(str) ? str.slice(0, -2) * 1 : 0;
-	},
-	numberToPx(num) {
-		return `${num}px`;
-	},
-	jQuerySupplements() {
-		const { options } = treeSortable;
-		const { levelPrefix } = options;
-		$.fn.extend({
-			getBranchLevel() {
-				if ($(this).length === 0) return 0;
+	};
 
-				const { depth } = options;
-				const margin = $(this).css('margin-left');
+	const GEAR_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"></path><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"></path></svg>`;
+	const MEGA_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-grid-1x2" viewBox="0 0 16 16"><path d="M6 1H1v14h5V1zm9 0h-5v5h5V1zm0 9v5h-5v-5h5zM0 1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V1zm1 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1h-5z"></path></svg>`;
 
-				return /(px)|(em)|(rem)$/i.test(margin)
-					? Math.floor(margin.slice(0, -2) / depth) + 1
-					: Math.floor(margin / depth) + 1;
-			},
-			updateBranchLevel(current, prev = null) {
-				return this.each(function () {
-					prev = prev || $(this).getBranchLevel() || 1;
-					$(this)
-						.removeClass(levelPrefix + '-' + prev)
-						.addClass(levelPrefix + '-' + current);
-				});
-			},
-			shiftBranchLevel(dx) {
-				return this.each(function () {
-					let level = $(this).getBranchLevel() || 1,
-						newLevel = level + dx;
-					$(this)
-						.removeClass(levelPrefix + '-' + level)
-						.addClass(levelPrefix + '-' + newLevel);
-				});
-			},
-			getParent() {
-				const {
-					options: { branchSelector },
-				} = treeSortable;
-				const level = $(this).getBranchLevel() || 1;
-				let $prev = $(this).prev(branchSelector);
+	const isBranch = element => Boolean(element && element.matches && element.matches(options.branchSelector));
 
-				while ($prev.length && $prev.getBranchLevel() >= level) {
-					$prev = $prev.prev(branchSelector);
-				}
+	/** Level of a branch (1-based), from its level class; 0 when there is no branch. */
+	function getLevel(branch) {
+		if (!isBranch(branch)) return 0;
 
-				return $prev;
-			},
-			getRootChildren() {
-				const {
-					options: { branchSelector, treeSelector, levelPrefix },
-				} = treeSortable;
+		const match = branch.className.match(new RegExp(`${options.levelPrefix}-(\\d+)`));
 
-				return $(treeSelector).children(
-					`${branchSelector}.${levelPrefix}-1`
-				);
-			},
-			getChildren() {
-				const {
-					options: { branchSelector },
-				} = treeSortable;
-				let $children = $();
+		if (match) return Number(match[1]);
 
-				this.each(function () {
-					let level = $(this).getBranchLevel() || 1,
-						$next = $(this).next(branchSelector);
+		return Math.floor(parseFloat(getComputedStyle(branch).marginLeft || 0) / options.depth) + 1;
+	}
 
-					while ($next.length && $next.getBranchLevel() > level) {
-						$children = $children.add($next);
-						$next = $next.next(branchSelector);
-					}
-				});
+	function setLevel(branch, level) {
+		branch.className = branch.className.replace(new RegExp(`\\s*${options.levelPrefix}-\\d+`, 'g'), '');
+		branch.classList.add(`${options.levelPrefix}-${level}`);
+	}
 
-				return $children;
-			},
-			nextBranch() {
-				return $(this).next();
-			},
-			prevBranch() {
-				return $(this).prev();
-			},
-			nextSibling() {
-				const {
-					options: { branchSelector },
-				} = treeSortable;
+	const nextBranch = branch => (isBranch(branch.nextElementSibling) ? branch.nextElementSibling : null);
+	const prevBranch = branch => (isBranch(branch.previousElementSibling) ? branch.previousElementSibling : null);
 
-				let level = $(this).getBranchLevel() || 1,
-					$next = $(this).next(branchSelector),
-					nextLevel = $next.getBranchLevel();
+	/** The branches nested under `branch` (the following deeper ones). */
+	function getChildren(branch) {
+		const level = getLevel(branch);
+		const children = [];
+		let next = nextBranch(branch);
 
-				while ($next.length && nextLevel > level) {
-					$next = $next.next(branchSelector);
-					nextLevel = $next.getBranchLevel();
-				}
+		while (next && getLevel(next) > level) {
+			children.push(next);
+			next = nextBranch(next);
+		}
 
-				return +nextLevel === +level ? $next : $();
-			},
-			prevSibling() {
-				const {
-					options: { branchSelector },
-				} = treeSortable;
-				let level = $(this).getBranchLevel() || 1,
-					$prev = $(this).prev(branchSelector),
-					prevLevel = $prev.getBranchLevel();
+		return children;
+	}
 
-				while ($prev.length && prevLevel > level) {
-					$prev = $prev.prev(branchSelector);
-					prevLevel = $prev.getBranchLevel();
-				}
+	/** The closest earlier branch with a lower level, or null for a root branch. */
+	function getParent(branch) {
+		const level = getLevel(branch);
+		let prev = prevBranch(branch);
 
-				return prevLevel === level ? $prev : $();
-			},
-			getSiblings(level = null) {
-				const { options: {treeSelector, branchSelector}} = treeSortable;
-					level = level || $(this).getBranchLevel();
+		while (prev && getLevel(prev) >= level) {
+			prev = prevBranch(prev);
+		}
 
-				let $siblings = [],
-					$branches = $(`${treeSelector} > ${branchSelector}`),
-					$self = this;
+		return prev;
+	}
 
-				$branches.length && $branches.each(function () {
-					let branchLevel = $(this).getBranchLevel();
+	const getTree = () => document.querySelector(options.treeSelector);
 
-					if (+branchLevel === +level && $self[0] !== $(this)[0]) {
-						$siblings.push($(this));
-					}
-				});
+	function getRootChildren() {
+		const tree = getTree();
+		return tree ? [...tree.children].filter(branch => isBranch(branch) && getLevel(branch) === 1) : [];
+	}
 
-				return $siblings;
-			}
-		});
-	},
+	/** The next branch on the same level, skipping children; null if none. */
+	function nextSibling(branch) {
+		const level = getLevel(branch);
+		let next = nextBranch(branch);
 
-	updateBranchZIndex() {
-		const { options: { treeSelector, branchSelector }} = treeSortable;
-		const $branches = $(`${treeSelector} > ${branchSelector}`);
-		const length = $branches.length;
+		while (next && getLevel(next) > level) {
+			next = nextBranch(next);
+		}
 
-		$branches.length &&
-			$branches.each(function (index) {
-				$(this).css('z-index', Math.max(1, length - index));
-			});
-	},
-	initSorting() {
-		const {
-			options,
-			pxToNumber,
-			numberToPx,
-			updateBranchZIndex,
-		} = treeSortable;
-		const {
-			treeSelector,
-			dragHandlerSelector,
-			placeholderName,
-			childrenBusSelector,
-		} = options;
+		return next && getLevel(next) === level ? next : null;
+	}
 
-		/** Store the current level, for sorting the item after stop dragging. */
-		let currentLevel = 1,
-			originalLevel = 1,
-			childrenBus = null,
-			helperHeight = 0,
-			originalIndex = 0,
-			aliasExists = false;
+	/** All other branches on a level. */
+	function getSiblings(branch, level = getLevel(branch)) {
+		const tree = getTree();
+		return tree ? [...tree.children].filter(other => isBranch(other) && other !== branch && getLevel(other) === level) : [];
+	}
 
-		/** Update the placeholder branch level by new level. */
-		const updatePlaceholder = (placeholder, level) => {
-			placeholder.updateBranchLevel(level);
+	function run() {
+		const tree = getTree();
+
+		if (!tree || !window.Sortable || tree.dataset.huTreeSortable) return;
+
+		tree.dataset.huTreeSortable = '1';
+
+		let item = null;
+		let bus = null;
+		let currentLevel = 1;
+		let originalLevel = 1;
+		let originalIndex = 0;
+		let aliasExists = false;
+
+		const paths = () => tree.querySelectorAll(`${options.branchSelector} .hu-menu-branch-path`);
+
+		/** Pick the level from how far right the dragged copy is. */
+		const onPointerMove = () => {
+			const ghost = document.querySelector('.sortable-fallback');
+
+			if (!item || !ghost) return;
+
+			const prev = prevBranch(item);
+			const next = nextBranch(item);
+			const upper = prev ? Math.min(getLevel(prev) + 1, options.maxLevel) : 1;
+			const lower = Math.min(next ? getLevel(next) : 1, upper);
+			const position = Math.max(0, ghost.getBoundingClientRect().left - tree.getBoundingClientRect().left);
+
+			let level = Math.floor(position / options.depth) + 1;
+			level = Math.max(lower, Math.min(level, upper));
+
+			// Two items with the same alias can't share a level.
+			const alias = item.dataset.alias;
+			aliasExists = getSiblings(item, level).some(other => other.dataset.alias === alias);
+
+			if (aliasExists || level === currentLevel) return;
+
+			setLevel(item, level);
 			currentLevel = level;
 		};
 
-		/** Check if we can swap items vertically for branch with children */
-		const canSwapItems = ui => {
-			let offset = ui.helper.offset(),
-				height = offset.top + helperHeight,
-				nextBranch = ui.placeholder.nextBranch(),
-				nextBranchOffset = nextBranch.offset() || 0,
-				nextBranchHeight = nextBranch.outerHeight();
+		Sortable.create(tree, {
+			handle: options.dragHandlerSelector,
+			draggable: options.branchSelector,
+			animation: 150,
+			forceFallback: true,
+			fallbackOnBody: true,
+			ghostClass: 'hu-sortable-placeholder',
 
-			return height > nextBranchOffset.top + nextBranchHeight / 3;
-		};
+			onStart(event) {
+				item = event.item;
+				bus = item.querySelector(options.childrenBusSelector);
+				originalLevel = currentLevel = getLevel(item);
+				originalIndex = [...tree.children].indexOf(item);
+				aliasExists = false;
 
-		$(treeSelector).sortable({
-			handle: dragHandlerSelector,
-			placeholder: placeholderName,
-			items: '> *',
-			start(_, ui) {
-				/**
-				 * Synchronize the placeholder level with the item's level.
-				 *
-				 */
-				const level = ui.item.getBranchLevel();
-				ui.placeholder.updateBranchLevel(level);
-				originalIndex = ui.item.index();
+				// Children travel inside the dragged branch.
+				getChildren(item).forEach(child => bus.appendChild(child));
 
-				/**  Store the original level. */
-				originalLevel = level;
-
-				/** Fill the children bus with the children. */
-				childrenBus = ui.item.find(childrenBusSelector);
-				childrenBus.append(ui.item.next().getChildren());
-
-				/**
-				 * Calculate the placeholder width & height according to the
-				 * helper's width & height respectively.
-				 */
-				let height = childrenBus.outerHeight();
-				let placeholderMarginTop = ui.placeholder.css('margin-top');
-
-				height += height > 0 ? pxToNumber(placeholderMarginTop) : 0;
-				height += ui.helper.outerHeight();
-				helperHeight = height;
-				height -= 2;
-
-				let width =
-					ui.helper.find(dragHandlerSelector).outerWidth() - 2;
-				ui.placeholder.css({ height, width });
-
-				const tmp = ui.placeholder.nextBranch();
-				tmp.css('margin-top', numberToPx(helperHeight));
-				ui.placeholder.detach();
-				$(this).sortable('refresh');
-				ui.item.after(ui.placeholder);
-				tmp.css('margin-top', 0);
-
-				// Set the current level by the initial item's level.
-				currentLevel = level;
-				$('.hu-menu-tree-branch .hu-menu-branch-path').hide();
-				
+				paths().forEach(path => (path.style.display = 'none'));
+				document.addEventListener('pointermove', onPointerMove);
 			},
-			sort(_, ui) {
-				const { options, getTreeEdge } = treeSortable;
-				const { depth, maxLevel } = options;
-				let treeEdge = getTreeEdge(),
-					offset = ui.helper.offset(),
-					currentBranchEdge = offset.left,
-					lowerBound = 1,
-					upperBound = maxLevel;
 
-				/**
-				 * Calculate the upper bound. The upper bound would be,
-				 * the minimum value between the
-				 * (previous branch level + 1) and the maxLevel.
-				 */
-				let prevBranch = ui.placeholder.prevBranch();
-				prevBranch =
-					prevBranch[0] === ui.item[0]
-						? prevBranch.prevBranch()
-						: prevBranch;
+			onEnd() {
+				document.removeEventListener('pointermove', onPointerMove);
 
-				let prevBranchLevel = prevBranch.getBranchLevel();
-				upperBound = Math.min(prevBranchLevel + 1, maxLevel);
-
-				/**
-				 * Calculate the lower bound. The lower bound would be,
-				 * the maximum value between the
-				 * Next Sibling Level and 1
-				 */
-				let nextSibling = ui.placeholder.nextSibling(),
-					placeholderLevel = 1;
-
-				if (nextSibling.length) {
-					placeholderLevel = ui.placeholder.getBranchLevel() || 1;
-				} else {
-					/**
-					 * If no sibling found then
-					 * the placeholder level would be the next branch's level.
-					 */
-					let nextBranch = ui.placeholder.nextBranch();
-					placeholderLevel = nextBranch.getBranchLevel() || 1;
-				}
-
-				lowerBound = Math.max(1, placeholderLevel);
-
-				/**
-				 * Calculate the position which is the current helper offset left
-				 * minus the tree parent's offset left.
-				 * Find the changed level by dividing the position by depth value.
-				 *
-				 * The final valid changed level would be a value
-				 * between upper and lower bound inclusive.
-				 */
-				let position = Math.max(0, currentBranchEdge - treeEdge);
-				let newLevel = Math.floor(position / depth) + 1;
-				newLevel = Math.max(lowerBound, Math.min(newLevel, upperBound));
-
-				if (canSwapItems(ui)) {
-					let nextBranch = ui.placeholder.nextBranch();
-
-					if (nextBranch.getChildren().length) {
-						newLevel = nextBranch.getBranchLevel() + 1;
-					}
-
-					nextBranch.after(ui.placeholder);
-					$(this).sortable('refreshPositions');
-				}
-
-				let $siblings = ui.item.getSiblings(newLevel);
-				
-				if ($siblings.length > 0) {
-					let itemAlias = ui.item.data('alias');
-					aliasExists = $siblings.some($item => $item.data('alias') === itemAlias);
-
-					if (aliasExists) {
-						return;
-					}
-				}
-
-				/** Update the placeholder position by the changed level. */
-				updatePlaceholder(ui.placeholder, newLevel);
-			},
-			change(_, ui) {
-				let prevBranch = ui.placeholder.prevBranch();
-
-				prevBranch = prevBranch[0] === ui.item[0]
-					? prevBranch.prevBranch()
-					: prevBranch;
-
-				/**
-				 * After changing branches bound the placeholder to the
-				 * changed boundary.
-				 */
-				let prevBranchLevel = prevBranch.getBranchLevel() || 1;
-
-				if (prevBranch.length) {
-					ui.placeholder.detach();
-					let children = prevBranch.getChildren();
-					if (children && children.length) prevBranchLevel += 1;
-					ui.placeholder.updateBranchLevel(prevBranchLevel);
-					prevBranch.after(ui.placeholder);
-				}
-			},
-			stop(_, ui) {
-				$('.hu-menu-tree-branch:not(.hu-branch-level-1) .hu-menu-branch-path').show();
-
-				/**
-				 * If the changing item's alias exits to the newly updating
-				 * level then shows error message for the users.
-				 */
 				if (aliasExists) {
-					Joomla.HelixToaster.error(`Can't set the same alias <strong>${ui.item.data('alias')}</strong> in the same menu level!`, 'Error');
+					Joomla.HelixToaster.error(`Can't set the same alias <strong>${item.dataset.alias}</strong> in the same menu level!`, 'Error');
 				}
-				/**
-				 * Place the children after the sorted item,
-				 * and clear the children bus.
-				 */
-				const children = childrenBus.children().insertAfter(ui.item);
-				childrenBus.empty();
 
-				/** Update the item by currently changed level. */
-				ui.item.updateBranchLevel(currentLevel);
-				children.shiftBranchLevel(currentLevel - originalLevel);
+				// Put the children back after their branch, at their new level.
+				const children = [...bus.children];
+				item.after(...children);
+				children.forEach(child => setLevel(child, getLevel(child) + currentLevel - originalLevel));
 
-				/**
-				 * Change the settings icons. If the new level is 1 then 
-				 * the icon would be the mega menu icon.
-				 * Otherwise, this is the cog/gear icon.
-				 */
-				const gearIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"></path><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"></path></svg>`;
-				const megaIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-grid-1x2" viewBox="0 0 16 16"><path d="M6 1H1v14h5V1zm9 0h-5v5h5V1zm0 9v5h-5v-5h5zM0 1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V1zm1 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1h-5z"></path></svg>`;
+				// Root branches open the mega menu; deeper ones their settings.
+				const settingsIcon = item.querySelector('.hu-branch-tools-list-megamenu');
+				if (settingsIcon) settingsIcon.innerHTML = currentLevel > 1 ? GEAR_ICON : MEGA_ICON;
 
-				ui.item.find('.hu-branch-tools-list-megamenu')
-					.html(currentLevel > 1 ? gearIcon : megaIcon);
+				tree.querySelectorAll(`${options.branchSelector}:not(.${options.levelPrefix}-1) .hu-menu-branch-path`).forEach(
+					path => (path.style.display = '')
+				);
 
-				/**
-				 * Trigger `sortCompleted` event if the level changed or index changed.
-				 * i.e. if the items sorted then trigger the event.
-				 */
-				if (currentLevel !== originalLevel || originalIndex !== ui.item.index()) {
-					$(document).trigger('sortCompleted', [ui]);
+				if (currentLevel !== originalLevel || originalIndex !== [...tree.children].indexOf(item)) {
+					document.dispatchEvent(new CustomEvent('sortCompleted', { detail: { item } }));
 				}
 
 				Joomla.utils.calculateSiblingDistances();
+
+				item = null;
+				bus = null;
 			},
 		});
-	},
-};
+	}
 
-Joomla.sortable = treeSortable;
+	Joomla.sortable = {
+		options,
+		run,
+		getLevel,
+		setLevel,
+		getChildren,
+		getParent,
+		getRootChildren,
+		nextSibling,
+		getSiblings,
+	};
+})();

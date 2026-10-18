@@ -4,103 +4,107 @@
  * @since   2.0.0
  */
 
-jQuery(function ($) {
+document.addEventListener('DOMContentLoaded', () => {
+	const { delegate, request, param, serialize } = Joomla.utils;
 	const config = Joomla.getOptions('meta') || {};
-	var $itemModal = null,
-		$itemFrame = null,
-		menuType = $('select[name=menu]').val() || 'mainmenu';
+	const menuSelect = document.querySelector('select[name=menu]');
+	const container = document.getElementById('hu-menu-builder-container');
 
-	(function initialize() {
-		fetchMenuItems(menuType);
-		changeMenuType();
+	if (!container) return;
 
-		handleAddNewMenu();
-		removeEventListeners();
-	})();
+	let menuType = (menuSelect && menuSelect.value) || 'mainmenu';
 
-	function removeEventListeners() {
-		$(document).off('click', '.hu-add-menu-item');
+	const helixUrl = (action, extra = '') =>
+		`${config.base}/administrator/index.php?option=com_ajax&helix=ultimate&request=task&action=${action}${extra}&helix_id=${window.helixUltimateStyleId}`;
+
+	const branchOf = element => element.closest('.hu-menu-tree-branch');
+	const itemIdOf = element => Number((branchOf(element) || {}).dataset?.itemid || 0);
+
+	/* ------------------------------------------------------------------ */
+	/* Loading the tree                                                    */
+	/* ------------------------------------------------------------------ */
+
+	/** Fetch the menu items of a menu type and render the tree. */
+	async function fetchMenuItems(type) {
+		try {
+			const response = await request(helixUrl('getMenuItems', `&menutype=${encodeURIComponent(type)}`));
+
+			if (response.status) {
+				container.innerHTML = response.data;
+				Joomla.sortable.run();
+			}
+		} catch (error) {
+			console.error('Could not load the menu items', error);
+		}
+
+		Joomla.reloadPreview();
+		Joomla.utils.calculateSiblingDistances();
 	}
-	/**
-	 * Rebuild menu items tree
-	 */
-	function rebuildMenu() {
-		const url = `${config.base}/administrator/index.php?option=com_ajax&helix=ultimate&request=task&action=rebuildMenu&helix_id=${helixUltimateStyleId}`;
-		$.ajax({
-			method: 'GET',
-			url,
-			success(res) {},
-			error(err) {
-				alert('Rebuild menu failed with: ' + err.message);
-			},
-		});
+
+	/** Rebuild the menu items tree (nested set) after a change. */
+	async function rebuildMenu() {
+		try {
+			await request(helixUrl('rebuildMenu'), { responseType: 'text' });
+		} catch (error) {
+			alert('Rebuild menu failed with: ' + error.message);
+		}
 	}
 
-	/** User Defined functions. */
-	function changeMenuType() {
-		const $menuTypeField = $('select[name=menu]');
-		$menuTypeField.on('change', function () {
-			menuType = $(this).val();
+	if (menuSelect) {
+		menuSelect.addEventListener('change', () => {
+			menuType = menuSelect.value;
 			fetchMenuItems(menuType);
 		});
 	}
 
-	/**
-	 * Fetch the menu items for a menu type using ajax and attach the
-	 * HTML contents to the panel.
-	 */
-	function fetchMenuItems(menuType) {
-		const url = `${config.base}/administrator/index.php?option=com_ajax&helix=ultimate&request=task&action=getMenuItems&menutype=${menuType}&helix_id=${helixUltimateStyleId}`;
-		$.ajax({
-			type: 'GET',
-			url,
-			beforeSend() {
-				/** Remove click event listener before a new menu item fetch request. */
-				$(document).off('click', '.hu-branch-tools .hu-branch-tools-icon');
-			},
-			success(response) {
-				response = response && JSON.parse(response);
+	fetchMenuItems(menuType);
 
-				if (response.status) {
-					$('#hu-menu-builder-container').html(response.data);
-					removeEventListeners();
+	/* ------------------------------------------------------------------ */
+	/* Branch toolbar                                                      */
+	/* ------------------------------------------------------------------ */
 
-					/** After successful tree generation run the sortable. */
-					Joomla.sortable.run();
-					onAfterSort();
-					openToolbar();
-					handleEditMenuItem();
-					handleDeleteMenuItem();
-					openMegaMenuModal();
-				}
-			},
-			complete() {
-				Joomla.reloadPreview();
-				Joomla.utils.calculateSiblingDistances();
-			},
+	function closeToolbar() {
+		document.querySelectorAll('.hu-branch-tools .hu-branch-tools-list.active').forEach(list => {
+			list.classList.remove('active');
+			list.style.display = 'none';
 		});
 	}
 
-	function removeEventListeners() {
-		$(document).off('click', '.hu-branch-tools .hu-branch-tools-list-delete');
-		$(document).off('click', '.hu-branch-tools .hu-branch-tools-list-edit');
-		$(document).off('click', '.hu-branch-tools .hu-branch-tools-list-megamenu');
-	}
+	delegate(document, 'click', '.hu-branch-tools .hu-branch-tools-icon', (event, icon) => {
+		event.preventDefault();
 
-	/** Handle open megamenu options */
-	function openMegaMenuModal() {
-		$(document).on('click', '.hu-branch-tools .hu-branch-tools-list-megamenu', async function (e) {
-			e.preventDefault();
-			closeToolbar();
+		const list = icon.nextElementSibling;
 
-			const $branch = $(this).closest('.hu-menu-tree-branch');
-			const parent = $branch.data('parent') || 1;
-			const itemId = $branch.data('itemid') || 0;
+		document.querySelectorAll('.hu-branch-tools .hu-branch-tools-list.active').forEach(other => {
+			if (other !== list) {
+				other.classList.remove('active');
+				other.style.display = '';
+			}
+		});
 
-			const response = await getMegaMenuBodyHTML(itemId);
+		if (list) {
+			const opening = !list.classList.contains('active');
+			list.classList.toggle('active', opening);
+			list.style.display = opening ? 'block' : 'none';
+		}
+	});
+
+	/* ------------------------------------------------------------------ */
+	/* Mega menu / settings modal                                          */
+	/* ------------------------------------------------------------------ */
+
+	delegate(document, 'click', '.hu-branch-tools .hu-branch-tools-list-megamenu', async (event, link) => {
+		event.preventDefault();
+		closeToolbar();
+
+		const branch = branchOf(link);
+		const parent = branch.dataset.parent || 1;
+
+		try {
+			const response = await request(helixUrl('generateMegaMenuBody', `&id=${itemIdOf(link)}`));
 
 			if (response.status) {
-				$(document).helixUltimateMegamenuModal({
+				Joomla.helixModal.megamenu({
 					title: parent == '1' ? 'Mega Menu' : 'Settings',
 					className: 'hu-mega-menu-builder',
 					targetType: 'id',
@@ -110,371 +114,218 @@ jQuery(function ($) {
 
 				Joomla.helixMegaMenu.run();
 			}
-		});
-	}
+		} catch (error) {
+			Joomla.HelixToaster.error('Something went wrong!', 'Error');
+		}
+	});
 
-	/** Get Mega Menu Body HTML using AJAX */
-	function getMegaMenuBodyHTML(itemId) {
-		return new Promise((resolve, reject) => {
-			const url = `${config.base}/administrator/index.php?option=com_ajax&helix=ultimate&request=task&action=generateMegaMenuBody&id=${itemId}&helix_id=${helixUltimateStyleId}`;
-			$.ajax({
-				method: 'GET',
-				url,
-				success(res) {
-					res = typeof res === 'string' && res.length > 0 ? JSON.parse(res) : false;
-					resolve(res);
-				},
-				error(err) {
-					reject(err);
-				},
+	/* ------------------------------------------------------------------ */
+	/* Delete                                                              */
+	/* ------------------------------------------------------------------ */
+
+	delegate(document, 'click', '.hu-branch-tools .hu-branch-tools-list-delete', async (event, link) => {
+		event.preventDefault();
+		closeToolbar();
+
+		if (!window.confirm('Are you sure to delete the item?')) return;
+
+		try {
+			await request(`${config.base}/administrator/index.php?option=com_menus&task=items.trash&cid[]=${itemIdOf(link)}`, {
+				responseType: 'text',
 			});
+			fetchMenuItems(menuType);
+		} catch (error) {
+			Joomla.HelixToaster.error('Something went wrong!', 'Error');
+		}
+
+		rebuildMenu();
+		Joomla.HelixToaster.error('Menu item has been successfully removed!', 'Success');
+	});
+
+	/* ------------------------------------------------------------------ */
+	/* Ordering and parents after sorting                                  */
+	/* ------------------------------------------------------------------ */
+
+	/** Save the order of a parent's branches (or the root branches). */
+	async function handleBranchOrdering(parent) {
+		const children = parent ? Joomla.sortable.getChildren(parent) : Joomla.sortable.getRootChildren();
+
+		if (!children.length) return;
+
+		const data = param({
+			cid: children.map(child => child.dataset.itemid),
+			order: children.map((child, index) => index + 1),
 		});
-	}
 
-	/** ======================= Delete Menu Item Section ================= */
-
-	/**
-	 * Handling deleting a menu item.
-	 */
-	function handleDeleteMenuItem() {
-		$(document).on('click', '.hu-branch-tools .hu-branch-tools-list-delete', function (e) {
-			e.preventDefault();
-			closeToolbar();
-
-			const itemId = $(this).closest('.hu-menu-tree-branch').data('itemid') || 0;
-			const confirm = window.confirm('Are you sure to delete the item?');
-
-			if (confirm) {
-				deleteMenuItem(itemId);
-			}
-		});
-	}
-
-	/**
-	 * Delete / add to trash a menu item.
-	 *
-	 * @param {int} itemId
-	 */
-	function deleteMenuItem(itemId) {
-		const url = `${config.base}/administrator/index.php?option=com_menus&task=items.trash&cid[]=${itemId}`;
-		$.ajax({
-			method: 'GET',
-			url,
-			success(res) {
-				fetchMenuItems(menuType);
-			},
-			error(err) {
-				Joomla.HelixToaster.error('Something went wrong!', 'Error');
-			},
-			complete() {
-				rebuildMenu();
-				Joomla.HelixToaster.error('Menu item has been successfully removed!', 'Success');
-			},
-		});
-	}
-
-	/**
-	 * Open the options menu on click the tool icon
-	 */
-	function openToolbar() {
-		$(document).on('click', '.hu-branch-tools .hu-branch-tools-icon', function (e) {
-			e.preventDefault();
-			let self = this;
-			$('.hu-branch-tools .hu-branch-tools-list').each(function () {
-				if ($(this).hasClass('active') && $(this)[0] !== $(self).next('.hu-branch-tools-list')[0]) {
-					$(this).removeClass('active');
-					$(this).fadeIn();
-				}
+		try {
+			await request(`${config.base}/administrator/index.php?option=com_menus&view=items&task=items.saveOrderAjax&tmpl=component`, {
+				method: 'POST',
+				data,
+				responseType: 'text',
 			});
-			$(this).next('.hu-branch-tools-list').toggleClass('active').fadeToggle();
-		});
-	}
-
-	/**
-	 * CLose toolbar
-	 */
-	function closeToolbar() {
-		$('.hu-branch-tools .hu-branch-tools-list').each(function () {
-			if ($(this).hasClass('active')) {
-				$(this).removeClass('active');
-				$(this).hide();
-			}
-		});
-	}
-
-	/**
-	 * Handling editing menu item.
-	 * This will open a modal for editing the item.
-	 */
-	function handleEditMenuItem() {
-		$(document).on('click', '.hu-branch-tools .hu-branch-tools-list-edit', function (e) {
-			e.preventDefault();
-			closeToolbar();
-
-			const itemId = $(this).closest('.hu-menu-tree-branch').data('itemid') || 0;
-			openEditMenuItemModal(itemId);
-		});
-	}
-
-	/**
-	 * Opening the modal for editing menu item.
-	 *
-	 * @param {int} itemId
-	 */
-	function openEditMenuItemModal(itemId) {
-		loadFrameModal({
-			title: 'Edit Menu Item',
-			targetType: 'id',
-			target: 'editMenuItem',
-			className: 'edit-menu-item',
-			frameUrl:
-				config.base +
-				'/administrator/index.php?option=com_menus&task=item.edit&tmpl=component&menutype=' +
-				menuType +
-				'&id=' +
-				itemId,
-		});
-		handleSaveMenuItem('edit-menu-item', 'item.save');
-	}
-
-	/**
-	 * Handle after sorting tasks. i.e. check parental changes and update
-	 * them to the database.
-	 */
-	function onAfterSort() {
-		$(document).on('sortCompleted', async function (e, ui) {
-			let itemId = ui.item.data('itemid'),
-				parentId = ui.item.data('parent'),
-				parent = ui.item.getParent(),
-				newParentId = parent.length ? parent.data('itemid') : 1;
-
-			if (+parentId !== +newParentId) {
-				const resp = await parentAdoption({
-					id: itemId,
-					parent: newParentId,
-				});
-
-				if (resp.status) {
-					ui.item.data('parent', newParentId).attr('data-parent', newParentId);
-					handleBranchOrdering(parent);
-				}
-				return;
-			}
-
-			handleBranchOrdering(parent, true);
-		});
-	}
-
-	/** Handle Menu Item ordering for a container. */
-	function handleBranchOrdering(parent, onlyOrder = false) {
-		let children = parent.length ? parent.getChildren() : $(document).getRootChildren();
-
-		if (children.length === 0) return;
-
-		const orderData = { cid: [], order: [] };
-		children.each(function (index) {
-			orderData.cid.push($(this).data('itemid'));
-			orderData.order.push(index + 1);
-		});
-
-		saveOrderAjax(orderData).then(function () {
 			Joomla.reloadPreview();
-		});
-	}
-
-	/** Change the parent id of an item after sorting. */
-	function parentAdoption(data) {
-		return new Promise(function (resolve, reject) {
-			const url = `${config.base}/administrator/index.php?option=com_ajax&helix=ultimate&request=task&action=parentAdoption&helix_id=${helixUltimateStyleId}`;
-			$.ajax({
-				method: 'POST',
-				url,
-				data,
-				success(response) {
-					response = typeof response === 'string' && response.length > 0 ? JSON.parse(response) : response;
-					resolve(response);
-				},
-				error(err) {
-					reject(err);
-				},
-			});
-		});
-	}
-
-	/** ======================= Add new menu item section ================= */
-
-	/** Save Menu Item's order by ajax request. */
-	function saveOrderAjax(data) {
-		return new Promise(function (resolve, reject) {
-			const url = `${config.base}/administrator/index.php?option=com_menus&view=items&task=items.saveOrderAjax&tmpl=component`;
-			$.ajax({
-				method: 'POST',
-				url,
-				data,
-				success(response) {
-					resolve(response);
-				},
-				error(err) {
-					reject(err);
-				},
-			});
-		});
-	}
-
-	/** Create a new menu */
-	function handleAddNewMenu() {
-		$(document).on('click', '.hu-add-menu-item', function (e) {
-			e.preventDefault();
-
-			loadFrameModal({
-				title: 'Add New Item',
-				targetType: 'id',
-				target: 'addNewMenuItem',
-				className: 'add-new-menu-item',
-				frameUrl:
-					config.base +
-					'/administrator/index.php?option=com_menus&task=item.add&tmpl=component&menutype=' +
-					menuType,
-			});
-			handleSaveMenuItem('add-new-menu-item', 'item.apply');
-		});
-	}
-
-	/** Create Frame modal and load the iframe on it. */
-	function loadFrameModal({ title, targetType, target, className, frameUrl }) {
-		$(document).helixUltimateFrameModal({
-			title,
-			targetType,
-			target,
-			className,
-			frameUrl,
-		});
-
-		/** Initialize variables */
-		$itemModal = $(`.hu-modal.${className}`);
-		$itemFrame = $itemModal.find('iframe');
-		$itemFrame.off('load');
-		$(document).off('click', `.hu-modal.${className} button.hu-save-btn`);
-		$itemModal.find('.hu-save-btn').prop('disabled', true);
-		handleCloseModal();
-	}
-
-	/** Close modal on clicking the cancel button. */
-	function handleCloseModal() {
-		$itemModal.find('.hu-cancel-btn').on('click', function (e) {
-			$(this).closeModal();
-		});
-	}
-
-	/** Show or hide the spinner */
-	function showSpinner(status) {
-		const $spinner = $('.hu-spinner');
-
-		if (status) {
-			if ($spinner.hasClass('hidden')) {
-				$spinner.removeClass('hidden');
-			}
-		} else {
-			if (!$spinner.hasClass('hidden')) {
-				$spinner.addClass('hidden');
-			}
+		} catch (error) {
+			console.error('Could not save the menu order', error);
 		}
 	}
 
-	/** Handle Save functionality. */
-	function handleSaveMenuItem(className, task = 'item.apply') {
-		const saveBtnSelector = `.hu-modal.${className} button.hu-save-btn`;
+	document.addEventListener('sortCompleted', async event => {
+		const { item } = event.detail;
+		const parent = Joomla.sortable.getParent(item);
+		const parentId = Number(item.dataset.parent);
+		const newParentId = parent ? Number(parent.dataset.itemid) : 1;
 
-		$itemFrame.on('load', function () {
-			const frameDoc = $itemFrame.contents();
-			$(saveBtnSelector).prop('disabled', false);
+		if (parentId !== newParentId) {
+			try {
+				const response = await request(helixUrl('parentAdoption'), {
+					method: 'POST',
+					data: { id: item.dataset.itemid, parent: newParentId },
+				});
 
-			/** If already the event attached then remove it first. */
-			$(document).off('click', saveBtnSelector);
+				if (response.status) {
+					item.setAttribute('data-parent', newParentId);
+					handleBranchOrdering(parent);
+				}
+			} catch (error) {
+				Joomla.HelixToaster.error('Something went wrong!', 'Error');
+			}
 
-			/** Handle the click event. Use debounce for preventing multiple click. */
-			$(document).on(
-				'click',
-				saveBtnSelector,
-				Joomla.utils.debounce(async function () {
-					const $form = $(frameDoc).find('form');
+			return;
+		}
 
-					// Set the task as `item.apply` for saving
-					$form.find('input[name=task]').val(task);
-					$form.find('input[name=task]').attr('value', task);
-					const isValidForm = frameDoc[0].formvalidator.isValid($form[0]);
+		handleBranchOrdering(parent);
+	});
 
-					showSpinner(true);
+	/* ------------------------------------------------------------------ */
+	/* Add / edit items in an iframe modal                                 */
+	/* ------------------------------------------------------------------ */
 
-					// If the form is valid then refetch the menu items
-					// & close the modal.
-					if (isValidForm) {
-						try {
-							const res = await submitItemForm($form);
-							const $responseElement = $('<div class="hu-menuitem-resp"></div>').hide().html(res);
-							const $alertHeading = $responseElement.find('.alert-heading');
-							const $alertMessage = $responseElement.find('.alert-message');
-							const respType = $alertHeading.length > 0 ? $alertHeading.text() : '';
-							const message = $alertMessage.length > 0 ? $alertMessage.text() : '';
+	const showSpinner = status => {
+		document.querySelectorAll('.hu-spinner').forEach(spinner => spinner.classList.toggle('hidden', !status));
+	};
 
-							/**
-							 * For Joomla!4 detect the system-message-container and inside the <noscript>
-							 * tag find if there any `.alert-danger` class.
-							 * If so then show the error.
-							 */
-							const $messageContainer = $responseElement.find('#system-message-container noscript');
-							const $element = $('<div></div>').hide().html($messageContainer.text());
-							const $errorAlert = $element.find('.alert-danger');
+	/** Read Joomla's message markup from a response page. */
+	function readResponse(html) {
+		const doc = new DOMParser().parseFromString(html, 'text/html');
+		const heading = doc.querySelector('.alert-heading');
+		const message = doc.querySelector('.alert-message');
+		const noscript = doc.querySelector('#system-message-container noscript');
 
-							if ($errorAlert.length > 0) {
-								Joomla.HelixToaster.error($messageContainer.html(), 'Error');
-								showSpinner(false);
-								return;
-							}
+		let error = '';
 
-							if (res && respType !== 'Error') {
-								fetchMenuItems(menuType);
-								$(this).closeModal();
+		if (noscript) {
+			const messages = new DOMParser().parseFromString(noscript.textContent, 'text/html');
 
-								if (task === 'item.apply') {
-									Joomla.HelixToaster.success('Menu item has been successfully added!', 'Saved');
-								} else if (task === 'item.save') {
-									Joomla.HelixToaster.success('Changes have been successfully saved!', 'Updated');
-								}
-							} else {
-								Joomla.HelixToaster.error(message, 'Error');
-							}
+			if (messages.querySelector('.alert-danger')) {
+				error = noscript.innerHTML;
+			}
+		}
 
-							showSpinner(false);
-						} catch (err) {
-							Joomla.HelixToaster.error('Something went wrong!', 'Error');
-							showSpinner(false);
-						}
+		return {
+			type: heading ? heading.textContent : '',
+			message: message ? message.textContent : '',
+			error,
+		};
+	}
+
+	/**
+	 * Open a menu item form in a modal and save it from the modal footer.
+	 *
+	 * @param {object} modal  { title, target, className, frameUrl }
+	 * @param {string} task   `item.apply` (new item) or `item.save` (edit)
+	 */
+	function openItemModal({ title, target, className, frameUrl }, task) {
+		Joomla.helixModal.frame({ title, targetType: 'id', target, className, frameUrl });
+
+		const modal = document.querySelector(`.hu-modal.${className}`);
+		const frame = modal.querySelector('iframe');
+		const saveButton = modal.querySelector('.hu-save-btn');
+
+		saveButton.disabled = true;
+
+		modal.querySelector('.hu-cancel-btn').addEventListener('click', () => Joomla.helixModal.close());
+
+		frame.addEventListener('load', () => {
+			saveButton.disabled = false;
+		});
+
+		saveButton.addEventListener(
+			'click',
+			Joomla.utils.debounce(async () => {
+				const frameDoc = frame.contentWindow.document;
+				const form = frameDoc.querySelector('form');
+
+				if (!form) return;
+
+				const taskInput = form.querySelector('input[name=task]');
+
+				if (taskInput) {
+					taskInput.value = task;
+					taskInput.setAttribute('value', task);
+				}
+
+				const validator = frameDoc.formvalidator || (frame.contentWindow.document && frame.contentWindow.document.formvalidator);
+
+				if (validator && !validator.isValid(form)) return;
+
+				showSpinner(true);
+
+				try {
+					const html = await request(form.getAttribute('action'), {
+						method: 'POST',
+						data: serialize(form),
+						responseType: 'text',
+					});
+					const response = readResponse(html);
+
+					if (response.error) {
+						Joomla.HelixToaster.error(response.error, 'Error');
+					} else if (html && response.type !== 'Error') {
+						fetchMenuItems(menuType);
+						Joomla.helixModal.close();
+
+						Joomla.HelixToaster.success(
+							task === 'item.apply' ? 'Menu item has been successfully added!' : 'Changes have been successfully saved!',
+							task === 'item.apply' ? 'Saved' : 'Updated'
+						);
 					} else {
-						showSpinner(false);
+						Joomla.HelixToaster.error(response.message, 'Error');
 					}
-				}, 500)
-			);
-		});
+				} catch (error) {
+					Joomla.HelixToaster.error('Something went wrong!', 'Error');
+				}
+
+				showSpinner(false);
+			}, 500)
+		);
 	}
 
-	/** Submit the menu item form using ajax and return promise. */
-	function submitItemForm($form) {
-		const url = $form.attr('action');
-		const data = $form.serializeArray();
+	delegate(document, 'click', '.hu-branch-tools .hu-branch-tools-list-edit', (event, link) => {
+		event.preventDefault();
+		closeToolbar();
 
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				method: 'POST',
-				url,
-				data,
-				success(res) {
-					resolve(res);
-				},
-				error(err) {
-					reject(err);
-				},
-			});
-		});
-	}
+		openItemModal(
+			{
+				title: 'Edit Menu Item',
+				target: 'editMenuItem',
+				className: 'edit-menu-item',
+				frameUrl: `${config.base}/administrator/index.php?option=com_menus&task=item.edit&tmpl=component&menutype=${encodeURIComponent(menuType)}&id=${itemIdOf(link)}`,
+			},
+			'item.save'
+		);
+	});
+
+	delegate(document, 'click', '.hu-add-menu-item', event => {
+		event.preventDefault();
+
+		openItemModal(
+			{
+				title: 'Add New Item',
+				target: 'addNewMenuItem',
+				className: 'add-new-menu-item',
+				frameUrl: `${config.base}/administrator/index.php?option=com_menus&task=item.add&tmpl=component&menutype=${encodeURIComponent(menuType)}`,
+			},
+			'item.apply'
+		);
+	});
 });

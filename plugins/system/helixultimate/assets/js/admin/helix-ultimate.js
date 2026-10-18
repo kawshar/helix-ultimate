@@ -6,1254 +6,858 @@
  */
 
 /**
- * From Joomla 4.0.4, Joomla! has changed their approach of checking
- * the field dependencies. This may be a problem of Joomla that they
- * Initialize the `Showon` functionalities too early (before the DOM Content Loaded)
- *
- * This hack reinitialize the `Showon` after the `DOMContentLoaded` event is triggered.
- *
- * @note This may be temporary, If Joomla update this and fix this as an issue
- * then this code block may not be required.
+ * Helix Ultimate customizer: panels, draft/save, devices and generic fields.
  */
-window.addEventListener('DOMContentLoaded', () => {
-    if (typeof Joomla.Showon !== 'undefined' && typeof Joomla.Showon.initialise !== 'undefined') {
-        Joomla.Showon.initialise(document);
-    }
-});
-
-jQuery(function ($) {
-    'use strict';
-
-    var settings = Joomla.getOptions('data') || {};
-    let meta = Joomla.getOptions('meta') || {};
-    const storage = localStorage || window.localStorage;
-    let delayTimeout = null;
-
-    Joomla.initColorPicker = function (selector, options = {}) {
-        const defaults = {
-            animationSpeed: 50,
-            animationEasing: 'swing',
-            control: 'hue',
-            position: 'bottom',
-            theme: 'bootstrap',
-            keywords: 'transparent, initial, inherit',
-            letterCase: 'uppercase',
-        };
-
-        $(selector).each(function () {
-            $(this).minicolors({ ...defaults, ...options });
-        });
-    };
-
-    /** In case of chosen multi-select not working.  */
-    // $('.form-select[multiple]').chosen({ width: '100%' }); @todo in Joomla 6 crate issue
-
-    /**
-     * Positioning the toolbar of its previous location.
-     */
-    const initialToolbarPosition = () => {
-        let position = storage.getItem('toolbarPosition') || {};
-        position = typeof position === 'string' && position.length > 0 ? JSON.parse(position) : false;
-
-        let $huContainer = $('.hu-container'),
-            $huSidebar = $('#hu-options-panel'),
-            containerWidth = $huContainer.width(),
-            sidebarWidth = $huSidebar.width(),
-            gap = 20;
-
-        if (position.left + sidebarWidth > containerWidth) {
-            position.left = containerWidth - sidebarWidth - gap;
-        } else if (position.left < 0) {
-            position.left = gap;
-        }
-
-        if (position) {
-            $('.hu-options-core').css({
-                left: position.left + 'px',
-                top: position.top + 'px',
-            });
-        }
-        $('.hu-options-core').show();
-    };
-
-    /**
-     * Listen the resize event and re positioning the toolbar from
-     * storage position.
-     */
-    initialToolbarPosition();
-    window.addEventListener('resize', initialToolbarPosition);
-
-    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-
-    let $previewFrame = document.getElementById('hu-template-preview');
-
-    /** Reload the preview Iframe */
-    function reloadPreview() {
-        const url = $previewFrame.contentWindow.location.href;
-
-        /** Check if the iframe url is not `about:blank` then reload. */
-        if (url.length && url !== 'about:blank') {
-            $previewFrame.src = $previewFrame.getAttribute('src');
-        }
-    }
-
-    Joomla.reloadPreview = reloadPreview;
-
-    $previewFrame.addEventListener('load', function () {
-        let iDocument = $previewFrame.contentWindow.document;
-        let innerWrapper = iDocument.querySelector('.body-innerwrapper');
-
-        /**
-         * Update all the anchor tags inside the iframe.
-         * Append a query string `helixMode=edit` which
-         * will uniquely identify the iframe and the document.
-         */
-        let anchors = iDocument.querySelectorAll('a');
-        anchors.forEach(anchor => {
-            let href = anchor.getAttribute('href') || '';
-            if (href === '#' || href === '') return;
-
-            let url = new URLSearchParams(new URL(anchor.href).search);
-
-            if (url.has('helixMode')) return;
-            url.append('helixMode', 'edit');
-
-            let urlArr = anchor.href.split('?');
-            urlArr[1] = url.toString();
-
-            anchor.setAttribute('href', urlArr.join('?'));
-        });
-
-        /**
-         * Set a class into preview iframe body
-         * as we can distinguish the original preview
-         * and the backend iframe preview.
-         */
-        iDocument.body.classList.add('back-panel');
-
-        if (innerWrapper) {
-            innerWrapper.style.marginTop = `${settings.topbarHeight}px`;
-        }
-    });
-
-    $(document).on('keyup', function (e) {
-        if (e.which === 27) {
-            if ($('.hu-megamenu-popover').hasClass('show')) {
-                $('.hu-megamenu-popover').removeClass('show');
-                return;
-            }
-            if ($('body').hasClass('hu-modal-open')) {
-                $(document).closeModal();
-            }
-        }
-    });
-
-    $(document).off('keyup');
-
-    $('.reload-preview-iframe').on('click', function (e) {
-        e.preventDefault();
-        let that = this;
-
-        reloadPreview();
-        $(this).addClass('spin');
-
-        $previewFrame.addEventListener('load', function () {
-            $(that).removeClass('spin');
-        });
-    });
-
-    (function initTooltips() {
-        $('.hu-topbar').tooltip({
-            classes: {
-                'ui-tooltip': 'ui-corner-all',
-            },
-            position: {
-                my: 'left top+8px',
-            },
-            hide: false,
-            show: false,
-        });
-
-        $('.action-reset-drafts, .reload-preview-iframe').tooltip({
-            classes: {
-                'ui-tooltip': 'ui-corner-all',
-            },
-            position: {
-                my: 'left top+10px',
-            },
-            hide: false,
-            show: false,
-        });
-    })();
-
-    Joomla.helixLoading = function (status, draft) {
-        const $loadingEl = $('.hu-loading-msg');
-        const $doneEl = $('.hu-done-msg');
-        const $resetBtn = $('.action-reset-drafts');
-
-        $loadingEl.hide();
-        $doneEl.hide();
-        $resetBtn.hide();
-
-        if (status) {
-            $resetBtn.hide();
-            $doneEl.hide();
-            $loadingEl.show();
-        } else {
-            $loadingEl.hide();
-            $resetBtn.hide();
-            $doneEl.show();
-        }
-
-        /** If timeout exists then clear it first. */
-        if (delayTimeout) clearTimeout(delayTimeout);
-
-        (async () => {
-            if (!status) await delay(2000);
-            $doneEl.hide();
-
-            if (draft) $resetBtn.show();
-            else $resetBtn.hide();
-        })();
-    };
-
-    function delay(ms = 500) {
-        return new Promise(resolve => {
-            delayTimeout = setTimeout(resolve, ms);
-        });
-    }
-
-    function updateSetvalue() {
-        let $controls = $('form#hu-style-form').find('.controls.helix-input-touched');
-
-        if ($controls.length > 0) {
-            $controls.each(function (index, control) {
-                let $controlEl = $(control);
-
-                if ($controlEl.length > 0) {
-                    let inputSelector = $controlEl.data('selector');
-                    let $inputEl = $controlEl.find(inputSelector);
-
-                    if ($inputEl.length > 0) {
-                        $inputEl.attr('value', $inputEl.val());
-                    }
-
-                    // Reset by the setvalue.
-                    $controlEl.attr('data-setvalue', $inputEl.val());
-                    $controlEl.data('setvalue', $inputEl.val());
-                    $controlEl.removeClass('helix-input-touched');
-                }
-            });
-        }
-    }
-
-    /**
-     * Reset field values by the last saved value.
-     * This is done after discarding the draft.
-     *
-     * @return void
-     */
-    function resetBySafepointValue() {
-        let $controls = $('form#hu-style-form').find('.controls.helix-input-touched.field-reset');
-
-        if ($controls.length > 0) {
-            $controls.each(function (index, control) {
-                let $controlEl = $(control);
-
-                if ($controlEl.length > 0) {
-                    let safepoint = $controlEl.data('safepoint');
-                    let inputSelector = $controlEl.data('selector');
-                    let $inputEl = $controlEl.find(inputSelector);
-
-                    // Reset by the setvalue.
-                    if ($inputEl.length > 0) {
-                        let type =
-                            typeof $inputEl.attr('type') != 'undefined' ? $inputEl.attr('type').toLowerCase() : false;
-                        if (type && type === 'checkbox') {
-                            let checked = safepoint == 1 ? true : false;
-                            $inputEl.prop('checked', checked);
-                        }
-
-                        if ($inputEl.attr('name') === 'megamenu') {
-                            $('.hu-megamenu-action-tracker').val('restore').trigger('change');
-                        }
-
-                        if ($inputEl.attr('name') !== 'megamenu') {
-                            $inputEl.val(safepoint);
-                            $inputEl.attr('value', safepoint);
-
-                            // Fire change event for applying showon behavior
-                            $inputEl.change();
-                        }
-
-                        // Update currPoint value
-                        $controlEl.attr('data-currpoint', safepoint);
-                        $controlEl.data('currpoint', safepoint);
-
-                        // Update chosen select values.
-                        if (
-                            $inputEl.prop('tagName').toLowerCase() === 'select' &&
-                            $controlEl.find(inputSelector + '_chzn').length > 0
-                        ) {
-                            $inputEl.trigger('liszt:updated');
-                            $inputEl.trigger('chosen:updated');
-                        }
-                    }
-
-                    // Reset media preview image.
-                    let $imagePreview = $controlEl.find('.hu-image-holder img');
-
-                    if ($imagePreview.length > 0) {
-                        $imagePreview.attr('src', `${meta.base}/${safepoint}`);
-                    }
-
-                    // Reset the predefined header
-                    let $predefinedHeader = $controlEl.find('.hu-header-item');
-
-                    $predefinedHeader.each(function () {
-                        if ($(this).hasClass('active')) {
-                            $(this).removeClass('active');
-                        }
-
-                        if ($(this).data('style') === safepoint) {
-                            $(this).addClass('active');
-                        }
-                    });
-
-                    $controlEl.removeClass('helix-input-touched');
-                    $controlEl.removeClass('field-reset');
-                }
-            });
-        }
-    }
-
-    (function handleMenuBuilderChanges() {
-        const $builderField = $('.hu-menu-builder input[name=megamenu]');
-
-        $builderField.on('change', function (e) {
-            e.preventDefault();
-
-            const $controls = $(this).closest('.controls');
-            const safePoint = $controls.data('safepoint');
-            const currentPoint = $controls.data('currpoint');
-            const value = Joomla.utils.helixHash($(this).val());
-
-            triggerDraftChange($(this), safePoint, currentPoint, value);
-        });
-    })();
-
-    function draftChanges() {
-        $('#layout').val(JSON.stringify(getGeneratedLayout()));
-        webfontData();
-
-        $('.hu-input-preset').val(JSON.stringify($('.hu-preset.active').data()));
-
-        let data = $('#hu-style-form').find('input, select, textarea').not('.internal-use-only').serializeArray();
-        let flag = false;
-
-        $.ajax({
-            type: 'POST',
-            url:
-                'index.php?option=com_ajax&request=task&helix=ultimate&id=' +
-                helixUltimateStyleId +
-                '&action=draft-tmpl-style&format=json&helix_id=' +
-                helixUltimateStyleId,
-            data: data,
-            beforeSend: function () {
-                Joomla.helixLoading(true, false);
-                flag = true;
-            },
-            success: function (response) {
-                var data = $.parseJSON(response);
-
-                if (data.status) {
-                    let $previewFrame = document.getElementById('hu-template-preview');
-
-                    reloadPreview();
-
-                    $previewFrame.addEventListener('load', function () {
-                        flag && Joomla.helixLoading(false, data.isDrafted);
-                        flag = false;
-                    });
-                }
-            },
-            error: function (err) {
-                console.error('error: Something went wrong!', err);
-                Joomla.HelixToaster.error('Error:' + err.message, 'Error');
-            },
-        });
-    }
-
-    /**
-     * Track the input fields (input, select, textarea, checkbox, hidden, media ...) * are changed.
-     * This function is responsible for handling onClick/onChange/onBlur
-     * live changes preview
-     *
-     */
-    (function trackChanges() {
-        $('form#hu-style-form')
-            .find('input[type="text"], input[type="email"], input[type="number"]')
-            .on('keydown', function (e) {
-                if (e.keyCode === 13) {
-                    e.preventDefault();
-                    return;
-                }
-            });
-
-        $('form#hu-style-form')
-            .find('input[type="text"], input[type="email"], input[type="number"], textarea')
-            .on('blur', function (e) {
-                e.preventDefault();
-
-                let $control = $(this).closest('.controls');
-                if (!$control.hasClass('field-reset') && $control.hasClass('trackable')) {
-                    let safePoint = $(this).closest('.controls').data('safepoint');
-                    let currPoint = $(this).closest('.controls').data('currpoint');
-                    let value = $(this).val();
-
-                    triggerDraftChange($(this), safePoint, currPoint, value);
-                }
-            });
-
-        $('form#hu-style-form')
-            .find('input[type="checkbox"], input[type=color]')
-            .on('change', function (e) {
-                e.preventDefault();
-
-                console.log('change fired!');
-
-                let $control = $(this).closest('.controls');
-                if (!$control.hasClass('field-reset') && $control.hasClass('trackable')) {
-                    let safePoint = $(this).closest('.controls').data('safepoint');
-                    let currPoint = $(this).closest('.controls').data('currpoint');
-                    let value = $(this).prop('checked') ? 1 : 0;
-
-                    triggerDraftChange($(this), safePoint, currPoint, value);
-                }
-            });
-
-        $('form#hu-style-form')
-            .find('select, input[type="hidden"]')
-            .on('change', function (e) {
-                e.preventDefault();
-
-                let $control = $(this).closest('.controls');
-                if (!$control.hasClass('field-reset') && $control.hasClass('trackable')) {
-                    let safePoint = $(this).closest('.controls').data('safepoint');
-                    let currPoint = $(this).closest('.controls').data('currpoint');
-                    let value = $(this).val();
-
-                    triggerDraftChange($(this), safePoint, currPoint, value);
-                }
-            });
-    })();
-
-    function prepareResetFields() {
-        let $controls = $('form#hu-style-form').find('.controls.helix-input-touched');
-
-        if ($controls.length > 0) {
-            $controls.each((i, el) => {
-                if (!$(el).hasClass('field-reset')) {
-                    $(el).addClass('field-reset');
-                }
-            });
-        }
-    }
-
-    // Reset drafted settings
-    $('.action-reset-drafts').on('click', function (e) {
-        e.preventDefault();
-        let self = this;
-
-        if ($(this).hasClass('hide')) {
-            return;
-        }
-
-        prepareResetFields();
-
-        let confirm = window.confirm('Do you really want to reset your settings?');
-
-        if (confirm) {
-            $('#layout').val(JSON.stringify(getGeneratedLayout()));
-            webfontData();
-
-            $('.hu-input-preset').val(JSON.stringify($('.hu-preset.active').data()));
-
-            $.ajax({
-                type: 'GET',
-                url:
-                    'index.php?option=com_ajax&request=task&helix=ultimate&id=' +
-                    helixUltimateStyleId +
-                    '&action=reset-drafted-settings&format=json&helix_id=' +
-                    helixUltimateStyleId,
-                success: function (response) {
-                    var data = $.parseJSON(response);
-
-                    if (data.status) {
-                        let $previewFrame = document.getElementById('hu-template-preview');
-
-                        reloadPreview();
-                    }
-                },
-                error: function (err) {
-                    console.error('error', err);
-                },
-                complete: function () {
-                    resetBySafepointValue();
-                    Joomla.HelixToaster.success('Successfully rolled back to the previous state!', 'Success');
-                    $('.hu-loading-msg').hide();
-                    $('.hu-done-msg').hide();
-                    $('.action-reset-drafts').hide();
-                },
-            });
-        }
-    });
-
-    function showSaveLoader(status) {
-        const $loader = $('.hu-topbar-save-spinner');
-
-        if (status) {
-            if ($loader.hasClass('hidden')) {
-                $loader.removeClass('hidden');
-                $loader.closest('.action-save-template').find('svg').hide();
-            }
-        } else {
-            if (!$loader.hasClass('hidden')) {
-                $loader.addClass('hidden');
-                $loader.closest('.action-save-template').find('svg').show();
-            }
-        }
-    }
-
-    // Save settings. Add debounce for preventing multiple click.
-    $('.action-save-template').on(
-        'click',
-        Joomla.utils.debounce(function (e) {
-            e.preventDefault();
-
-            var self = this;
-
-            showSaveLoader(true);
-
-            /**
-             * Clear the delay timeout created by draft changes
-             * for prevent showing reset button if already been saved.
-             */
-            if (delayTimeout) clearTimeout(delayTimeout);
-
-            $('#layout').val(JSON.stringify(getGeneratedLayout()));
-            webfontData();
-
-            $('.hu-input-preset').val(JSON.stringify($('.hu-preset.active').data()));
-
-            var tmplID = $(this).data('id'),
-                tmplView = $(this).data('view');
-
-            const data = $('#hu-style-form').find('input, select, textarea').not('.internal-use-only').serializeArray();
-
-            $.ajax({
-                type: 'POST',
-                url:
-                    'index.php?option=com_ajax&request=task&helix=ultimate&id=' +
-                    helixUltimateStyleId +
-                    '&action=save-tmpl-style&format=json&helix_id=' +
-                    helixUltimateStyleId,
-                data: data,
-                success: function (response) {
-                    var data = $.parseJSON(response);
-
-                    if (data.status) {
-                        let $previewFrame = document.getElementById('hu-template-preview');
-                        $previewFrame.contentWindow.location.reload(true);
-
-                        Joomla.HelixToaster.success('Changes have been successfully saved!', 'Success');
-                        $('.hu-loading-msg').hide();
-                        $('.hu-done-msg').hide();
-                        $('.action-reset-drafts').hide();
-                        showSaveLoader(false);
-                    } else {
-                        Joomla.HelixToaster.error(data.message, 'Failed');
-                        $('.hu-loading-msg').hide();
-                        $('.hu-done-msg').hide();
-                        $('.action-reset-drafts').hide();
-                        showSaveLoader(false);
-                    }
-
-                    // Update the setvalues.
-                    updateSetvalue();
-                    
-                },
-                complete() {
-                },
-                error: function (err) {
-                    console.error('error', err);
-                    Joomla.HelixToaster.error('Error: ' + err.message, 'Error');
-                    showSaveLoader(false);
-                },
-            });
-        }, 500)
-    );
-
-    /**
-     * Trigger draft changing based on how the data is changed.
-     * If the input value is equal to the currentPoint then no change has done, so no drafting.
-     * If the input value is not equal to the currentPoint then change happens, draft the change.
-     * Update the current value to the newly changed value. Mark the control that, it's been touched.
-     * If any changed value is equal to the safePoint value then remove the touched flag.
-     *
-     * @param	HTMLElement	$el			The input element.
-     * @param	mixed		safePoint	The value of last saved value of the input.
-     * @param	mixed		currPoint	The value of the input which has just been changed before draft.
-     * @param	mixed		value		The changing value.
-     *
-     * @return	void
-     */
-    function triggerDraftChange($el, safePoint, currPoint, value) {
-        if (value != currPoint) {
-            currPoint = value;
-            $el.closest('.controls').attr('data-currpoint', currPoint);
-            $el.closest('.controls').data('currpoint', currPoint);
-
-            if (!$el.closest('.controls').hasClass('helix-input-touched')) {
-                $el.closest('.controls').addClass('helix-input-touched');
-            }
-            draftChanges();
-        }
-
-        if (value == safePoint) {
-            if ($el.closest('.controls').hasClass('helix-input-touched')) {
-                $el.closest('.controls').removeClass('helix-input-touched');
-            }
-        }
-    }
-
-    // Device switching from `desktop -> tablet -> mobile` or vice versa.
-    $('.hu-device').on('click', function (e) {
-        e.preventDefault();
-        const device = $(this).data('device');
-
-        $(this).parent().find('.active').removeClass('active');
-        $(this).addClass('active');
-
-        switchBetweenDevices(device);
-    });
-
-    /**
-     * Make settings fields responsive after changing devices.
-     *
-     *
-     */
-    function onDeviceChange({ name, parent, map, device }) {
-        ['', '_sm', '_xs'].forEach(size => {
-            const $element = $(`input[name=${name}${size}]`).closest(parent);
-            if (!$element.hasClass('field-hidden')) $element.addClass('field-hidden');
-        });
-        const selector = `input[name=${name}${map[device] === 'md' ? '' : '_' + map[device]}]`;
-        $(selector).closest(parent).removeClass('field-hidden');
-    }
-
-    /** Change logo height on device changed. */
-    onDeviceChange({
-        name: 'logo_height',
-        parent: '.group-style-logo',
-        map: {
-            desktop: 'md',
-            tablet: 'sm',
-            mobile: 'xs',
-        },
-        device: 'desktop',
-    });
-
-    /**
-     * Function to switch between various devices
-     *
-     * @param {string} device 	Device type i.e. `desktop`, `tablet`, `mobile`
-     */
-    function switchBetweenDevices(device) {
-        const widthMap = {
-            desktop: '100%',
-            tablet: `${settings.breakpoints.tablet}px`,
-            mobile: `${settings.breakpoints.mobile}px`,
-            md: '100%',
-            sm: `${settings.breakpoints.tablet}px`,
-            xs: `${settings.breakpoints.mobile}px`,
-        };
-
-        const deviceMap = {
-            md: 'desktop',
-            sm: 'tablet',
-            xs: 'mobile',
-            desktop: 'desktop',
-            tablet: 'tablet',
-            mobile: 'mobile',
-        };
-
-        const map = {
-            desktop: 'md',
-            tablet: 'sm',
-            mobile: 'xs',
-        };
-
-        const $iframe = $('#hu-template-preview');
-
-        $(`.hu-device[data-device=${deviceMap[device]}]`).parent().find('.active').removeClass('active');
-        $(`.hu-device[data-device=${deviceMap[device]}]`).addClass('active');
-
-        // Change the typography field device wise size field
-        ['', '-sm', '-xs'].forEach(size => {
-            $(`.hu-webfont-size-field${size}`).closest('.hu-webfont-unit').removeClass('active');
-        });
-
-        $(`input.hu-webfont-size-field${map[device] === 'md' ? '' : '-' + map[device]}`)
-            .closest('.hu-webfont-unit')
-            .addClass('active');
-
-        /** Change header height on device changed. */
-        onDeviceChange({
-            name: 'header_height',
-            parent: '.group-style-header',
-            map,
-            device,
-        });
-
-        /** Change logo height on device changed. */
-        onDeviceChange({
-            name: 'logo_height',
-            parent: '.group-style-logo',
-            map,
-            device,
-        });
-
-        /**
-         * @TODO: uncomment it if responsive sticky header required.
-         * Change sticky header on device changed.
-         */
-        // onDeviceChange({
-        // 	name: 'sticky_header',
-        // 	parent: '.group-style-header',
-        // 	map,
-        // 	device,
-        // });
-
-        $iframe.animate(
-            {
-                width: widthMap[device],
-            },
-            300,
-            'linear'
-        );
-    }
-
-    // Switcher
-    $('#hu-style-form')
-        .find('input[type="checkbox"]:not(.hu-menu-item-selector)')
-        .each(function () {
-            var $this = $(this);
-            $this.closest('.control-group').addClass('control-group-checkbox');
-        });
-
-    /**
-     * Draggable sidebar
-     */
-    $('.hu-options-core').draggable({
-        iframeFix: true,
-        cursor: 'grabbing',
-        handle: '.hu-panel-handle',
-        containment: '#helix-ultimate',
-        drag: function (event, ui) {
-            storage.setItem('toolbarPosition', JSON.stringify(ui.position));
-            panelPositioning();
-        },
-    });
-
-    /**
-     * Calculate the editor panel position and display the panel
-     */
-    function panelPositioning() {
-        let $optionsCore = $('.hu-options-core');
-        let $panel = $('.hu-edit-panel.active-panel');
-        let $sidebar = $('#hu-options-panel');
-        let $container = $('.hu-container');
-
-        let sidebarOffset = $sidebar.offset();
-        let sidebarWidth = $sidebar.width();
-        let panelWidth = $panel.width();
-        let containerWidth = $container.width();
-        let gap = 10;
-
-        let panelHorizontalPosition = sidebarOffset.left + sidebarWidth + gap;
-
-        if (panelHorizontalPosition + panelWidth > containerWidth) {
-            if ($optionsCore.hasClass('hu-panel-position-right')) {
-                $optionsCore.removeClass('hu-panel-position-right');
-            }
-
-            $optionsCore.addClass('hu-panel-position-left');
-        } else {
-            if ($optionsCore.hasClass('hu-panel-position-left')) {
-                $optionsCore.removeClass('hu-panel-position-left');
-            }
-
-            $optionsCore.addClass('hu-panel-position-right');
-        }
-    }
-
-    /**
-     * Display editor panel on click sidebar icon
-     *
-     */
-    $('.hu-fieldset-header').on('click', function (e) {
-        e.preventDefault();
-
-        let fieldset = $(this).data('fieldset');
-
-        if ($('.' + fieldset + '-panel').hasClass('active-panel')) {
-            $('.' + fieldset + '-panel').removeClass('active-panel');
-            $(this).removeClass('active');
-            return;
-        }
-
-        $('.' + fieldset + '-panel')
-            .parent()
-            .find('.active-panel')
-            .removeClass('active-panel');
-        $('.' + fieldset + '-panel').addClass('active-panel');
-
-        // Make active sidebar icon
-        if ($(this).parents('#hu-options').find('.hu-fieldset .hu-fieldset-header').hasClass('active')) {
-            $(this).parents('#hu-options').find('.hu-fieldset .hu-fieldset-header').removeClass('active');
-        }
-
-        $(this).addClass('active');
-
-        panelPositioning();
-        Joomla.utils.calculateSiblingDistances();
-    });
-
-    /**
-     * Close an opened panel
-     */
-    $('.hu-panel-close').on('click', function (e) {
-        e.preventDefault();
-
-        if ($(this).closest('.hu-edit-panel').hasClass('active-panel')) {
-            $(this).closest('.hu-edit-panel').removeClass('active-panel');
-        }
-
-        let $sidebarItem = $(`.${$(this).data('sidebarclass')} .hu-fieldset-header`);
-
-        if ($sidebarItem.hasClass('active')) {
-            $sidebarItem.removeClass('active');
-        }
-    });
-
-    $('.hu-fieldset-toggle-icon').on('click', function (e) {
-        e.preventDefault();
-
-        $('.hu-fieldset').removeClass('active');
-        $('#hu, #hu-options').removeClass();
-    });
-
-    $('.hu-group-header-box').on('click', function (e) {
-        e.preventDefault();
-
-        let $prevActiveEl = $(this)
-            .closest('.hu-edit-panel')
-            .find('.hu-group-wrap')
-            .find('.hu-field-list.active-group');
-
-        if ($prevActiveEl.length > 0) {
-            let prevUid = $prevActiveEl.data('uid');
-            let currUid = $(this).next().data('uid');
-
-            if (prevUid !== currUid) {
-                $prevActiveEl.removeClass('active-group');
-                $prevActiveEl.parent().removeClass('active');
-                $prevActiveEl.slideUp(400);
-            }
-        }
-
-        let $fieldList = $(this).next();
-
-        if ($fieldList.hasClass('active-group')) {
-            $(this).parent().removeClass('active');
-            $fieldList.removeClass('active-group');
-            $fieldList.slideUp(400);
-        } else {
-            $fieldList.addClass('active-group');
-            $(this).parent().addClass('active');
-            $fieldList.slideDown(400);
-        }
-    });
-
-    $('.hu-header-item').on('click', function (e) {
-        e.preventDefault();
-
-        var $parent = $(this).closest('.hu-header-list');
-
-        $parent.find('.hu-header-item').removeClass('active');
-        $(this).addClass('active');
-
-        var styleName = $(this).data('style'),
-            filedName = $parent.data('name');
-
-        $('#' + filedName)
-            .val(styleName)
-            .trigger('change');
-    });
-
-    $('.hu-offcanvas-item').on('click', function (e) {
-        e.preventDefault();
-
-        var $parent = $(this).closest('.hu-offcanvas-list');
-
-        $parent.find('.hu-offcanvas-item').removeClass('active');
-        $(this).addClass('active');
-
-        var styleName = $(this).data('style'),
-            filedName = $parent.data('name');
-
-        $('#' + filedName)
-            .val(styleName)
-            .trigger('change');
-    });
-
-    // Preset
-    $(document).ready(function () {
-        if ($('#custom_style').attr('checked') == 'checked') {
-            $('.hu-fieldset-presets').find('.hu-group-wrap').show();
-        } else {
-            $('.hu-fieldset-presets').find('.hu-group-wrap').hide();
-        }
-    });
-
-    $(document).on('change', '#custom_style', function (e) {
-        e.preventDefault();
-        if ($(this).attr('checked') == 'checked') {
-            $('.hu-fieldset-presets').find('.hu-group-wrap').slideDown();
-        } else {
-            $('.hu-fieldset-presets').find('.hu-group-wrap').slideUp();
-        }
-    });
-
-    $(document).on('click', '.hu-preset', function (e) {
-        e.preventDefault();
-
-        $('.hu-preset').removeClass('active');
-        $(this).addClass('active');
-
-        draftChanges();
-    });
-
-    $('.helix-responsive-devices span').click(function () {
-        if ($(this).hasClass('active')) return;
-        const parent = $(this).parents('.hu-webfont-size');
-        parent.find('input').removeClass('active');
-        const inputClass = $(this).data('active_class');
-        parent.find(inputClass).addClass('active');
-        $(this).parent().find('span.active').removeClass('active');
-        $(this).addClass('active');
-        const device = $(this).data('device');
-
-        switchBetweenDevices(device);
-    });
-
-    window.purgeCss = function (self = null) {
-        $.ajax({
-            type: 'POST',
-            url:
-                'index.php?option=com_ajax&request=task&helix=ultimate&id=' +
-                helixUltimateStyleId +
-                '&action=purge-css-file&format=json&helix_id=' +
-                helixUltimateStyleId,
-            data: {},
-            beforeSend: function () {
-                self && self.append('<span class="fas fa-circle-notch fa-spin" aria-hidden="true"></span>');
-            },
-            success: function (response) {
-                var data = $.parseJSON(response);
-                if (self && data.status) {
-                    self.find('span').remove();
-                    self.removeClass('disable');
-                }
-            },
-            error: function () {
-                alert('Somethings wrong, Try again');
-            },
-        });
-    };
-
-    $('.btn-purge-hu-css').on('click', function (e) {
-        e.preventDefault();
-        var self = $(this);
-        if (self.hasClass('disable')) {
-            return;
-        }
-        self.addClass('disable');
-
-        window.purgeCss(self);
-    });
-
-    // Import helix settings.
-    $('#btn-hu-import-settings').on('click', function (event) {
-        event.preventDefault();
-        $('#helix-import-file').click();
-    });
-
-    $('#helix-import-file').on('change', function (e) {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            const settings = JSON.parse(event.target.result);
-            var data = { settings: event.target.result };
-
-            var request = {
-                action: 'import-tmpl-style',
-                option: 'com_ajax',
-                helix: 'ultimate',
-                request: 'task',
-                data: data,
-                format: 'json',
-            };
-
-            $.ajax({
-                type: 'POST',
-                data: request,
-                success: function (response) {
-                    var data = $.parseJSON(response);
-                    if (data.status) {
-                        window.location.reload();
-                    }
-                },
-                complete() {
-                    Joomla.HelixToaster.success('Settings have been successfully imported!', 'Success');
-                },
-                error: function () {
-                    Joomla.HelixToaster.error('Something went wrong importing settings!', 'Error');
-                },
-            });
-            return false;
-        };
-
-        reader.readAsText(e.target.files[0]);
-    });
-
-    function webfontData() {
-        $('.hu-field-webfont').each(function () {
-            var $that = $(this),
-                webfont = {
-                    fontFamily: $that.find('.hu-webfont-list').val(),
-                    fontSize: $that.find('[name=hu-webfont-size-field]').val(),
-                    fontSize_sm: $that.find('[name=hu-webfont-size-field-sm]').val(),
-                    fontSize_xs: $that.find('[name=hu-webfont-size-field-xs]').val(),
-                    fontWeight: $that.find('.hu-webfont-weight-list').val(),
-                    fontStyle: $that.find('.hu-webfont-style-list').val(),
-                    fontSubset: $that.find('.hu-webfont-subset-list').val(),
-                    fontColor: $that.find('.hu-font-color-input').val(),
-                    fontLineHeight: $that.find('.hu-font-line-height-input').val(),
-                    fontLetterSpacing: $that.find('[name=hu-font-letter-spacing-input]').val(),
-                    textDecoration: $that.find('.hu-text-decoration').val(),
-                    textAlign: $that.find('.hu-text-align').val(),
-                };
-
-            $that.find('.hu-webfont-input').val(JSON.stringify(webfont));
-        });
-    }
-
-    function getGeneratedLayout() {
-        var item = [];
-        $('#hu-layout-builder')
-            .find('.hu-layout-section')
-            .each(function (index) {
-                var $row = $(this),
-                    rowIndex = index,
-                    rowObj = $row.data();
-                delete rowObj.sortableItem;
-
-                var activeLayout = $row.find('.hu-column-layout.active'),
-                    layoutArray = activeLayout.data('layout'),
-                    layout = 12;
-
-                if (layoutArray != 12) {
-                    layout = layoutArray.split(',').join('');
-                }
-
-                item[rowIndex] = {
-                    type: 'row',
-                    layout: layout,
-                    settings: rowObj,
-                    attr: [],
-                };
-
-                // Find Column Elements
-                $row.find('.hu-layout-column').each(function (index) {
-                    var $column = $(this),
-                        colIndex = index,
-                        colObj = $column.data();
-                    delete colObj.sortableItem;
-
-                    item[rowIndex].attr[colIndex] = {
-                        type: 'sp_col',
-                        settings: colObj,
-                    };
-                });
-            });
-
-        return item;
-    }
-
-    /* Helix Help Control functionalities */
-    $('.hu-help-icon').on('click', function (e) {
-        e.preventDefault();
-        let $helpElement = $(this).closest('.control-group').find('.hu-control-help');
-
-        $(this).toggleClass('active');
-
-        if ($helpElement.hasClass('show')) {
-            $helpElement.removeClass('show');
-            $helpElement.slideUp(100);
-        } else {
-            $helpElement.addClass('show');
-            $helpElement.slideDown(100);
-        }
-
-        let $siblings = $(this).closest('.control-group').siblings();
-
-        $siblings.each(function () {
-            let $help = $(this).find('.hu-control-help');
-
-            if ($help.hasClass('show')) {
-                $help.removeClass('show');
-                $help.slideUp(100);
-            }
-        });
-    });
-
-    /*Option Group*/
-    $(document).on('click', '.hu-option-group-title', function (event) {
-        event.preventDefault();
-        $(this).closest('.hu-option-group').toggleClass('active').siblings().removeClass('active');
-    });
-
-    /* Helix Group Depend On functionalities */
-    let $togglers = {};
-
-    function handleDependOnRelationship() {
-        let $groups = $('.hu-group-wrap');
-        $groups.each(function () {
-            if ($(this).attr('data-dependon')) {
-                let depend = $(this).data('dependon');
-                let [name, value] = depend.split(':');
-                let $parentElement = $(`[name=${name}]`);
-                let parentValue = $parentElement.val();
-
-                if ($parentElement.prop('type') === 'checkbox') {
-                    parentValue = $parentElement.prop('checked');
-                    value = value == 1;
-                }
-
-                if (parentValue == value) {
-                    $(this).fadeIn(300);
-                } else {
-                    $(this).fadeOut(300);
-                }
-
-                $togglers[name] = $parentElement;
-            }
-        });
-    }
-
-    handleDependOnRelationship();
-
-    Object.values($togglers).forEach(function ($toggler) {
-        $toggler.on('change', function (e) {
-            e.preventDefault();
-            handleDependOnRelationship();
-        });
-    });
-
-    /* Helix dimension Field */
-    (function handleDimensionData() {
-        let $width = $('.hu-field-dimension-width');
-        let $height = $('.hu-field-dimension-height');
-
-        $width.on('keyup', function (e) {
-            e.preventDefault();
-
-            let $input = $(this).closest('.controls').find('.hu-field-dimension-input'),
-                fieldValue = $input.val() || '0x0',
-                value = $(this).val(),
-                [width, height] = fieldValue.toLowerCase().split('x');
-
-            if (value === '') {
-                value = '0';
-            }
-
-            width = value;
-            fieldValue = `${width}x${height}`;
-            $input.val(fieldValue);
-        });
-
-        $height.on('keyup', function (e) {
-            e.preventDefault();
-            let $input = $(this).closest('.controls').find('.hu-field-dimension-input'),
-                fieldValue = $input.val() || '0x0',
-                value = $(this).val(),
-                [width, height] = fieldValue.toLowerCase().split('x');
-
-            if (value === '') {
-                value = '0';
-            }
-
-            height = value;
-            fieldValue = `${width}x${height}`;
-            $input.val(fieldValue);
-        });
-    })();
-
-    /** Handle enable on  */
-    let $enableOnParentElements = [];
-
-    function handleEnableOn() {
-        let $childElement = $('.control-group[data-enableon]');
-
-        $childElement.each(function () {
-            let [name, value] = $(this).data('enableon').split(':');
-
-            let $parentElement = $(`[name=${name}]`);
-            $enableOnParentElements.push($parentElement);
-            let parentValue = $parentElement.val();
-
-            if ($parentElement.prop('type') === 'checkbox') {
-                parentValue = $parentElement.prop('checked');
-                value = value == 1;
-            }
-
-            if (parentValue == value) {
-                $(this).find('input, select, textarea').prop('readonly', false);
-                if ($(this).hasClass('uneditable')) $(this).removeClass('uneditable');
-            } else {
-                $(this).find('input, select, textarea').prop('readonly', true);
-                if (!$(this).hasClass('uneditable')) $(this).addClass('uneditable');
-            }
-        });
-    }
-
-    handleEnableOn();
-
-    $enableOnParentElements.forEach(function ($element) {
-        $element.on('change', function () {
-            handleEnableOn();
-        });
-    });
-
-    /* Switcher action */
-    $('.hu-switcher .hu-action-group [hu-switcher-action]').on('click', function (e) {
-        let value = $(this).data('value');
-        $(this).siblings().removeClass('active');
-        $(this).addClass('active');
-        let $input = $(this).closest('.hu-switcher').find('input[type=hidden]');
-        $input.val(value).trigger('change');
-        const hiddenField = e.target.closest('.hu-switcher').querySelector('input[type=hidden]');
-        Joomla.utils.triggerEvent(hiddenField, 'change');
-    });
+document.addEventListener('DOMContentLoaded', () => {
+	'use strict';
+
+	/**
+	 * From Joomla 4.0.4, Joomla initialises `Showon` before DOMContentLoaded,
+	 * which misses the Helix fields. Initialise it again now.
+	 */
+	if (typeof Joomla.Showon !== 'undefined' && typeof Joomla.Showon.initialise !== 'undefined') {
+		Joomla.Showon.initialise(document);
+	}
+
+	const { fire, delegate, readData, serialize, request, ajaxUrl, show, hide, toggle } = Joomla.utils;
+
+	const settings = Joomla.getOptions('data') || {};
+	const meta = Joomla.getOptions('meta') || {};
+	const form = document.getElementById('hu-style-form');
+	const previewFrame = document.getElementById('hu-template-preview');
+
+	let delayTimeout = null;
+
+	/**
+	 * Colour pickers (Coloris).
+	 *
+	 * Coloris listens on the document, so fields added later (e.g. in the
+	 * layout row settings modal) open the picker too; `wrap` adds the swatch.
+	 */
+	const boundColorSelectors = new Set();
+	const COLOR_FIELDS = '.hu-color-input, .hu-input-color, .hu-font-color-input';
+
+	Joomla.initColorPicker = function (selector = COLOR_FIELDS) {
+		if (!window.Coloris) return;
+
+		// Older callers pass elements; their fields match the standard selectors.
+		if (typeof selector !== 'string') selector = COLOR_FIELDS;
+
+		if (!boundColorSelectors.has(selector)) {
+			boundColorSelectors.add(selector);
+
+			Coloris({
+				el: selector,
+				wrap: true,
+				theme: 'default',
+				themeMode: 'light',
+				format: 'hex',
+				formatToggle: false,
+				alpha: true,
+				margin: 4,
+				focusInput: true,
+				selectInput: false,
+				clearButton: true,
+				clearLabel: 'Clear',
+				closeButton: true,
+				closeLabel: 'Done',
+			});
+		}
+
+		Coloris.wrap(selector);
+	};
+
+	Joomla.initColorPicker();
+
+	// Coloris refreshes its swatch on `input`; values set in code (e.g. reset) only fire `change`.
+	delegate(document, 'change', COLOR_FIELDS, (event, field) => {
+		const wrapper = field.parentElement;
+		if (wrapper && wrapper.classList.contains('clr-field')) wrapper.style.color = field.value;
+	});
+
+	/* ------------------------------------------------------------------ */
+	/* Preview                                                             */
+	/* ------------------------------------------------------------------ */
+
+	/** Reload the preview iframe. */
+	function reloadPreview() {
+		const url = previewFrame.contentWindow.location.href;
+
+		// Only reload when the iframe has really loaded something.
+		if (url.length && url !== 'about:blank') {
+			previewFrame.src = previewFrame.getAttribute('src');
+		}
+	}
+
+	Joomla.reloadPreview = reloadPreview;
+
+	previewFrame.addEventListener('load', () => {
+		const iDocument = previewFrame.contentWindow.document;
+
+		/**
+		 * Tag every link inside the preview with `helixMode=edit`, so pages
+		 * opened inside the iframe keep rendering in edit mode.
+		 */
+		iDocument.querySelectorAll('a').forEach(anchor => {
+			const href = anchor.getAttribute('href') || '';
+			if (href === '#' || href === '') return;
+
+			const url = new URLSearchParams(new URL(anchor.href).search);
+
+			if (url.has('helixMode')) return;
+			url.append('helixMode', 'edit');
+
+			const urlArr = anchor.href.split('?');
+			urlArr[1] = url.toString();
+
+			anchor.setAttribute('href', urlArr.join('?'));
+		});
+
+		// Lets the template tell the backend preview apart from the real site.
+		iDocument.body.classList.add('back-panel');
+	});
+
+	document.querySelectorAll('.reload-preview-iframe').forEach(button => {
+		button.addEventListener('click', event => {
+			event.preventDefault();
+
+			reloadPreview();
+			button.classList.add('spin');
+			previewFrame.addEventListener('load', () => button.classList.remove('spin'), { once: true });
+		});
+	});
+
+	Joomla.utils.tooltip(document.querySelector('.hu-sidebar'));
+
+	/* ------------------------------------------------------------------ */
+	/* Draft status                                                        */
+	/* ------------------------------------------------------------------ */
+
+	const loadingEl = document.querySelector('.hu-loading-msg');
+	const doneEl = document.querySelector('.hu-done-msg');
+	const resetBtn = document.querySelector('.action-reset-drafts');
+
+	const hideStatus = () => [loadingEl, doneEl, resetBtn].forEach(hide);
+
+	function delay(ms = 500) {
+		return new Promise(resolve => {
+			delayTimeout = setTimeout(resolve, ms);
+		});
+	}
+
+	Joomla.helixLoading = function (status, draft) {
+		hideStatus();
+		show(status ? loadingEl : doneEl, 'block');
+
+		if (delayTimeout) clearTimeout(delayTimeout);
+
+		(async () => {
+			if (!status) await delay(2000);
+			hide(doneEl);
+			toggle(resetBtn, draft, 'inline-flex');
+		})();
+	};
+
+	/* ------------------------------------------------------------------ */
+	/* Collecting the form                                                 */
+	/* ------------------------------------------------------------------ */
+
+	/** Write every typography field into its hidden JSON input. */
+	function webfontData() {
+		document.querySelectorAll('.hu-field-webfont').forEach(field => {
+			const value = selector => {
+				const element = field.querySelector(selector);
+				return element ? element.value : undefined;
+			};
+
+			const webfont = {
+				fontFamily: value('.hu-webfont-list'),
+				fontSize: value('[name=hu-webfont-size-field]'),
+				fontSize_sm: value('[name=hu-webfont-size-field-sm]'),
+				fontSize_xs: value('[name=hu-webfont-size-field-xs]'),
+				fontWeight: value('.hu-webfont-weight-list'),
+				fontStyle: value('.hu-webfont-style-list'),
+				fontSubset: value('.hu-webfont-subset-list'),
+				fontColor: value('.hu-font-color-input'),
+				fontLineHeight: value('.hu-font-line-height-input'),
+				fontLetterSpacing: value('[name=hu-font-letter-spacing-input]'),
+				textDecoration: value('.hu-text-decoration'),
+				textAlign: value('.hu-text-align'),
+			};
+
+			const input = field.querySelector('.hu-webfont-input');
+			if (input) input.value = JSON.stringify(webfont);
+		});
+	}
+
+	/** Sync the composite fields (layout, fonts, preset) into their inputs. */
+	function collectComposites() {
+		const layoutInput = document.getElementById('layout');
+
+		if (layoutInput && Joomla.helixLayout) {
+			layoutInput.value = JSON.stringify(Joomla.helixLayout.serialize());
+		}
+
+		webfontData();
+
+		const presetInput = document.querySelector('.hu-input-preset');
+		const activePreset = document.querySelector('.hu-preset.active');
+
+		if (presetInput) {
+			presetInput.value = JSON.stringify(readData(activePreset));
+		}
+	}
+
+	const formData = () => serialize(form, '.internal-use-only');
+
+	/* ------------------------------------------------------------------ */
+	/* Drafts                                                              */
+	/* ------------------------------------------------------------------ */
+
+	async function draftChanges() {
+		collectComposites();
+
+		Joomla.helixLoading(true, false);
+
+		try {
+			const data = await request(ajaxUrl('draft-tmpl-style'), { method: 'POST', data: formData() });
+
+			if (data.status) {
+				reloadPreview();
+				previewFrame.addEventListener('load', () => Joomla.helixLoading(false, data.isDrafted), { once: true });
+			}
+		} catch (error) {
+			console.error('error: Something went wrong!', error);
+			Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
+		}
+	}
+
+	Joomla.helixDraftChanges = draftChanges;
+
+	/**
+	 * Draft a change only when the value really changed.
+	 * `safepoint` is the last saved value, `currpoint` the last drafted one.
+	 * Mark the control as touched; untouch it when it is back to the saved value.
+	 */
+	function triggerDraftChange(element, value) {
+		const control = element.closest('.controls');
+
+		if (!control) return;
+
+		const { safepoint, currpoint } = control.dataset;
+
+		if (value != currpoint) {
+			control.dataset.currpoint = value;
+			control.classList.add('helix-input-touched');
+			draftChanges();
+		}
+
+		if (value == safepoint) {
+			control.classList.remove('helix-input-touched');
+		}
+	}
+
+	const isTrackable = control => control && control.classList.contains('trackable') && !control.classList.contains('field-reset');
+
+	/** Track value changes of the form fields and draft them live. */
+	(function trackChanges() {
+		const textFields = 'input[type="text"], input[type="email"], input[type="number"]';
+
+		form.querySelectorAll(textFields).forEach(field => {
+			field.addEventListener('keydown', event => {
+				if (event.key === 'Enter') event.preventDefault();
+			});
+		});
+
+		// `change` also covers values set by a picker (e.g. Coloris) without a blur.
+		form.querySelectorAll(`${textFields}, textarea`).forEach(field => {
+			['blur', 'change'].forEach(type =>
+				field.addEventListener(type, () => {
+					if (isTrackable(field.closest('.controls'))) triggerDraftChange(field, field.value);
+				})
+			);
+		});
+
+		form.querySelectorAll('input[type="checkbox"], input[type=color]').forEach(field => {
+			field.addEventListener('change', () => {
+				if (isTrackable(field.closest('.controls'))) triggerDraftChange(field, field.checked ? 1 : 0);
+			});
+		});
+
+		form.querySelectorAll('select, input[type="hidden"]').forEach(field => {
+			field.addEventListener('change', () => {
+				if (isTrackable(field.closest('.controls'))) triggerDraftChange(field, field.value);
+			});
+		});
+
+		// The menu builder stores a large JSON value, so compare hashes.
+		document.querySelectorAll('.hu-menu-builder input[name=megamenu]').forEach(field => {
+			field.addEventListener('change', () => triggerDraftChange(field, Joomla.utils.helixHash(field.value)));
+		});
+	})();
+
+	/* ------------------------------------------------------------------ */
+	/* Reset draft                                                         */
+	/* ------------------------------------------------------------------ */
+
+	const touchedControls = () => [...form.querySelectorAll('.controls.helix-input-touched')];
+
+	/** After saving, the current values become the new reset values. */
+	function updateSetvalue() {
+		touchedControls().forEach(control => {
+			const input = control.querySelector(control.dataset.selector);
+
+			if (input) {
+				input.setAttribute('value', input.value);
+				control.dataset.setvalue = input.value;
+			}
+
+			control.classList.remove('helix-input-touched');
+		});
+	}
+
+	/** Put the fields back to their last saved value after discarding a draft. */
+	function resetBySafepointValue() {
+		form.querySelectorAll('.controls.helix-input-touched.field-reset').forEach(control => {
+			const safepoint = control.dataset.safepoint ?? '';
+			const input = control.dataset.selector ? control.querySelector(control.dataset.selector) : null;
+
+			if (input) {
+				if ((input.type || '').toLowerCase() === 'checkbox') {
+					input.checked = safepoint == 1;
+				}
+
+				if (input.name === 'megamenu') {
+					const tracker = document.querySelector('.hu-megamenu-action-tracker');
+
+					if (tracker) {
+						tracker.value = 'restore';
+						fire(tracker);
+					}
+				} else {
+					input.value = safepoint;
+					input.setAttribute('value', safepoint);
+					// Re-applies showon rules.
+					fire(input);
+				}
+
+				control.dataset.currpoint = safepoint;
+			}
+
+			const imagePreview = control.querySelector('.hu-image-holder img');
+
+			if (imagePreview) {
+				imagePreview.setAttribute('src', `${meta.base}/${safepoint}`);
+			}
+
+			control.querySelectorAll('.hu-header-item').forEach(item => {
+				item.classList.toggle('active', item.dataset.style === safepoint);
+			});
+
+			control.classList.remove('helix-input-touched', 'field-reset');
+		});
+	}
+
+	if (resetBtn) {
+		resetBtn.addEventListener('click', async event => {
+			event.preventDefault();
+
+			if (resetBtn.classList.contains('hide')) return;
+
+			touchedControls().forEach(control => control.classList.add('field-reset'));
+
+			if (!window.confirm('Do you really want to reset your settings?')) return;
+
+			collectComposites();
+
+			try {
+				const data = await request(ajaxUrl('reset-drafted-settings'));
+
+				if (data.status) reloadPreview();
+			} catch (error) {
+				console.error('error', error);
+			}
+
+			resetBySafepointValue();
+			Joomla.HelixToaster.success('Successfully rolled back to the previous state!', 'Success');
+			hideStatus();
+		});
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* Save                                                                */
+	/* ------------------------------------------------------------------ */
+
+	function showSaveLoader(status) {
+		const loader = document.querySelector('.hu-topbar-save-spinner');
+
+		if (!loader) return;
+
+		loader.classList.toggle('hidden', !status);
+
+		const icon = loader.closest('.action-save-template').querySelector('svg');
+		toggle(icon, !status);
+	}
+
+	document.querySelectorAll('.action-save-template').forEach(button => {
+		button.addEventListener(
+			'click',
+			Joomla.utils.debounce(async event => {
+				event.preventDefault();
+
+				showSaveLoader(true);
+
+				// Don't show the reset button for a draft that is now saved.
+				if (delayTimeout) clearTimeout(delayTimeout);
+
+				collectComposites();
+
+				try {
+					const data = await request(ajaxUrl('save-tmpl-style'), { method: 'POST', data: formData() });
+
+					if (data.status) {
+						previewFrame.contentWindow.location.reload();
+						Joomla.HelixToaster.success('Changes have been successfully saved!', 'Success');
+					} else {
+						Joomla.HelixToaster.error(data.message, 'Failed');
+					}
+
+					hideStatus();
+					updateSetvalue();
+				} catch (error) {
+					console.error('error', error);
+					Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
+				}
+
+				showSaveLoader(false);
+			}, 500)
+		);
+	});
+
+	/* ------------------------------------------------------------------ */
+	/* Devices                                                             */
+	/* ------------------------------------------------------------------ */
+
+	const deviceMap = { md: 'desktop', sm: 'tablet', xs: 'mobile', desktop: 'desktop', tablet: 'tablet', mobile: 'mobile' };
+	const sizeMap = { desktop: 'md', tablet: 'sm', mobile: 'xs' };
+
+	/** Show only the responsive variant of a setting that matches the device. */
+	function onDeviceChange({ name, parent, device }) {
+		['', '_sm', '_xs'].forEach(size => {
+			const input = document.querySelector(`input[name=${name}${size}]`);
+			const element = input && input.closest(parent);
+			if (element) element.classList.add('field-hidden');
+		});
+
+		const suffix = sizeMap[device] === 'md' ? '' : '_' + sizeMap[device];
+		const input = document.querySelector(`input[name=${name}${suffix}]`);
+		const element = input && input.closest(parent);
+
+		if (element) element.classList.remove('field-hidden');
+	}
+
+	onDeviceChange({ name: 'logo_height', parent: '.group-style-logo', device: 'desktop' });
+
+	/**
+	 * Switch the preview and the responsive fields between devices.
+	 *
+	 * @param {string} device  `desktop`, `tablet`, `mobile` (or `md`, `sm`, `xs`)
+	 */
+	function switchBetweenDevices(device) {
+		const name = deviceMap[device] || 'desktop';
+		const widthMap = {
+			desktop: '100%',
+			tablet: `${settings.breakpoints.tablet}px`,
+			mobile: `${settings.breakpoints.mobile}px`,
+		};
+
+		document.querySelectorAll('.hu-device').forEach(button => {
+			button.classList.toggle('active', button.dataset.device === name);
+		});
+
+		// Typography size inputs follow the device.
+		['', '-sm', '-xs'].forEach(size => {
+			document.querySelectorAll(`.hu-webfont-size-field${size}`).forEach(input => {
+				const unit = input.closest('.hu-webfont-unit');
+				if (unit) unit.classList.remove('active');
+			});
+		});
+
+		const suffix = sizeMap[name] === 'md' ? '' : '-' + sizeMap[name];
+
+		document.querySelectorAll(`input.hu-webfont-size-field${suffix}`).forEach(input => {
+			const unit = input.closest('.hu-webfont-unit');
+			if (unit) unit.classList.add('active');
+		});
+
+		onDeviceChange({ name: 'header_height', parent: '.group-style-header', device: name });
+		onDeviceChange({ name: 'logo_height', parent: '.group-style-logo', device: name });
+
+		// The width change is animated in CSS.
+		previewFrame.style.width = widthMap[name];
+	}
+
+	Joomla.helixSwitchDevice = switchBetweenDevices;
+
+	document.querySelectorAll('.hu-device').forEach(button => {
+		button.addEventListener('click', event => {
+			event.preventDefault();
+			switchBetweenDevices(button.dataset.device);
+		});
+	});
+
+	delegate(document, 'click', '.helix-responsive-devices span', (event, span) => {
+		if (span.classList.contains('active')) return;
+
+		const parent = span.closest('.hu-webfont-size');
+
+		parent.querySelectorAll('input').forEach(input => input.classList.remove('active'));
+		parent.querySelectorAll(span.dataset.active_class).forEach(input => input.classList.add('active'));
+		span.parentElement.querySelectorAll('span.active').forEach(item => item.classList.remove('active'));
+		span.classList.add('active');
+
+		switchBetweenDevices(span.dataset.device);
+	});
+
+	/* ------------------------------------------------------------------ */
+	/* Panels and groups                                                   */
+	/* ------------------------------------------------------------------ */
+
+	// Checkboxes render as switches.
+	form.querySelectorAll('input[type="checkbox"]:not(.hu-menu-item-selector)').forEach(checkbox => {
+		const group = checkbox.closest('.control-group');
+		if (group) group.classList.add('control-group-checkbox');
+	});
+
+	const panelFor = name => document.querySelector(`.${name}-panel`);
+
+	/** Open a panel from the sidebar, or close it when it is already open. */
+	document.querySelectorAll('.hu-fieldset-header').forEach(header => {
+		header.addEventListener('click', event => {
+			event.preventDefault();
+
+			const panel = panelFor(header.dataset.fieldset);
+
+			if (!panel) return;
+
+			if (panel.classList.contains('active-panel')) {
+				panel.classList.remove('active-panel');
+				header.classList.remove('active');
+				return;
+			}
+
+			document.querySelectorAll('.hu-edit-panel.active-panel').forEach(item => item.classList.remove('active-panel'));
+			panel.classList.add('active-panel');
+
+			document.querySelectorAll('#hu-options .hu-fieldset-header.active').forEach(item => item.classList.remove('active'));
+			header.classList.add('active');
+
+			Joomla.utils.calculateSiblingDistances();
+		});
+	});
+
+	document.querySelectorAll('.hu-panel-close').forEach(button => {
+		button.addEventListener('click', event => {
+			event.preventDefault();
+
+			const panel = button.closest('.hu-edit-panel');
+			if (panel) panel.classList.remove('active-panel');
+
+			document.querySelectorAll(`.${button.dataset.sidebarclass} .hu-fieldset-header`).forEach(header => header.classList.remove('active'));
+		});
+	});
+
+	/** Accordion groups: one open group per panel. */
+	document.querySelectorAll('.hu-group-header-box').forEach(groupHeader => {
+		groupHeader.addEventListener('click', event => {
+			event.preventDefault();
+
+			const fieldList = groupHeader.nextElementSibling;
+			const panel = groupHeader.closest('.hu-edit-panel');
+
+			panel.querySelectorAll('.hu-group-wrap .hu-field-list.active-group').forEach(previous => {
+				if (previous !== fieldList) {
+					previous.classList.remove('active-group');
+					previous.parentElement.classList.remove('active');
+					hide(previous);
+				}
+			});
+
+			const opening = !fieldList.classList.contains('active-group');
+
+			fieldList.classList.toggle('active-group', opening);
+			groupHeader.parentElement.classList.toggle('active', opening);
+			toggle(fieldList, opening, 'block');
+		});
+	});
+
+	/* ------------------------------------------------------------------ */
+	/* Field widgets                                                       */
+	/* ------------------------------------------------------------------ */
+
+	/** Predefined header and off-canvas pickers. */
+	['header', 'offcanvas'].forEach(type => {
+		delegate(document, 'click', `.hu-${type}-item`, (event, item) => {
+			event.preventDefault();
+
+			const list = item.closest(`.hu-${type}-list`);
+
+			list.querySelectorAll(`.hu-${type}-item`).forEach(other => other.classList.remove('active'));
+			item.classList.add('active');
+
+			const input = document.getElementById(list.dataset.name);
+
+			if (input) {
+				input.value = item.dataset.style;
+				fire(input);
+			}
+		});
+	});
+
+	/** Preset colour groups only show when "Custom Style" is on. */
+	const customStyle = document.getElementById('custom_style');
+	const presetGroups = () => document.querySelectorAll('.hu-fieldset-presets .hu-group-wrap');
+
+	if (customStyle) {
+		const syncPresetGroups = () => presetGroups().forEach(group => toggle(group, customStyle.checked));
+
+		syncPresetGroups();
+		customStyle.addEventListener('change', syncPresetGroups);
+	}
+
+	delegate(document, 'click', '.hu-preset', (event, preset) => {
+		event.preventDefault();
+
+		document.querySelectorAll('.hu-preset').forEach(item => item.classList.remove('active'));
+		preset.classList.add('active');
+
+		draftChanges();
+	});
+
+	/** Help text toggles; only one open per group of fields. */
+	document.querySelectorAll('.hu-help-icon').forEach(icon => {
+		icon.addEventListener('click', event => {
+			event.preventDefault();
+
+			const group = icon.closest('.control-group');
+			const help = group.querySelector('.hu-control-help');
+
+			icon.classList.toggle('active');
+
+			if (help) {
+				const opening = !help.classList.contains('show');
+				help.classList.toggle('show', opening);
+				toggle(help, opening, 'block');
+			}
+
+			[...group.parentElement.children]
+				.filter(sibling => sibling !== group)
+				.forEach(sibling => {
+					sibling.querySelectorAll('.hu-control-help.show').forEach(other => {
+						other.classList.remove('show');
+						hide(other);
+					});
+				});
+		});
+	});
+
+	/** Option groups inside modals (row/column settings). */
+	delegate(document, 'click', '.hu-option-group-title', (event, title) => {
+		event.preventDefault();
+
+		const group = title.closest('.hu-option-group');
+
+		group.classList.toggle('active');
+		[...group.parentElement.children].filter(sibling => sibling !== group).forEach(sibling => sibling.classList.remove('active'));
+	});
+
+	/** Groups that depend on another field: `data-dependon="name:value"`. */
+	const fieldMatches = (name, expected) => {
+		const field = document.querySelector(`[name=${name}]`);
+
+		if (!field) return false;
+
+		if (field.type === 'checkbox') {
+			return field.checked === (expected == 1);
+		}
+
+		return field.value == expected;
+	};
+
+	function handleDependOnRelationship() {
+		document.querySelectorAll('.hu-group-wrap[data-dependon]').forEach(group => {
+			const [name, value] = group.dataset.dependon.split(':');
+			toggle(group, fieldMatches(name, value));
+		});
+	}
+
+	handleDependOnRelationship();
+
+	new Set([...document.querySelectorAll('.hu-group-wrap[data-dependon]')].map(group => group.dataset.dependon.split(':')[0])).forEach(name => {
+		const field = document.querySelector(`[name=${name}]`);
+		if (field) field.addEventListener('change', handleDependOnRelationship);
+	});
+
+	/** Fields that are read-only unless another field matches: `data-enableon`. */
+	function handleEnableOn() {
+		document.querySelectorAll('.control-group[data-enableon]').forEach(group => {
+			const [name, value] = group.dataset.enableon.split(':');
+			const enabled = fieldMatches(name, value);
+
+			group.querySelectorAll('input, select, textarea').forEach(field => (field.readOnly = !enabled));
+			group.classList.toggle('uneditable', !enabled);
+		});
+	}
+
+	handleEnableOn();
+
+	new Set([...document.querySelectorAll('.control-group[data-enableon]')].map(group => group.dataset.enableon.split(':')[0])).forEach(name => {
+		const field = document.querySelector(`[name=${name}]`);
+		if (field) field.addEventListener('change', handleEnableOn);
+	});
+
+	/** Dimension field: width and height inputs write "WxH" into the hidden input. */
+	const updateDimension = (input, index) => {
+		const hidden = input.closest('.controls').querySelector('.hu-field-dimension-input');
+		const parts = (hidden.value || '0x0').toLowerCase().split('x');
+
+		parts[index] = input.value === '' ? '0' : input.value;
+		hidden.value = `${parts[0]}x${parts[1]}`;
+	};
+
+	document.querySelectorAll('.hu-field-dimension-width').forEach(input => {
+		if (input.closest('.controls').querySelector('.hu-field-dimension-input')) {
+			input.addEventListener('keyup', () => updateDimension(input, 0));
+		}
+	});
+
+	document.querySelectorAll('.hu-field-dimension-height').forEach(input => {
+		if (input.closest('.controls').querySelector('.hu-field-dimension-input')) {
+			input.addEventListener('keyup', () => updateDimension(input, 1));
+		}
+	});
+
+	/** Segmented switchers write their value into the hidden input. */
+	document.querySelectorAll('.hu-switcher .hu-action-group [hu-switcher-action]').forEach(action => {
+		action.addEventListener('click', () => {
+			[...action.parentElement.children].forEach(sibling => sibling.classList.remove('active'));
+			action.classList.add('active');
+
+			const input = action.closest('.hu-switcher').querySelector('input[type=hidden]');
+
+			if (input) {
+				input.value = readData(action, 'value');
+				fire(input);
+			}
+		});
+	});
+
+	/* ------------------------------------------------------------------ */
+	/* Advanced: purge CSS, import settings                                */
+	/* ------------------------------------------------------------------ */
+
+	window.purgeCss = async function (button = null) {
+		let spinner = null;
+
+		if (button) {
+			spinner = document.createElement('span');
+			spinner.className = 'fas fa-circle-notch fa-spin';
+			spinner.setAttribute('aria-hidden', 'true');
+			button.appendChild(spinner);
+		}
+
+		try {
+			const data = await request(ajaxUrl('purge-css-file'), { method: 'POST', data: {} });
+
+			if (button && data.status) {
+				button.classList.remove('disable');
+			}
+		} catch (error) {
+			alert('Somethings wrong, Try again');
+		}
+
+		if (spinner) spinner.remove();
+	};
+
+	document.querySelectorAll('.btn-purge-hu-css').forEach(button => {
+		button.addEventListener('click', event => {
+			event.preventDefault();
+
+			if (button.classList.contains('disable')) return;
+
+			button.classList.add('disable');
+			window.purgeCss(button);
+		});
+	});
+
+	const importButton = document.getElementById('btn-hu-import-settings');
+	const importFile = document.getElementById('helix-import-file');
+
+	if (importButton && importFile) {
+		importButton.addEventListener('click', event => {
+			event.preventDefault();
+			importFile.click();
+		});
+
+		importFile.addEventListener('change', () => {
+			const file = importFile.files[0];
+
+			if (!file) return;
+
+			const reader = new FileReader();
+
+			reader.onload = async event => {
+				const data = new URLSearchParams({
+					action: 'import-tmpl-style',
+					option: 'com_ajax',
+					helix: 'ultimate',
+					request: 'task',
+					format: 'json',
+					'data[settings]': event.target.result,
+				});
+
+				try {
+					const response = await request(window.location.href, { method: 'POST', data });
+
+					Joomla.HelixToaster.success('Settings have been successfully imported!', 'Success');
+
+					if (response.status) window.location.reload();
+				} catch (error) {
+					Joomla.HelixToaster.error('Something went wrong importing settings!', 'Error');
+				}
+			};
+
+			reader.readAsText(file);
+		});
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* Deep links                                                          */
+	/* ------------------------------------------------------------------ */
+
+	/**
+	 * Open a panel (and optionally a group inside it) from the URL,
+	 * e.g. `&panel=basic&group=logo`. Used by the template style details page.
+	 */
+	(function openRequestedPanel() {
+		const params = new URLSearchParams(window.location.search);
+		const panel = (params.get('panel') || '').replace(/[^a-z0-9_-]/gi, '').toLowerCase();
+		const group = (params.get('group') || '').replace(/[^a-z0-9_-]/gi, '').toLowerCase();
+
+		if (!panel) return;
+
+		const header = document.querySelector(`.hu-fieldset-header[data-fieldset="${panel}"]`);
+
+		if (!header) return;
+
+		if (!header.classList.contains('active')) header.click();
+
+		if (!group) return;
+
+		const groupWrap = document.querySelector(`.${panel}-panel .hu-group-${group}`);
+
+		if (groupWrap && !groupWrap.classList.contains('active')) {
+			groupWrap.querySelector(':scope > .hu-group-header-box').click();
+		}
+	})();
 });

@@ -5,257 +5,185 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
  */
 
-jQuery(function ($) {
-	/** Enable chosen for the font family of the typography panel. */
-	// $('.hu-webfont-list').chosen({ width: '100%' }); @todo in Joomla 6 crate issue
+/**
+ * Typography field: live preview, Google font loading, subsets and font list updates.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+	const { fire, delegate, readData, request } = Joomla.utils;
 
-	Joomla.initColorPicker('.hu-font-color-input');
+	const SYSTEM_FONTS = ['Arial', 'Tahoma', 'Verdana', 'Helvetica', 'Times New Roman', 'Trebuchet MS', 'Georgia'];
+	const FONT_WEIGHTS = '100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic';
 
-	//Web Fonts
-	let $parentId = $('.hu-field-webfont').data('id');
-	let $parentEl = $('#' + $parentId);
+	const fieldOf = element => element.closest('.hu-field-webfont');
+	const valueOf = (field, selector) => {
+		const element = field.querySelector(selector);
+		return element ? element.value : '';
+	};
 
-	function renderPreview($parent) {
-		let fontFamily = $parent.find('.hu-webfont-list').val(),
-			fontWeight = $parent.find('.hu-webfont-weight-list').val(),
-			fontSize = $parent.find('.hu-webfont-unit.active').find('.hu-unit-field-value').val(),
-			fontColor = $parent.find('.hu-font-color-input').val(),
-			fontSubset = $parent.find('.hu-webfont-subset-list').val(),
-			fontLineHeight = $parent.find('.hu-font-line-height-input').val(),
-			fontSpacing = $parent.find('[name=hu-font-letter-spacing-input]').val(),
-			textDecoration = $parent.find('input.hu-text-decoration').val(),
-			textAlign = $parent.find('input.hu-text-align').val();
+	/** Add a Google font stylesheet once, so the preview can use it. */
+	const loadGoogleFont = (family, subset = '') => {
+		const url = `//fonts.googleapis.com/css?family=${family.replace(/ /g, '+')}:${FONT_WEIGHTS}${subset ? `&subset=${subset}` : ''}&display=swap`;
 
-		let $preview = $parent.find('.hu-webfont-preview');
+		if (document.querySelector(`link[href="${url}"]`)) return;
 
-		if (!!fontFamily) {
-			$preview.css('font-family', fontFamily);
-		}
+		const link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.href = url;
+		document.head.appendChild(link);
+	};
 
-		if (!!fontWeight) {
-			$preview.css('font-weight', fontWeight);
-		} else {
-			$preview.css('font-weight', '100');
-		}
+	/** Post to the Helix task endpoint (the current URL), like the old `$.ajax({ data })`. */
+	const task = (action, data = {}) => {
+		const params = new URLSearchParams({ action, option: 'com_ajax', helix: 'ultimate', request: 'task', format: 'json' });
 
-		if (!!fontSize) {
-			if (!/(em|rem|px|%)$/.test(fontSpacing)) {
-				fontSize += 'px';
-			}
+		Object.entries(data).forEach(([key, value]) => params.append(`data[${key}]`, value));
 
-			fontSize = fontSize.replace(/\s+/, '');
-			$preview.css('font-size', fontSize);
-		} else {
-			$preview.css('font-size', '');
-		}
+		return request(window.location.href, { method: 'POST', data: params });
+	};
 
-		if (!!fontColor) {
-			$preview.css('color', fontColor);
-		} else {
-			$preview.css('color', '#000000');
-		}
+	const withUnit = value => {
+		value = String(value).replace(/\s+/, '');
+		return /(em|rem|px|%)$/.test(value) ? value : `${value}px`;
+	};
 
-		if (!!fontLineHeight) {
-			$preview.css('line-height', fontLineHeight);
-		} else {
-			$preview.css('line-height', '');
-		}
+	function renderPreview(field) {
+		if (!field) return;
 
-		if (!!fontSpacing) {
-			if (!/(em|rem|px|%)$/.test(fontSpacing)) {
-				fontSpacing += 'px';
-			}
+		const preview = field.querySelector('.hu-webfont-preview');
 
-			fontSpacing = fontSpacing.replace(/\s+/, '');
-			$preview.css('letter-spacing', fontSpacing);
-		} else {
-			$preview.css('letter-spacing', '');
-		}
+		if (!preview) return;
 
-		if (!!textDecoration) {
-			$preview.css('text-decoration', textDecoration);
-		}
+		const activeUnit = field.querySelector('.hu-webfont-unit.active');
+		const fontFamily = valueOf(field, '.hu-webfont-list');
+		const fontWeight = valueOf(field, '.hu-webfont-weight-list');
+		const fontSize = activeUnit ? valueOf(activeUnit, '.hu-unit-field-value') : '';
+		const fontColor = valueOf(field, '.hu-font-color-input');
+		const lineHeight = valueOf(field, '.hu-font-line-height-input');
+		const spacing = valueOf(field, '[name=hu-font-letter-spacing-input]');
+		const decoration = valueOf(field, 'input.hu-text-decoration');
+		const align = valueOf(field, 'input.hu-text-align');
 
-		if (!!textAlign) {
-			$preview.css('text-align', textAlign);
-		}
+		if (fontFamily) preview.style.fontFamily = fontFamily;
+
+		// Unset weight/colour: show what the site gets (normal weight, readable text).
+		preview.style.fontWeight = fontWeight || '';
+		preview.style.fontSize = fontSize ? withUnit(fontSize) : '';
+		preview.style.color = fontColor || '';
+		// A light font colour gets a dark preview background so it stays legible.
+		field.querySelector('.hu-webfont-preview-wrapper')?.classList.toggle('is-light-text', isLightColor(getComputedStyle(preview).color));
+		preview.style.lineHeight = lineHeight || '';
+		preview.style.letterSpacing = spacing ? withUnit(spacing) : '';
+
+		if (decoration) preview.style.textDecoration = decoration;
+		if (align) preview.style.textAlign = align;
 	}
 
-	$('.hu-field-webfont').each(function () {
-		renderPreview($(this));
-	});
+	/** True when a colour reads better on a dark preview background than a light one. */
+	function isLightColor(color) {
+		const [r, g, b, a = 1] = (color.match(/[\d.]+/g) || []).map(Number);
 
-	$(document).on('change', '.hu-webfont-list', function (event) {
-		event.preventDefault();
+		if (r === undefined || a < 0.4) return false;
 
-		var $that = $(this),
-			fontName = $that.val();
-
-		var systemFonts = ['Arial', 'Tahoma', 'Verdana', 'Helvetica', 'Times New Roman', 'Trebuchet MS', 'Georgia'];
-
-		if ($.inArray(fontName, systemFonts) !== -1) {
-			$that.closest('.hu-field-webfont').find('.hu-webfont-subset-list').html('').trigger('liszt:updated');
-		} else {
-			var data = {
-				fontName: fontName,
-			};
-
-			var request = {
-				action: 'fontVariants',
-				option: 'com_ajax',
-				helix: 'ultimate',
-				request: 'task',
-				data: data,
-				format: 'json',
-			};
-
-			$.ajax({
-				type: 'POST',
-				data: request,
-				success: function (response) {
-					var font = $.parseJSON(response);
-					$that
-						.closest('.hu-field-webfont')
-						.find('.hu-webfont-subset-list')
-						.html(font.subsets)
-						.trigger('liszt:updated');
-				},
-			});
-
-			var font = $that.val().replace(' ', '+');
-			$('head').append(
-				"<link href='//fonts.googleapis.com/css?family=" +
-					font +
-					":100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&display=swap' rel='stylesheet' type='text/css'>"
-			);
-		}
-
-		renderPreview($(this).closest('.hu-field-webfont'));
-
-		return false;
-	});
-
-	// Font Size
-	$(document).on('change', '.hu-webfont-unit .hu-unit-field-value', function (event) {
-		event.preventDefault();
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	$('.hu-font-color-input').on('input', function (event) {
-		event.preventDefault();
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	$('.hu-font-line-height-input').on('change', function (event) {
-		event.preventDefault();
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	$('[name=hu-font-letter-spacing-input]').on('change', function (event) {
-		event.preventDefault();
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	// Font Weight
-	$(document).on('change', '.hu-webfont-weight-list', function (event) {
-		event.preventDefault();
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	// Font Style
-	$(document).on('change', '.hu-webfont-style-list', function (event) {
-		event.preventDefault();
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	//Font Subset
-	$('.list-font-subset').on('change', function (event) {
-		event.preventDefault();
-
-		var font = $(this).closest('.hu-field-webfont').find('.hu-webfont-list').val().replace(' ', '+');
-		$('head').append(
-			"<link href='//fonts.googleapis.com/css?family=" +
-				font +
-				':100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&subset=' +
-				$(this).val() +
-				'&display=swap' +
-				"' rel='stylesheet' type='text/css'>"
-		);
-	});
-
-	// Text decoration
-	$('.hu-font-decoration .hu-action-group .hu-switcher-action').on('click', function (e) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		$(this).siblings().removeClass('active');
-		$(this).addClass('active');
-		$(this)
-			.closest('.hu-font-decoration')
-			.find('input.hu-text-decoration')
-			.val($(this).data('value'))
-			.trigger('change');
-
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	// Text alignment
-	$('.hu-font-alignment .hu-action-group .hu-switcher-action').on('click', function (e) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		$(this).siblings().removeClass('active');
-		$(this).addClass('active');
-		$(this).closest('.hu-font-alignment').find('input.hu-text-align').val($(this).data('value')).trigger('change');
-
-		renderPreview($(this).closest('.hu-field-webfont'));
-	});
-
-	//Update Fonts list
-	$(document).on('click', '#update_fonts', function (event) {
-		event.preventDefault();
-
-		var $that = $(this);
-		var request = {
-			action: 'update-font-list',
-			option: 'com_ajax',
-			helix: 'ultimate',
-			request: 'task',
-			data: {},
-			format: 'json',
+		const channel = value => {
+			const c = value / 255;
+			return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 		};
 
-		$.ajax({
-			type: 'POST',
-			data: request,
-			beforeSend: function () {
-				$that.find('span').addClass('fa-spin');
-			},
-			success: function (response) {
-				var data = $.parseJSON(response);
-				if (data.status) {
-					$that.after(data.message);
-				} else {
-					$that.after(
-						"<p class='font-update-failed'>Unexpected error occurs. Please make sure that, you have inserted Google Font API key.</p>"
-					);
+		// WCAG relative luminance. Above ~0.21 the dark preview background (#1f2937)
+		// gives more contrast than the light one (#f2f5fa).
+		return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b) > 0.21;
+	}
 
-					$that.find('span').removeClass('fa-spin');
+	document.querySelectorAll('.hu-field-webfont').forEach(renderPreview);
+
+	/** Font family: refresh subsets and load the font for the preview. */
+	delegate(document, 'change', '.hu-webfont-list', async (event, select) => {
+		const field = fieldOf(select);
+		const subsets = field.querySelector('.hu-webfont-subset-list');
+		const fontName = select.value;
+
+		renderPreview(field);
+
+		if (SYSTEM_FONTS.includes(fontName)) {
+			if (subsets) subsets.innerHTML = '';
+			return;
+		}
+
+		loadGoogleFont(fontName);
+
+		try {
+			const font = await task('fontVariants', { fontName });
+
+			if (subsets && font.subsets !== undefined) subsets.innerHTML = font.subsets;
+		} catch (error) {
+			console.error('Could not load the font subsets', error);
+		}
+	});
+
+	/** Anything else that changes the look refreshes the preview. */
+	delegate(document, 'change', '.hu-webfont-unit .hu-unit-field-value, .hu-webfont-weight-list, .hu-webfont-style-list, .hu-font-line-height-input, [name=hu-font-letter-spacing-input]', (event, input) =>
+		renderPreview(fieldOf(input))
+	);
+
+	delegate(document, 'input', '.hu-font-color-input', (event, input) => renderPreview(fieldOf(input)));
+
+	/** Font subset: load the font with that subset. */
+	delegate(document, 'change', '.list-font-subset', (event, select) => {
+		loadGoogleFont(valueOf(fieldOf(select), '.hu-webfont-list'), select.value);
+	});
+
+	/** Text decoration and alignment switchers. */
+	[
+		['.hu-font-decoration', 'input.hu-text-decoration'],
+		['.hu-font-alignment', 'input.hu-text-align'],
+	].forEach(([wrapper, inputSelector]) => {
+		document.querySelectorAll(`${wrapper} .hu-action-group .hu-switcher-action`).forEach(action => {
+			action.addEventListener('click', event => {
+				event.preventDefault();
+				event.stopPropagation();
+
+				[...action.parentElement.children].forEach(sibling => sibling.classList.remove('active'));
+				action.classList.add('active');
+
+				const input = action.closest(wrapper).querySelector(inputSelector);
+
+				if (input) {
+					input.value = readData(action, 'value');
+					fire(input);
 				}
-			},
-			complete(response) {
-				if (response.status === 200) {
-					$that.find('span').removeClass('fa-spin');
-					$that
-						.next()
-						.delay(2000)
-						.fadeOut(300, function () {
-							$(this).remove();
-						});
-				}
-			},
+
+				renderPreview(fieldOf(action));
+			});
 		});
+	});
 
-		return false;
+	/** Update the Google font list from the API. */
+	delegate(document, 'click', '#update_fonts', async (event, button) => {
+		event.preventDefault();
+
+		const icon = button.querySelector('span');
+		const showMessage = html => {
+			button.insertAdjacentHTML('afterend', html);
+
+			const message = button.nextElementSibling;
+
+			setTimeout(() => message && message.remove(), 2300);
+		};
+
+		if (icon) icon.classList.add('fa-spin');
+
+		try {
+			const data = await task('update-font-list');
+
+			showMessage(
+				data.status
+					? data.message
+					: "<p class='font-update-failed'>Unexpected error occurs. Please make sure that, you have inserted Google Font API key.</p>"
+			);
+		} catch (error) {
+			showMessage("<p class='font-update-failed'>Unexpected error occurs. Please try again.</p>");
+		}
+
+		if (icon) icon.classList.remove('fa-spin');
 	});
 });
