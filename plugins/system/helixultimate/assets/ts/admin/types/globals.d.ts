@@ -14,6 +14,7 @@
  * tightened as their files move over.
  */
 
+import type { HelixLayoutApi } from '../layout';
 import type { HelixModalApi } from '../modal';
 import type { HelixToasterApi } from '../toaster';
 import type { HelixUtils } from '../utils';
@@ -42,7 +43,7 @@ declare global {
 		initColorPicker?(selector?: string | Element | Element[]): void;
 		/** `data-revealon` showon for fields rendered in modals (fields.js). */
 		setUpShowon?(container?: ParentNode | null): void;
-		helixLayout?: unknown;
+		helixLayout?: HelixLayoutApi;
 		helixMegaMenu?: unknown;
 		helixSwitchDevice?: (device: string) => void;
 		helixLoading?: unknown;
