@@ -29,8 +29,8 @@ $wa->useScript('keepalive')
 // Helix frontend editor CSS
 $doc->addStylesheet(Uri::base() . 'plugins/system/helixultimate/assets/css/frontend-editor.css');
 
-HTMLHelper::_('jquery.framework');
-HTMLHelper::_('jquery.token');
+// CSRF token for the blog options fetch/XHR requests.
+HTMLHelper::_('form.csrf');
 
 // Tabs & form config
 $this->tab_name          = 'com-content-form';

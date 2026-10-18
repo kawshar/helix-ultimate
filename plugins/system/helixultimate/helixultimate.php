@@ -136,25 +136,33 @@ class PlgSystemHelixultimate extends CMSPlugin
 
     	// For menu item form
     	if ($form->getName() === 'com_menus.item') {
-    	    HTMLHelper::_('jquery.framework');
-    	    $doc->addScript($plgPath . '/assets/js/admin/jquery-ui.min.js', ['relative' => false, 'version' => 'auto']);
-    	    $doc->addStyleSheet($plgPath . '/assets/css/admin/modal.css', ['relative' => false, 'version' => 'auto']);
-    	    $doc->addScript($plgPath . '/assets/js/admin/modal.js', ['relative' => false, 'version' => 'auto']);
+    	    // Colour picker for the page title background (helixcolor field).
+    	    $doc->getWebAssetManager()
+    	        ->registerAndUseStyle('helix.coloris', 'plugins/system/helixultimate/assets/css/libs/coloris.min.css', ['version' => 'auto', 'relative' => false])
+    	        ->registerAndUseScript('helix.coloris', 'plugins/system/helixultimate/assets/js/libs/coloris.min.js', ['version' => 'auto', 'relative' => false], ['defer' => true])
+    	        ->addInlineScript(
+    	            "Coloris({ el: '.hu-color-input', wrap: true, theme: 'default', format: 'hex', formatToggle: false, alpha: true, clearButton: true, closeButton: true }); Coloris.wrap('.hu-color-input');",
+    	            [],
+    	            ['type' => 'module'],
+    	            ['helix.coloris']
+    	        );
     	    $form->loadFile('megamenu', false);
     	}
 
     	// For article form
     	if ($form->getName() === 'com_content.article') {
-    	    HTMLHelper::_('jquery.framework');
-    	    HTMLHelper::_('jquery.token');
+    	    // CSRF token for the fetch/XHR requests (read as Joomla.getOptions('csrf.token')).
+    	    HTMLHelper::_('form.csrf');
     	    Text::script('JGLOBAL_CONFIRM_DELETE');
     	    Text::script('HELIX_ULTIMATE_UPLOAD_IMAGE_FAILED');
     	    Text::script('HELIX_ULTIMATE_REMOVE_IMAGE_FAILED');
     	    Text::script('HELIX_ULTIMATE_UPLOAD_GALLERY_IMAGE_FAILED');
     	    Text::script('HELIX_ULTIMATE_REMOVE_GALLERY_IMAGE_FAILED');
-    	    Text::script('HELIX_ULTIMATE_UPLOAD_PROGRESS_NOT_SUPPORTED');
-    	    $doc->addStyleSheet($plgPath . '/assets/css/admin/blog-options.css', ['relative' => false, 'version' => 'auto']);
-    	    $doc->addScript($plgPath . '/assets/js/admin/blog-options.js', ['relative' => false, 'version' => 'auto']);
+    	    $doc->getWebAssetManager()
+    	        ->registerAndUseStyle('helix.blogOptions', 'plugins/system/helixultimate/assets/css/admin/blog-options.css', ['version' => 'auto', 'relative' => false])
+    	        ->registerAndUseScript('helix.sortable', 'plugins/system/helixultimate/assets/js/libs/sortable.min.js', ['version' => 'auto', 'relative' => false], ['defer' => true])
+    	        ->registerAndUseScript('helix.utils', 'plugins/system/helixultimate/assets/js/admin/utils.js', ['version' => 'auto', 'relative' => false], ['defer' => true], ['core'])
+    	        ->registerAndUseScript('helix.blogOptions', 'plugins/system/helixultimate/assets/js/admin/blog-options.js', ['version' => 'auto', 'relative' => false], ['defer' => true], ['helix.utils', 'helix.sortable']);
 
 		    if (is_file($tmplPath . '/blog-options.xml')) {
 		        Form::addFormPath($tmplPath);
@@ -756,11 +764,6 @@ class PlgSystemHelixultimate extends CMSPlugin
 			'style' => ['template.atum.base', 'template.atum', 'template.active', 'template.active.language', 'template.user', 'template.atum.ltr', 'template.atum.rtl'],
 			'script' => ['choicesjs', 'dragula']
 		];
-
-		if (JVERSION >= 6) {
-			$doc->addScript(Uri::root(true) . '/plugins/system/helixultimate/assets/js/chosen.jquery.js');
-			$doc->addStyleSheet(Uri::root(true) . '/plugins/system/helixultimate/assets/css/chosen.css');
-		}
 
 		foreach ($assets as $type => $names)
 		{

@@ -8,12 +8,10 @@
 
 defined('_JEXEC') or die();
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Form\FormField;
 use Joomla\Filesystem\File;
-use Joomla\CMS\HTML\HTMLHelper;
 
 /**
  * Form field for Helix image.
@@ -38,8 +36,6 @@ class JFormFieldHeliximage extends FormField
 	 */
 	protected function getInput()
 	{
-		HTMLHelper::_('jquery.framework');
-
 		$class = ' hu-image-field-empty';
 
 		if ($this->value)

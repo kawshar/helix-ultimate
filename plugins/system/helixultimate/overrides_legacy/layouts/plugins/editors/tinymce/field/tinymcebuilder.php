@@ -11,7 +11,6 @@ defined ('_JEXEC') or die();
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Uri\Uri;
 
 extract($displayData);
 
@@ -56,9 +55,6 @@ extract($displayData);
  */
 
 HTMLHelper::_('behavior.core');
-
-$helix_plg_url = Uri::root(true) . '/plugins/system/helixultimate';
-Factory::getDocument()->addScript($helix_plg_url . '/assets/js/admin/jquery-ui.min.js');
 
 HTMLHelper::_('stylesheet', 'media/vendor/tinymce/skins/lightgray/skin.min.css', array('version' => 'auto', 'relative' => false));
 HTMLHelper::_('stylesheet', 'editors/tinymce/tinymce-builder.css', array('version' => 'auto', 'relative' => true));

@@ -5,406 +5,283 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-jQuery(function($) {
+/**
+ * Article editor blog options: featured image and gallery upload, remove
+ * and reorder.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+	const { delegate, request } = Joomla.utils;
+	const huText = (key, fallback) => (Joomla.Text ? Joomla.Text._(key, fallback) : fallback);
+	const ALLOWED_GALLERY_EXT = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
+	// Absolute so it also works from SEF frontend edit URLs.
+	const endpoint = `${(Joomla.getOptions('system.paths') || {}).base || ''}/index.php`;
 
-	function huText(key, fallback) {
-		if (typeof Joomla !== 'undefined' && Joomla.Text) {
-			return Joomla.Text._(key, fallback);
-		}
+	const baseData = action => ({
+		option: 'com_ajax',
+		helix: 'ultimate',
+		request: 'task',
+		action,
+		format: 'json',
+	});
 
-		return fallback;
-	}
+	/** CSRF token as a form field, alongside the X-CSRF-Token header. */
+	const tokenData = () => {
+		const token = Joomla.getOptions('csrf.token');
 
-	function getCsrfTokenData() {
-		var tokenData = {};
-		var token = typeof Joomla !== 'undefined' ? Joomla.getOptions('csrf.token') : null;
+		return token ? { [token]: 1 } : {};
+	};
 
-		if (token) {
-			tokenData[token] = 1;
-			return tokenData;
-		}
-
-		$('#adminForm input[type="hidden"]').each(function() {
-			if (this.value === '1' && /^[a-f0-9]{32}$/i.test(this.name)) {
-				tokenData[this.name] = '1';
-			}
-		});
-
-		return tokenData;
-	}
-
-	function parseAjaxResponse(response) {
-		if (response && typeof response === 'object') {
-			return response;
-		}
-
-		if (typeof response !== 'string' || !response.length) {
-			return null;
-		}
+	const parseResponse = response => {
+		if (response && typeof response === 'object') return response;
+		if (typeof response !== 'string' || !response.length) return null;
 
 		try {
 			return JSON.parse(response);
 		} catch (e) {
 			return null;
 		}
-	}
+	};
 
-	function getArticleId() {
-		var $idField = $('#jform_id');
+	const getArticleId = () => {
+		const fieldId = parseInt(document.getElementById('jform_id')?.value, 10);
 
-		if ($idField.length) {
-			var fieldId = parseInt($idField.val(), 10);
+		if (fieldId > 0) return fieldId;
 
-			if (fieldId > 0) {
-				return fieldId;
-			}
-		}
-
-		var match = window.location.search.match(/(?:[?&](?:id|a_id)=)(\d+)/);
+		const match = window.location.search.match(/(?:[?&](?:id|a_id)=)(\d+)/);
 
 		return match ? parseInt(match[1], 10) : 0;
-	}
+	};
 
-	function clearFeaturedImageField($field) {
-		$field.find('.hu-image-upload-wrapper').empty();
-		$field.removeClass('hu-image-field-has-image').addClass('hu-image-field-empty');
-		$field.find('#jform_attribs_helix_ultimate_image').val('');
-	}
+	/**
+	 * Upload a file with XMLHttpRequest (fetch has no upload progress).
+	 * Resolves with the parsed JSON response, or null when it is not JSON.
+	 */
+	const upload = (data, onProgress) => new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		const token = Joomla.getOptions('csrf.token');
+		const body = new FormData();
 
-	$(document).ready(function() {
-		var first_tab = $('#myTabTabs').find('>li').first();
-		$('a[href="#attrib-helix_ultimate_blog_options"]').parent().insertAfter(first_tab);
+		Object.entries({ ...baseData('upload-blog-image'), ...tokenData(), ...data }).forEach(([key, value]) => body.append(key, value));
 
-		activateBlogMediaContent();
-	})
+		xhr.open('POST', endpoint);
+		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		if (token) xhr.setRequestHeader('X-CSRF-Token', token);
 
-	function activateBlogMediaContent() {
-		// Find the label with the "active" class within the fieldset
-		var activeLabel = $('#jform_attribs_helix_ultimate_article_format label.active');
-
-		// Check if a label with "active" class was found
-		if (activeLabel.length > 0) {
-			// Trigger a click event on the found label
-			activeLabel.click();
-		}
-	}
-
-	$('.hu-image-field').each(function(index, el) {
-
-		var $field = $(el);
-
-		// Upload form
-		$field.find('.btn-hu-image-upload').on('click', function(event) {
-			event.preventDefault();
-			$field.find('.hu-image-upload').click();
+		xhr.upload.addEventListener('progress', event => {
+			if (event.lengthComputable) onProgress(Math.floor((event.loaded / event.total) * 100));
 		});
 
-		//Upload
-		$field.find(".hu-image-upload").on('change', (function(e) {
-			e.preventDefault();
-			var $this = $(this);
-			var file = $(this).prop('files')[0];
-
-			var data = new FormData();
-			var tokenData = getCsrfTokenData();
-
-			data.append('option', 'com_ajax');
-			data.append('helix', 'ultimate');
-			data.append('request', 'task');
-			data.append('action', 'upload-blog-image');
-			data.append('format', 'json');
-
-			Object.keys(tokenData).forEach(function(key) {
-				data.append(key, tokenData[key]);
-			});
-
-			if (file.type.match(/image.*/)) {
-				data.append('image', file);
-
-				$.ajax({
-					type: "POST",
-					data: data,
-					dataType: 'json',
-					contentType: false,
-					cache: false,
-					processData:false,
-					beforeSend: function() {
-						$this.prop('disabled', true);
-						$field.find('.btn-hu-image-upload').attr('disabled', 'disabled');
-						var loader = $('<div class="hu-image-item-loader"><div class="progress" id="upload-image-progress"><div class="bar"></div></div></div>');
-						$field.find('.hu-image-upload-wrapper').addClass('loading').html(loader)
-					},
-					success: function(response)
-					{
-						var data = parseAjaxResponse(response);
-
-						if (!data) {
-							$field.find('.hu-image-upload-wrapper').removeClass('loading').empty();
-							alert(huText('HELIX_ULTIMATE_UPLOAD_IMAGE_FAILED', 'Unable to upload image. Please try again.'));
-							return;
-						}
-
-						if(data.status) {
-							$field.find('.hu-image-upload-wrapper').removeClass('loading').empty().html(data.output);
-						} else {
-							$field.find('.hu-image-upload-wrapper').removeClass('loading').empty();
-						}
-
-						var $image = $field.find('.hu-image-upload-wrapper').find('>img');
-
-						if($image.length) {
-							$('.hu-image-field').removeClass('hu-image-field-empty').addClass('hu-image-field-has-image');
-							$field.find('#jform_attribs_helix_ultimate_image').val($image.data('src'));
-						} else {
-							$('.hu-image-field').removeClass('hu-image-field-has-image').addClass('hu-image-field-empty');
-							$field.find('#jform_attribs_helix_ultimate_image').val('');
-						}
-
-		 				$this.val('');
-		 				$this.prop('disabled', false);
-		 				$field.find('.btn-hu-image-upload').removeAttr('disabled');
-
-					},
-					xhr: function() {
-						myXhr = $.ajaxSettings.xhr();
-						if(myXhr.upload){
-							myXhr.upload.addEventListener('progress', function(evt) {
-								$('#upload-image-progress').find('.bar').css('width', Math.floor(evt.loaded / evt.total *100) + '%');
-							}, false);
-						} else {
-							alert(huText('HELIX_ULTIMATE_UPLOAD_PROGRESS_NOT_SUPPORTED', 'Upload progress is not supported.'));
-						}
-						return myXhr;
-					},
-					error: function()
-					{
-						$field.find('.hu-image-upload-wrapper').empty();
-						$this.val('');
-					}
-				});
+		xhr.addEventListener('load', () => {
+			if (xhr.status >= 200 && xhr.status < 300) {
+				resolve(parseResponse(xhr.responseText));
+			} else {
+				reject(new Error(`${xhr.status} ${xhr.statusText}`));
 			}
+		});
+		xhr.addEventListener('error', () => reject(new Error('Network error')));
 
-			$this.val('');
-
-		}));
-
+		xhr.send(body);
 	});
 
-	// Delete Image
-	$(document).on('click', '.btn-hu-image-remove', function(event) {
+	const removeImage = async src => parseResponse(await request(endpoint, {
+		method: 'POST',
+		data: { ...baseData('remove-blog-image'), id: getArticleId(), src: src || '', ...tokenData() },
+		responseType: 'text',
+	}));
 
-		event.preventDefault();
+	// Featured image
 
-		var $this = $(this);
-		var $parent = $this.closest('.hu-image-field');
-		var articleId = getArticleId();
+	const clearFeaturedImage = field => {
+		field.querySelector('.hu-image-upload-wrapper').innerHTML = '';
+		field.classList.remove('hu-image-field-has-image');
+		field.classList.add('hu-image-field-empty');
+		field.querySelector('.form-field-hu-image').value = '';
+	};
 
-		if (confirm(huText('JGLOBAL_CONFIRM_DELETE', 'Are you sure you want to delete?')) === true) {
-			if (articleId <= 0) {
-				clearFeaturedImageField($parent);
+	document.querySelectorAll('.hu-image-field').forEach(field => {
+		const input = field.querySelector('.hu-image-upload');
+		const button = field.querySelector('.btn-hu-image-upload');
+		const wrapper = field.querySelector('.hu-image-upload-wrapper');
+		const hidden = field.querySelector('.form-field-hu-image');
+
+		button.addEventListener('click', event => {
+			event.preventDefault();
+			input.click();
+		});
+
+		input.addEventListener('change', async () => {
+			const file = input.files[0];
+
+			if (!file || !file.type.match(/image.*/)) {
+				input.value = '';
 				return;
 			}
 
-		    var request = $.extend({
-				'option' : 'com_ajax',
-				'helix' : 'ultimate',
-				'request' : 'task',
-				'action' : 'remove-blog-image',
-				'id'     : articleId,
-				'src'	 : $parent.find('.hu-image-upload-wrapper').find('>img').attr('data-src') || $parent.find('.hu-image-upload-wrapper').find('>img').data('src'),
-				'format' : 'json'
-			}, getCsrfTokenData());
+			input.disabled = true;
+			button.setAttribute('disabled', 'disabled');
+			wrapper.classList.add('loading');
+			wrapper.innerHTML = '<div class="hu-image-item-loader"><div class="progress"><div class="bar"></div></div></div>';
 
-			$.ajax({
-				type: "POST",
-				data   : request,
-				dataType: 'json',
-				success: function(response)
-				{
-					var data = parseAjaxResponse(response);
+			const bar = wrapper.querySelector('.bar');
 
-					if (!data) {
-						alert(huText('HELIX_ULTIMATE_REMOVE_IMAGE_FAILED', 'Unable to remove image. Please try again.'));
-						return;
-					}
+			try {
+				const data = await upload({ image: file }, percent => {
+					bar.style.width = `${percent}%`;
+				});
 
-					if(data.status) {
-						clearFeaturedImageField($parent);
-					} else {
-						alert(data.output || huText('HELIX_ULTIMATE_REMOVE_IMAGE_FAILED', 'Unable to remove image. Please try again.'));
-					}
-				},
-				error: function() {
-					alert(huText('HELIX_ULTIMATE_REMOVE_IMAGE_FAILED', 'Unable to remove image. Please try again.'));
+				wrapper.classList.remove('loading');
+				wrapper.innerHTML = data && data.status ? data.output : '';
+
+				if (!data) {
+					alert(huText('HELIX_ULTIMATE_UPLOAD_IMAGE_FAILED', 'Unable to upload image. Please try again.'));
 				}
-			});
+
+				const image = wrapper.querySelector(':scope > img');
+
+				field.classList.toggle('hu-image-field-has-image', !!image);
+				field.classList.toggle('hu-image-field-empty', !image);
+				hidden.value = image ? image.dataset.src : '';
+			} catch (error) {
+				wrapper.classList.remove('loading');
+				wrapper.innerHTML = '';
+				alert(huText('HELIX_ULTIMATE_UPLOAD_IMAGE_FAILED', 'Unable to upload image. Please try again.'));
+			}
+
+			input.value = '';
+			input.disabled = false;
+			button.removeAttribute('disabled');
+		});
+	});
+
+	delegate(document, 'click', '.btn-hu-image-remove', async (event, target) => {
+		event.preventDefault();
+
+		const field = target.closest('.hu-image-field');
+
+		if (!confirm(huText('JGLOBAL_CONFIRM_DELETE', 'Are you sure you want to delete?'))) return;
+
+		if (getArticleId() <= 0) {
+			clearFeaturedImage(field);
+			return;
+		}
+
+		const failed = huText('HELIX_ULTIMATE_REMOVE_IMAGE_FAILED', 'Unable to remove image. Please try again.');
+
+		try {
+			const data = await removeImage(field.querySelector('.hu-image-upload-wrapper > img')?.dataset.src);
+
+			if (!data) {
+				alert(failed);
+			} else if (data.status) {
+				clearFeaturedImage(field);
+			} else {
+				alert(data.output || failed);
+			}
+		} catch (error) {
+			alert(failed);
 		}
 	});
 
 	// Gallery
-	$('.btn-hu-gallery-item-upload').on('click', function(event) {
+
+	const galleryList = document.querySelector('.hu-gallery-items');
+	const galleryInput = document.getElementById('hu-gallery-item-upload');
+
+	if (!galleryList) return;
+
+	/** Write the gallery order into the hidden field. */
+	const updateGalleryField = () => {
+		const hidden = document.querySelector('.form-field-hu-gallery');
+		const images = [...galleryList.querySelectorAll(':scope > .hu-gallery-item')].map(item => item.dataset.src);
+
+		if (hidden) hidden.value = JSON.stringify({ [hidden.dataset.name || 'helix_ultimate_gallery_images']: images });
+	};
+
+	document.querySelector('.btn-hu-gallery-item-upload')?.addEventListener('click', event => {
 		event.preventDefault();
-		$('#hu-gallery-item-upload').click();
+		galleryInput.click();
 	});
 
-	$('#hu-gallery-item-upload').on('change', function(event) {
-		event.preventDefault();
+	galleryInput?.addEventListener('change', () => {
+		[...galleryInput.files].forEach(async file => {
+			const ext = file.name.split('.').pop().toLowerCase();
 
-		var $this = $(this);
-		var files = $(this).prop('files');
-		var paths = Joomla.getOptions('system.paths');
+			if (!ALLOWED_GALLERY_EXT.includes(ext)) return;
 
-		for (i=0;i<files.length;i++){
-			var ext = files[i].name.split('.').pop().toLowerCase();
-			var allowed = ((ext == 'png') || (ext == 'jpg') || (ext == 'jpeg') || (ext == 'gif') || (ext == 'svg') || (ext == 'webp'));
-			if(allowed) {
-				
-				let gallery_id = 'gallery-id-' + Math.floor(Math.random() * (1e6 - 1 + 1) + 1);
-				
-				var data = new FormData();
-				var tokenData = getCsrfTokenData();
+			const galleryId = `gallery-id-${Math.floor(Math.random() * 1e6) + 1}`;
+			const item = document.createElement('li');
 
-				data.append('option', 'com_ajax');
-				data.append('helix', 'ultimate');
-				data.append('request', 'task');
-				data.append('action', 'upload-blog-image');
-				data.append('image', files[i]);
-				data.append('index', gallery_id);
-				data.append('gallery', true);
-				data.append('format', 'json');
+			item.className = 'hu-gallery-item loading';
+			item.id = galleryId;
+			item.innerHTML = '<div class="progress"><div class="bar"></div></div>';
+			galleryList.append(item);
 
-				Object.keys(tokenData).forEach(function(key) {
-					data.append(key, tokenData[key]);
+			const bar = item.querySelector('.bar');
+			const failed = huText('HELIX_ULTIMATE_UPLOAD_GALLERY_IMAGE_FAILED', 'Unable to upload gallery image. Please try again.');
+
+			try {
+				const data = await upload({ image: file, index: galleryId, gallery: true }, percent => {
+					bar.style.width = `${percent}%`;
 				});
 
-				$.ajax({
-					type: "POST",
-					data: data,
-					dataType: 'json',
-					contentType: false,
-					cache: false,
-					processData:false,
-					beforeSend: function() {
-						var loader = $('<li class="hu-gallery-item loading" id="'+ gallery_id +'"><div class="progress"><div class="bar"></div></div></li>');
-						$('.hu-gallery-items').append(loader);
-					},
-					success: function(response)
-					{
-						var data = parseAjaxResponse(response);
-
-						if (!data) {
-							$('#' + gallery_id).remove();
-							alert(huText('HELIX_ULTIMATE_UPLOAD_GALLERY_IMAGE_FAILED', 'Unable to upload gallery image. Please try again.'));
-							return;
-						}
-
-						if(data.status) {
-							$('#' + gallery_id).attr('data-src', data.data_src).removeClass('loading').empty().html(data.output);
-						} else {
-							$('#' + gallery_id).remove();
-							alert(data.output);
-						}
-
-						let images = [];
-		 				$('.hu-gallery-items').find('>.hu-gallery-item').each(function( index, value ) {
-		 					images.push( '"' + $(value).data('src') + '"' );
-		 				});
-		 				let output = '{"helix_ultimate_gallery_images":['+ images +']}';
-		 				$('#jform_attribs_helix_ultimate_gallery').val(output);
-						
-					},
-					xhr: function() {
-						myXhr = $.ajaxSettings.xhr();
-						if(myXhr.upload) {
-							myXhr.upload.addEventListener('progress', function(evt) {
-								$('#' + gallery_id).find('.bar').css('width', Math.floor(evt.loaded / evt.total *100) + '%');
-							}, false);
-						} else {
-							console.log(huText('HELIX_ULTIMATE_UPLOAD_PROGRESS_NOT_SUPPORTED', 'Upload progress is not supported.'));
-						}
-						return myXhr;
-					}
-				});
-			}
-		}
-		
-		$this.val('');
-
-	});
-
-	// Sortable
-	$('.hu-gallery-items').sortable({
-		stop : function(event,ui){
-			let images = [];
-
-			$('.hu-gallery-item').each(function( index, value ) {
-				images.push( '"' + $(value).data('src') + '"' );
-			});
-
-			let output = '{"helix_ultimate_gallery_images":['+ images +']}';
-			$('#jform_attribs_helix_ultimate_gallery').val(output);
-		}
-	});
-
-	$(document).on('click', '.btn-hu-remove-gallery-image', function(event) {
-		event.preventDefault();
-		var $this = $(this);
-		var $galleryItem = $this.parent();
-		var articleId = getArticleId();
-
-		if (confirm(huText('JGLOBAL_CONFIRM_DELETE', 'Are you sure you want to delete?')) === true) {
-			var updateGalleryField = function() {
-				$galleryItem.remove();
-
-				let images = [];
-
-				$('.hu-gallery-item').each(function( index, value ) {
-					images.push( '"' + $(value).data('src') + '"' );
-				});
-
-				let output = '{"helix_ultimate_gallery_images":['+ images +']}';
-				$('#jform_attribs_helix_ultimate_gallery').val(output);
-			};
-
-			if (articleId <= 0) {
-				updateGalleryField();
-				return;
-			}
-
-		    var request = $.extend({
-				'option' : 'com_ajax',
-				'helix' : 'ultimate',
-				'request' : 'task',
-				'action' : 'remove-blog-image',
-				'id'     : articleId,
-				'src'	 : $galleryItem.attr('data-src') || $galleryItem.data('src'),
-				'format' : 'json'
-			}, getCsrfTokenData());
-
-			$.ajax({
-				type: "POST",
-				data   : request,
-				dataType: 'json',
-				success: function(response)
-				{
-					var data = parseAjaxResponse(response);
-
-					if (!data) {
-						alert(huText('HELIX_ULTIMATE_REMOVE_GALLERY_IMAGE_FAILED', 'Unable to remove gallery image. Please try again.'));
-						return;
-					}
-
-					if(data.status) {
-						updateGalleryField();
-					} else {
-						alert(data.output || huText('HELIX_ULTIMATE_REMOVE_GALLERY_IMAGE_FAILED', 'Unable to remove gallery image. Please try again.'));
-					}
-				},
-				error: function() {
-					alert(huText('HELIX_ULTIMATE_REMOVE_GALLERY_IMAGE_FAILED', 'Unable to remove gallery image. Please try again.'));
+				if (data && data.status) {
+					item.dataset.src = data.data_src;
+					item.classList.remove('loading');
+					item.innerHTML = data.output;
+				} else {
+					item.remove();
+					alert((data && data.output) || failed);
 				}
-			});
-		}
+			} catch (error) {
+				item.remove();
+				alert(failed);
+			}
+
+			updateGalleryField();
+		});
+
+		galleryInput.value = '';
 	});
 
+	if (window.Sortable) {
+		Sortable.create(galleryList, {
+			draggable: '.hu-gallery-item',
+			animation: 150,
+			onEnd: updateGalleryField,
+		});
+	}
+
+	delegate(document, 'click', '.btn-hu-remove-gallery-image', async (event, target) => {
+		event.preventDefault();
+
+		const item = target.closest('.hu-gallery-item');
+
+		if (!confirm(huText('JGLOBAL_CONFIRM_DELETE', 'Are you sure you want to delete?'))) return;
+
+		const removeItem = () => {
+			item.remove();
+			updateGalleryField();
+		};
+
+		if (getArticleId() <= 0) {
+			removeItem();
+			return;
+		}
+
+		const failed = huText('HELIX_ULTIMATE_REMOVE_GALLERY_IMAGE_FAILED', 'Unable to remove gallery image. Please try again.');
+
+		try {
+			const data = await removeImage(item.dataset.src);
+
+			if (!data) {
+				alert(failed);
+			} else if (data.status) {
+				removeItem();
+			} else {
+				alert(data.output || failed);
+			}
+		} catch (error) {
+			alert(failed);
+		}
+	});
 });

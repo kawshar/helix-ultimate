@@ -9,9 +9,7 @@
 defined('_JEXEC') or die();
 
 use HelixUltimate\Framework\Platform\Helper;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Form\FormField;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\File;
@@ -39,12 +37,6 @@ class JFormFieldHelixgallery extends FormField
      */
     protected function getInput()
     {
-        $doc = Factory::getDocument();
-
-        HTMLHelper::_('jquery.framework');
-        $helix_plg_url = Uri::root(true) . '/plugins/system/helixultimate';
-        $doc->addScript($helix_plg_url . '/assets/js/admin/jquery-ui.min.js');
-
         $values = json_decode($this->value ?? "");
 
         if (! empty($values)) {

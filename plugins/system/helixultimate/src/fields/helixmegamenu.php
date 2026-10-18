@@ -235,7 +235,7 @@ class JFormFieldHelixmegamenu extends FormField
 		$html  = '';
 		$html .= '<div>';
 		$html .= '<span class="hu-megamenu-label">' . $label . '</span>';
-		$html .= '<input type="text" class="minicolors" id="hu-menu-badge-' . $name . '" placeholder="' . $placeholder . '" value="' . $value . '" />';
+		$html .= '<input type="text" class="hu-color-input" id="hu-menu-badge-' . $name . '" placeholder="' . htmlspecialchars($placeholder, ENT_QUOTES, 'UTF-8') . '" value="' . htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') . '" autocomplete="off" />';
 		$html .= '</div>';
 
 		return $html;
