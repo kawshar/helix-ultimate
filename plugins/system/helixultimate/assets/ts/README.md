@@ -16,4 +16,4 @@ Rules that keep the output compatible:
 - **Keep the public surface.** Whatever a script exposed before (on `Joomla` or as bare names on `window`) must still be exposed after the conversion.
 - **Never edit the generated `.js`** of a converted script. Edit the `.ts` source and rebuild.
 
-Converted so far: `utils`, `toaster`, `modal`, `fields`, `devices-field`, `webfont`, `media`, `presets`, `typography`, `layout`. The other scripts in `assets/js/admin/` are still hand-written JS.
+Converted so far: `utils`, `toaster`, `modal`, `fields`, `devices-field`, `webfont`, `media`, `presets`, `typography`, `layout`, `treeSortable`, `menubuilder`. The other scripts in `assets/js/admin/` are still hand-written JS.

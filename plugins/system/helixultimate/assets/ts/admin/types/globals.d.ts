@@ -17,18 +17,12 @@
 import type { HelixLayoutApi } from '../layout';
 import type { HelixModalApi } from '../modal';
 import type { HelixToasterApi } from '../toaster';
+import type { HelixMenuTree } from '../treeSortable';
 import type { HelixUtils } from '../utils';
 
 declare global {
 	interface JoomlaText {
 		_(key: string, fallback?: string): string;
-	}
-
-	/** Menu tree from treeSortable.js. */
-	interface HelixMenuTree {
-		getLevel(branch: Element): number;
-		nextSibling(branch: Element): Element | null;
-		[member: string]: unknown;
 	}
 
 	interface JoomlaApi {
@@ -44,7 +38,10 @@ declare global {
 		/** `data-revealon` showon for fields rendered in modals (fields.js). */
 		setUpShowon?(container?: ParentNode | null): void;
 		helixLayout?: HelixLayoutApi;
-		helixMegaMenu?: unknown;
+		/** Mega menu builder (megamenu.js). */
+		helixMegaMenu?: { run(): void; [member: string]: unknown };
+		/** Reload the customizer preview (helix-ultimate.js). */
+		reloadPreview?(): void;
 		helixSwitchDevice?: (device: string) => void;
 		helixLoading?: unknown;
 		helixDraftChanges?: () => void;
