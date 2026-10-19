@@ -589,8 +589,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Kept so existing selectors (and third-party CSS) still match the settings.
 		content.classList.add('hu-options-modal-content', 'hu-layout-settings');
 
-		const apply = `<button type="button" class="hu-btn hu-btn-primary hu-settings-apply" data-flag="${flag}">${Joomla.utils.icon('check')} Apply</button>`;
-
 		if (host) {
 			const step = Joomla.helixSubpanel.open({
 				host,
@@ -598,7 +596,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				body: content,
 				backLabel: 'Back to layout',
 				className: 'hu-subpanel-layout-settings',
-				footer: apply + footerButtons.join(''),
+				// Settings apply as they change (the global Save keeps them); only actions stay here.
+				footer: footerButtons.join('') || undefined,
 				onClose: () => {
 					if (settingsStep === step) settingsStep = null;
 				},
@@ -618,6 +617,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		Joomla.initColorPicker?.();
+
+		// Apply as you edit: titles follow typing, and a committed change updates the layout
+		// (and drafts it). After the document handlers, which can undo a change (component area).
+		content.addEventListener('input', () => applySettings(flag, content, target, false));
+		content.addEventListener('change', () => setTimeout(() => applySettings(flag, content, target, true)));
 
 		return content;
 	}
@@ -734,18 +738,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.body.classList.remove('hu-options-modal-open');
 	};
 
-	/** Apply row / column settings. */
-	delegate(document, 'click', '.hu-settings-apply', (event, button) => {
-		event.preventDefault();
+	/**
+	 * Store the settings in `content` on the row or column they were opened for.
+	 * `commit` also writes the layout field, which drafts the change for the preview.
+	 */
+	function applySettings(flag: string, content: HTMLElement, target: Element, commit: boolean): void {
+		const inputs = [...content.querySelectorAll<SettingsInput>('.hu-input')];
 
-		// Only the open settings: a step that is still sliding away has inputs too.
-		const inputs = [...(settingsContent()?.querySelectorAll<SettingsInput>('.hu-input') ?? [])];
-
-		switch (button.dataset.flag) {
+		switch (flag) {
 			case 'row-setting': {
-				const row = builder.querySelector('.row-active');
-
-				if (!row) break;
+				const row = target;
 
 				inputs.forEach(input => {
 					const name = input.dataset.attrname ?? '';
@@ -761,10 +763,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 
 			case 'column-setting': {
-				const column = builder.querySelector('.column-active');
+				const column = target;
 				let component = false;
-
-				if (!column) break;
 
 				inputs.forEach(input => {
 					const name = input.dataset.attrname ?? '';
@@ -782,17 +782,23 @@ document.addEventListener('DOMContentLoaded', () => {
 				break;
 			}
 
-			case 'menu-row-setting':
-			case 'menu-col-setting':
-				break;
-
 			default:
-				alert('You are doing somethings wrongs. Try again');
+				return;
 		}
 
+		if (commit) updateLayoutField();
+	}
+
+	/** The classic settings modal (no customizer panel) still applies with its button. */
+	delegate(document, 'click', '.hu-settings-apply', (event, button) => {
+		event.preventDefault();
+
+		const content = settingsContent();
+		const target = builder.querySelector(button.dataset.flag === 'row-setting' ? '.row-active' : '.column-active');
+
+		if (content && target && button.dataset.flag) applySettings(button.dataset.flag, content, target, true);
+
 		closeSettings();
-		updateLayoutField();
-		Joomla.HelixToaster.success('Changes applied successfully!', 'Layout Settings');
 	});
 
 	delegate(document, 'click', '.hu-settings-cancel, .action-hu-options-modal-close', event => {

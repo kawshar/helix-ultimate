@@ -69,6 +69,20 @@ class MegaMenuBuilder extends Builder
 	}
 
 	/**
+	 * Build from these settings instead of the stored ones (a customizer draft).
+	 *
+	 * @param	array	$settings	Sanitized mega menu settings.
+	 *
+	 * @return	void
+	 * @since	2.2.11
+	 */
+	public function useSettings(array $settings)
+	{
+		$this->params = clone $this->params;
+		$this->params->set('helixultimatemenulayout', \json_encode($settings));
+	}
+
+	/**
 	 * Get mega menu settings from the params.
 	 *
 	 * @return	stdClass	The mega menu settings object.

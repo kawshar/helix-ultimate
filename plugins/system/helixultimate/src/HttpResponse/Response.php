@@ -237,6 +237,14 @@ class Response
 		$layout = new FileLayout('megaMenu.container', HELIX_LAYOUT_PATH);
 		$builder = new MegaMenuBuilder($itemId);
 
+		// Settings drafted in the customizer (not saved yet) open instead of the stored ones.
+		$draft = \json_decode($input->post->get('draft', '', 'RAW') ?: 'null', true);
+
+		if (\is_array($draft))
+		{
+			$builder->useSettings(Helper::sanitizeMegaMenuSettings($draft));
+		}
+
 		return [
 			'status' => true,
 			'html' => $layout->render(['itemId' => $itemId, 'builder' => $builder])
@@ -251,9 +259,27 @@ class Response
 	 */
 	public static function saveMegaMenuSettings()
 	{
-		$user   = Factory::getApplication()->getIdentity();
-		$input  = Factory::getApplication()->input;
-		$itemId = $input->post->get('id', 0, 'INT');
+		$input = Factory::getApplication()->input;
+
+		return self::storeMegaMenuSettings(
+			$input->post->get('id', 0, 'INT'),
+			$input->post->get('settings', [], 'ARRAY')
+		);
+	}
+
+	/**
+	 * Write mega menu settings to a menu item, when the user may edit its menu.
+	 * Also used by the customizer's Save for the mega menus it drafted.
+	 *
+	 * @param	int		$itemId		The menu item ID.
+	 * @param	array	$settings	Raw settings (sanitized here).
+	 *
+	 * @return	array	The response array.
+	 * @since	2.2.11
+	 */
+	public static function storeMegaMenuSettings(int $itemId, array $settings): array
+	{
+		$user = Factory::getApplication()->getIdentity();
 
 		if (!$user || !$user->id || $itemId <= 0) {
 			return [
@@ -306,14 +332,14 @@ class Response
 			];
 		}
 
-		$settings = Helper::sanitizeMegaMenuSettings($input->post->get('settings', [], 'ARRAY'));
+		$settings = Helper::sanitizeMegaMenuSettings($settings);
 		$params   = $item->getParams();
 		$params->set('helixultimatemenulayout', \json_encode($settings));
 
 		$response = self::updateMenuItem($itemId, $params);
 
 		return [
-			'status' => true,
+			'status' => $response === true,
 			'data'   => $response
 		];
 	}

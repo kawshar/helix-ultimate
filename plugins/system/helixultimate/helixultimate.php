@@ -430,6 +430,15 @@ class PlgSystemHelixultimate extends CMSPlugin
 
 		$this->attachWebAsset();
 
+		// The customizer preview shows drafted mega menus.
+		Helper::applyDraftedMegaMenus();
+
+		// Keep the preview token (in the URL) from leaking to other sites through the Referer.
+		if ($this->app->isClient('site') && $this->app->input->get('helixPreview', '', 'STRING') !== '')
+		{
+			$this->app->setHeader('Referrer-Policy', 'same-origin', true);
+		}
+
 		// Legacy framework identifier consumed by downstream Helix scripts.
 		$this->app->input->set('helix_id', 9);
 

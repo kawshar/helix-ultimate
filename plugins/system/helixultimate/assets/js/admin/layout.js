@@ -363,7 +363,6 @@
       const content = document.getElementById(templateId).cloneNode(true);
       content.removeAttribute("id");
       content.classList.add("hu-options-modal-content", "hu-layout-settings");
-      const apply = `<button type="button" class="hu-btn hu-btn-primary hu-settings-apply" data-flag="${flag}">${Joomla.utils.icon("check")} Apply</button>`;
       if (host) {
         const step = Joomla.helixSubpanel.open({
           host,
@@ -371,7 +370,8 @@
           body: content,
           backLabel: "Back to layout",
           className: "hu-subpanel-layout-settings",
-          footer: apply + footerButtons.join(""),
+          // Settings apply as they change (the global Save keeps them); only actions stay here.
+          footer: footerButtons.join("") || void 0,
           onClose: () => {
             if (settingsStep === step) settingsStep = null;
           }
@@ -387,6 +387,8 @@
         showMediaPreview(input, value);
       });
       Joomla.initColorPicker?.();
+      content.addEventListener("input", () => applySettings(flag, content, target, false));
+      content.addEventListener("change", () => setTimeout(() => applySettings(flag, content, target, true)));
       return content;
     }
     const settingsContent = () => settingsStep?.body.querySelector(".hu-options-modal-content") ?? document.querySelector(".hu-options-modal .hu-options-modal-content");
@@ -468,13 +470,11 @@
       document.querySelectorAll(".hu-options-modal-overlay, .hu-options-modal").forEach((element) => element.remove());
       document.body.classList.remove("hu-options-modal-open");
     };
-    delegate(document, "click", ".hu-settings-apply", (event, button) => {
-      event.preventDefault();
-      const inputs = [...settingsContent()?.querySelectorAll(".hu-input") ?? []];
-      switch (button.dataset.flag) {
+    function applySettings(flag, content, target, commit) {
+      const inputs = [...content.querySelectorAll(".hu-input")];
+      switch (flag) {
         case "row-setting": {
-          const row = builder.querySelector(".row-active");
-          if (!row) break;
+          const row = target;
           inputs.forEach((input) => {
             const name = input.dataset.attrname ?? "";
             if (name === "name") {
@@ -486,9 +486,8 @@
           break;
         }
         case "column-setting": {
-          const column = builder.querySelector(".column-active");
+          const column = target;
           let component = false;
-          if (!column) break;
           inputs.forEach((input) => {
             const name = input.dataset.attrname ?? "";
             const title = column.querySelector(".hu-column-title");
@@ -502,15 +501,17 @@
           });
           break;
         }
-        case "menu-row-setting":
-        case "menu-col-setting":
-          break;
         default:
-          alert("You are doing somethings wrongs. Try again");
+          return;
       }
+      if (commit) updateLayoutField();
+    }
+    delegate(document, "click", ".hu-settings-apply", (event, button) => {
+      event.preventDefault();
+      const content = settingsContent();
+      const target = builder.querySelector(button.dataset.flag === "row-setting" ? ".row-active" : ".column-active");
+      if (content && target && button.dataset.flag) applySettings(button.dataset.flag, content, target, true);
       closeSettings();
-      updateLayoutField();
-      Joomla.HelixToaster.success("Changes applied successfully!", "Layout Settings");
     });
     delegate(document, "click", ".hu-settings-cancel, .action-hu-options-modal-close", (event) => {
       event.preventDefault();

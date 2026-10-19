@@ -251,7 +251,22 @@ class Request
 			return;
 		}
 
+		// Mega menus edited in the customizer are drafted with the style; they belong to their menu items.
+		$megaMenus = \json_decode((string) ($inputs['megamenu_drafts'] ?? ''), true);
+		unset($inputs['megamenu_drafts']);
+
 		$update = Helper::updateTemplateStyle($this->id, $inputs);
+
+		if ($update && \is_array($megaMenus))
+		{
+			foreach ($megaMenus as $itemId => $settings)
+			{
+				if (\is_array($settings))
+				{
+					Response::storeMegaMenuSettings((int) $itemId, $settings);
+				}
+			}
+		}
 
 		$keyOptions = [
 			'option' => 'com_ajax',

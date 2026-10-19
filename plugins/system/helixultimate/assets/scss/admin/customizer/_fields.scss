@@ -326,10 +326,17 @@
 
 /* Predefined header / off-canvas pickers: selection is a 2px blue outline */
 #helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap {
+	display: block;
+	width: 100%;
 	overflow: hidden;
 	border: 1px solid var(--sp-divider);
 	border-radius: var(--sp-radius);
 	background: var(--sp-panel);
+}
+
+#helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap img {
+	display: block;
+	width: 100%;
 }
 
 #helix-ultimate :is(.hu-header-list, .hu-offcanvas-list) > li > .img-wrap::after {

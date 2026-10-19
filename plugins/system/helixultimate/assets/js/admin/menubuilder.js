@@ -11,6 +11,13 @@
     const container = containerElement;
     let menuType = menuSelect && menuSelect.value || "mainmenu";
     const helixUrl = (action, extra = "") => `${config.base}/administrator/index.php?option=com_ajax&helix=ultimate&request=task&action=${action}${extra}&helix_id=${window.helixUltimateStyleId}`;
+    const readDrafts = () => {
+      try {
+        return JSON.parse(document.querySelector('#hu-style-form [name="megamenu_drafts"]')?.value || "{}") || {};
+      } catch (error) {
+        return {};
+      }
+    };
     const branchOf = (element) => element.closest(".hu-menu-tree-branch");
     const itemIdOf = (element) => Number(branchOf(element)?.dataset.itemid || 0);
     async function fetchMenuItems(type) {
@@ -70,7 +77,12 @@
       const isMega = parent === "1";
       const itemTitle = branch?.querySelector(".hu-branch-title")?.textContent?.trim() || "";
       try {
-        const response = await request(helixUrl("generateMegaMenuBody", `&id=${itemIdOf(link)}`));
+        const drafts = readDrafts();
+        const draft = drafts[itemIdOf(link)];
+        const response = await request(
+          helixUrl("generateMegaMenuBody", `&id=${itemIdOf(link)}`),
+          draft ? { method: "POST", data: param({ draft: JSON.stringify(draft) }) } : {}
+        );
         if (!response.status) return;
         const title = isMega ? "Mega Menu" : "Settings";
         if (!host) {
@@ -92,8 +104,7 @@
           width: isMega ? 760 : void 0,
           className: isMega ? "hu-subpanel-megamenu" : "hu-subpanel-menu-settings",
           // Root items: the settings column can slide away to give the columns room.
-          headerActions: isMega ? `<button type="button" class="hu-subpanel-action hu-megamenu-settings-toggle" aria-pressed="false">${settingsIcon}<span>Settings</span></button>` : void 0,
-          footer: `<button type="button" class="hu-btn hu-btn-primary hu-megamenu-save-btn">${Joomla.utils.icon("check")} Save</button><button type="button" class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>`
+          headerActions: isMega ? `<button type="button" class="hu-subpanel-action hu-megamenu-settings-toggle" aria-pressed="false">${settingsIcon}<span>Settings</span></button>` : void 0
         });
         Joomla.helixMegaMenu?.run({ root: body, close: () => step.close() });
         const toggle = step.header.querySelector(".hu-megamenu-settings-toggle");

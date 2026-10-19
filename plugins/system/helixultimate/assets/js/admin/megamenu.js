@@ -47,6 +47,7 @@
 	const state = {
 		root: null,
 		close: null,
+		live: false,
 		itemId: 0,
 		baseUrl: '',
 		settings: { ...DEFAULT_SETTINGS },
@@ -77,6 +78,41 @@
 	const rowIdOf = element => Number((element.closest('.hu-megamenu-row-wrapper') || {}).dataset?.rowid || 1);
 	const columnIdOf = element => Number((element.closest('.hu-megamenu-col') || {}).dataset?.columnid || 1);
 
+	/*
+	 * In the customizer panel the builder has no Save: each change is put in the
+	 * style form's `megamenu_drafts` field (by menu item) and drafted, so the
+	 * preview shows it, Restore drops it and the global Save writes it to the item.
+	 */
+	let staged = '';
+
+	function stage() {
+		const input = document.querySelector('#hu-style-form [name="megamenu_drafts"]');
+		const json = JSON.stringify(state.settings);
+
+		if (!state.live || !input || !state.itemId || json === staged) return;
+
+		let drafts = {};
+
+		try {
+			drafts = JSON.parse(input.value || '{}') || {};
+		} catch (error) {
+			drafts = {};
+		}
+
+		staged = json;
+		drafts[state.itemId] = state.settings;
+		input.value = JSON.stringify(drafts);
+
+		Joomla.helixDraftChanges?.();
+	}
+
+	// After the click / change has updated the settings (and quick edits settle).
+	let stageTimer = null;
+	const stageSoon = () => {
+		clearTimeout(stageTimer);
+		stageTimer = setTimeout(stage, 200);
+	};
+
 	/* ------------------------------------------------------------------ */
 	/* Settings data                                                       */
 	/* ------------------------------------------------------------------ */
@@ -84,12 +120,14 @@
 	function swapRow(prev, curr) {
 		const [row] = state.settings.layout.splice(prev, 1);
 		state.settings.layout.splice(curr, 0, row);
+		stageSoon();
 	}
 
 	function swapColumn(rowIndex, prev, curr) {
 		const columns = state.settings.layout[rowIndex].attr;
 		const [column] = columns.splice(prev, 1);
 		columns.splice(curr, 0, column);
+		stageSoon();
 	}
 
 	function swapItem({ prevRowIndex, prevColIndex, prevItemIndex, currRowIndex, currColIndex, currItemIndex }) {
@@ -104,6 +142,7 @@
 
 		toItems.splice(toItems.length ? currItemIndex : 0, 0, item);
 		target.items = toItems;
+		stageSoon();
 	}
 
 	/** Re-number rows / columns after they move. */
@@ -383,6 +422,7 @@
 			closePopover(true);
 			column.items.push({ type, item_id: itemId });
 			row.attr[columnId - 1] = column;
+			stageSoon();
 		}
 	}
 
@@ -777,6 +817,7 @@
 			refreshSortable(['item']);
 			layoutRow(columnsContainer.closest('.hu-megamenu-row-wrapper'));
 			columnsContainer.querySelectorAll('.hu-megamenu-cell[data-type="menu_item"]').forEach(renderCellChildren);
+			stageSoon();
 		}
 	}
 
@@ -793,6 +834,7 @@
 			state.settings.layout.push(response.row);
 			refreshSortable();
 			layoutRow(qa('.hu-megamenu-row-wrapper').pop());
+			stageSoon();
 		}
 	}
 
@@ -817,6 +859,13 @@
 
 	function bindEvents() {
 		const { delegate } = Joomla.utils;
+
+		// Most edits change the settings right away: stage whatever an interaction changed.
+		['change', 'click', 'pointerup', 'drop', 'keyup'].forEach(type =>
+			document.addEventListener(type, event => {
+				if (state.live && state.root && state.root.contains(event.target)) stageSoon();
+			})
+		);
 
 		delegate(document, 'click', '.hu-megamenu-save-btn', event => {
 			event.preventDefault();
@@ -1014,6 +1063,8 @@
 
 	function run(options = {}) {
 		state.close = typeof options.close === 'function' ? options.close : null;
+		// Opened as a panel step: edits are drafted (see stage()); the classic modal saves with its button.
+		state.live = Boolean(state.close);
 		state.root = options.root || document.querySelector('.hu-modal.hu-mega-menu-builder') || null;
 
 		if (!bound) {
@@ -1029,6 +1080,7 @@
 		state.settings = { ...DEFAULT_SETTINGS, ...settings };
 		state.itemId = (q('#hu-menu-itemid') || {}).value || 0;
 		state.baseUrl = (q('#hu-base-url') || {}).value || '';
+		staged = JSON.stringify(state.settings);
 
 		Joomla.initColorPicker();
 

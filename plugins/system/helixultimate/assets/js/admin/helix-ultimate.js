@@ -26,8 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('hu-style-form');
 	const previewFrame = document.getElementById('hu-template-preview');
 
-	let delayTimeout = null;
-
 	/**
 	 * Colour pickers (Coloris).
 	 *
@@ -79,33 +77,58 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Preview                                                             */
 	/* ------------------------------------------------------------------ */
 
-	/** Reload the preview iframe. */
+	/**
+	 * Reload the preview iframe at the same scroll position.
+	 * Resolves once the new page has loaded (at once when nothing was reloaded).
+	 */
 	function reloadPreview() {
-		const url = previewFrame.contentWindow.location.href;
+		const win = previewFrame.contentWindow;
+		const url = win.location.href;
 
 		// Only reload when the iframe has really loaded something.
-		if (url.length && url !== 'about:blank') {
+		if (!url.length || url === 'about:blank') return Promise.resolve();
+
+		const { scrollX, scrollY } = win;
+
+		return new Promise(resolve => {
+			const done = () => {
+				clearTimeout(timeout);
+				previewFrame.removeEventListener('load', onLoad);
+				resolve();
+			};
+			const onLoad = () => {
+				previewFrame.contentWindow.scrollTo(scrollX, scrollY);
+				done();
+			};
+			// Never leave the status spinning when the preview does not load.
+			const timeout = setTimeout(done, 15000);
+
+			previewFrame.addEventListener('load', onLoad);
 			previewFrame.src = previewFrame.getAttribute('src');
-		}
+		});
 	}
 
 	Joomla.reloadPreview = reloadPreview;
+
+	// The preview token (see Helper::createPreviewToken()) lets the site show the draft.
+	const previewToken = new URL(previewFrame.getAttribute('src'), location.href).searchParams.get('helixPreview');
 
 	previewFrame.addEventListener('load', () => {
 		const iDocument = previewFrame.contentWindow.document;
 
 		/**
-		 * Tag every link inside the preview with `helixMode=edit`, so pages
-		 * opened inside the iframe keep rendering in edit mode.
+		 * Tag every link to this site inside the preview with `helixMode=edit` (and
+		 * the preview token), so pages opened inside the iframe keep showing the draft.
 		 */
 		iDocument.querySelectorAll('a').forEach(anchor => {
 			const href = anchor.getAttribute('href') || '';
-			if (href === '#' || href === '') return;
+			if (href === '#' || href === '' || anchor.origin !== location.origin) return;
 
 			const url = new URLSearchParams(new URL(anchor.href).search);
 
 			if (url.has('helixMode')) return;
 			url.append('helixMode', 'edit');
+			if (previewToken) url.append('helixPreview', previewToken);
 
 			const urlArr = anchor.href.split('?');
 			urlArr[1] = url.toString();
@@ -133,29 +156,32 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Draft status                                                        */
 	/* ------------------------------------------------------------------ */
 
-	const loadingEl = document.querySelector('.hu-loading-msg');
-	const doneEl = document.querySelector('.hu-done-msg');
-	const resetBtn = document.querySelector('.action-reset-drafts');
+	/**
+	 * Draft status: one slot in every panel header, before Save. It shows a spinner
+	 * while a change is drafted and the preview reloads, then Restore while a draft
+	 * exists. The preview updating is the confirmation, so there is no extra "done" step.
+	 */
+	const loadingEls = () => [...document.querySelectorAll('.hu-loading-msg')];
+	const resetButtons = () => [...document.querySelectorAll('.action-reset-drafts')];
 
-	const hideStatus = () => [loadingEl, doneEl, resetBtn].forEach(hide);
+	// Opening the customizer drops any earlier draft, so it starts without one.
+	let hasDraft = false;
 
-	function delay(ms = 500) {
-		return new Promise(resolve => {
-			delayTimeout = setTimeout(resolve, ms);
-		});
+	/** No draft left (saved or restored). */
+	function hideStatus() {
+		hasDraft = false;
+
+		// Drafted mega menus are now saved to their items, or dropped.
+		const megaMenus = form.querySelector('[name="megamenu_drafts"]');
+		if (megaMenus) megaMenus.value = '';
+
+		[...loadingEls(), ...resetButtons()].forEach(element => hide(element));
 	}
 
 	Joomla.helixLoading = function (status, draft) {
-		hideStatus();
-		show(status ? loadingEl : doneEl, 'block');
-
-		if (delayTimeout) clearTimeout(delayTimeout);
-
-		(async () => {
-			if (!status) await delay(2000);
-			hide(doneEl);
-			toggle(resetBtn, draft, 'inline-flex');
-		})();
+		if (!status) hasDraft = !!draft;
+		loadingEls().forEach(element => toggle(element, status, 'inline-flex'));
+		resetButtons().forEach(button => toggle(button, !status && hasDraft, 'inline-flex'));
 	};
 
 	/* ------------------------------------------------------------------ */
@@ -214,22 +240,65 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Drafts                                                              */
 	/* ------------------------------------------------------------------ */
 
-	async function draftChanges() {
-		collectComposites();
+	let draftTimer = null; // a change waiting to be drafted
+	let draftRun = null; // the running draft (request + preview reload)
+	let draftAgain = false; // more changes came in while it ran
 
+	/**
+	 * Draft the form. Quick changes (typing, dragging a picker, blur + change) are
+	 * collected into one request, and only one runs at a time: changes made while it
+	 * runs are drafted right after, so the preview only reloads for the latest state.
+	 */
+	function draftChanges() {
 		Joomla.helixLoading(true, false);
+		clearTimeout(draftTimer);
+		draftTimer = setTimeout(runDraft, 300);
+	}
 
-		try {
-			const data = await request(ajaxUrl('draft-tmpl-style'), { method: 'POST', data: formData() });
+	async function runDraft() {
+		draftTimer = null;
 
-			if (data.status) {
-				reloadPreview();
-				previewFrame.addEventListener('load', () => Joomla.helixLoading(false, data.isDrafted), { once: true });
-			}
-		} catch (error) {
-			console.error('error: Something went wrong!', error);
-			Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
+		if (draftRun) {
+			draftAgain = true;
+			return;
 		}
+
+		draftRun = (async () => {
+			collectComposites();
+
+			try {
+				const data = await request(ajaxUrl('draft-tmpl-style'), { method: 'POST', data: formData() });
+
+				if (!data.status) throw new Error(data.message || 'Could not draft the changes.');
+
+				hasDraft = !!data.isDrafted;
+
+				// Newer changes are on their way: skip reloading for this state.
+				if (!draftAgain) await reloadPreview();
+			} catch (error) {
+				console.error('error: Something went wrong!', error);
+				Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
+			}
+		})();
+
+		await draftRun;
+		draftRun = null;
+
+		if (draftAgain) {
+			draftAgain = false;
+			return runDraft();
+		}
+
+		if (!draftTimer) Joomla.helixLoading(false, hasDraft);
+	}
+
+	/** Drop a change still waiting to be drafted and wait for the running one (before save / restore). */
+	async function settleDrafts() {
+		clearTimeout(draftTimer);
+		draftTimer = null;
+		draftAgain = false;
+
+		if (draftRun) await draftRun;
 	}
 
 	Joomla.helixDraftChanges = draftChanges;
@@ -361,15 +430,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	if (resetBtn) {
-		resetBtn.addEventListener('click', async event => {
+	{
+		delegate(document, 'click', '.action-reset-drafts', async (event, resetBtn) => {
 			event.preventDefault();
 
-			if (resetBtn.classList.contains('hide')) return;
-
-			touchedControls().forEach(control => control.classList.add('field-reset'));
-
 			if (!window.confirm('Do you really want to reset your settings?')) return;
+
+			await settleDrafts();
+			touchedControls().forEach(control => control.classList.add('field-reset'));
 
 			collectComposites();
 
@@ -391,44 +459,66 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Save                                                                */
 	/* ------------------------------------------------------------------ */
 
-	/** Spinner + disabled state on every Save button (one per panel header). */
-	function showSaveLoader(status) {
+	/**
+	 * Every Save button (one per panel header) shows the same state:
+	 * 'saving' (spinner, disabled), 'saved' (a check for a moment) or idle.
+	 */
+	let savedTimer = null;
+
+	function setSaveState(state) {
+		clearTimeout(savedTimer);
+
 		document.querySelectorAll('.action-save-template').forEach(button => {
-			button.disabled = status;
-			button.classList.toggle('is-saving', status);
-			button.querySelector('.hu-topbar-save-spinner')?.classList.toggle('hidden', !status);
+			button.disabled = state === 'saving';
+			button.setAttribute('aria-busy', String(state === 'saving'));
+
+			if (state) button.dataset.state = state;
+			else delete button.dataset.state;
 		});
+
+		if (state === 'saved') savedTimer = setTimeout(() => setSaveState(null), 1400);
 	}
 
-	const saveTemplate = Joomla.utils.debounce(async event => {
+	let saving = false;
+
+	async function saveTemplate(event) {
 		if (event) event.preventDefault();
 
-		showSaveLoader(true);
+		// One save at a time (a click while saving, or Ctrl/Cmd + S held down, is ignored).
+		if (saving) return;
 
-		// Don't show the reset button for a draft that is now saved.
-		if (delayTimeout) clearTimeout(delayTimeout);
+		saving = true;
+		setSaveState('saving');
 
-		collectComposites();
+		let saved = false;
 
 		try {
+			// Save after the last draft, so a late draft does not undo the save.
+			await settleDrafts();
+
+			collectComposites();
+
 			const data = await request(ajaxUrl('save-tmpl-style'), { method: 'POST', data: formData() });
 
 			if (data.status) {
+				saved = true;
 				previewFrame.contentWindow.location.reload();
 				Joomla.HelixToaster.success('Changes have been successfully saved!', 'Success');
-			} else {
-				Joomla.HelixToaster.error(data.message, 'Failed');
-			}
 
-			hideStatus();
-			updateSetvalue();
+				// Only a saved draft is gone: after a failure the changes stay drafted.
+				hideStatus();
+				updateSetvalue();
+			} else {
+				Joomla.HelixToaster.error(data.message || 'Could not save the changes.', 'Failed');
+			}
 		} catch (error) {
 			console.error('error', error);
 			Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
 		}
 
-		showSaveLoader(false);
-	}, 500);
+		saving = false;
+		setSaveState(saved ? 'saved' : null);
+	}
 
 	document.querySelectorAll('.action-save-template').forEach(button => button.addEventListener('click', saveTemplate));
 

@@ -79,19 +79,52 @@ $hu-logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox=
 	outline-offset: 1px;
 }
 
-#helix-ultimate .hu-panel-save:disabled {
-	opacity: 0.75;
+/* Saving: the label stays (keeping the width) but hidden, a spinner covers it;
+   after a save a check shows for a moment. Set by data-state in helix-ultimate.js. */
+#helix-ultimate .hu-panel-save {
+	position: relative;
+}
+
+#helix-ultimate .hu-panel-save-state {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	visibility: hidden;
+}
+
+#helix-ultimate .hu-panel-save-state svg {
+	display: none;
+}
+
+#helix-ultimate .hu-panel-save:is([data-state="saving"], [data-state="saved"]) .helix-topbar-save-text {
+	visibility: hidden;
+}
+
+#helix-ultimate .hu-panel-save:is([data-state="saving"], [data-state="saved"]) .hu-panel-save-state {
+	visibility: visible;
+}
+
+#helix-ultimate .hu-panel-save[data-state="saving"] .hu-icon-spinner,
+#helix-ultimate .hu-panel-save[data-state="saved"] .hu-icon-check {
+	display: block;
+}
+
+#helix-ultimate .hu-panel-save[data-state="saving"] {
+	opacity: 1; // .hu-btn-primary:disabled fades it; the spinner says enough.
 	cursor: progress;
 }
 
-#helix-ultimate .hu-panel-save .spinner-border {
-	width: 12px;
-	height: 12px;
-	border-width: 2px;
+#helix-ultimate .hu-panel-save[data-state="saved"] {
+	color: #fff;
+	background: var(--sp-published);
+	transition: background-color 0.2s, color 0.2s;
 }
 
-#helix-ultimate .hu-panel-save .hidden {
-	display: none;
+#helix-ultimate .hu-panel-save:disabled:not([data-state]) {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 
 
@@ -137,4 +170,39 @@ $hu-logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox=
 /* Section labels without a group (e.g. Custom Code) */
 #helix-ultimate .hu-no-group-wrap {
 	padding: 16px;
+}
+
+/* Restore (discard unsaved changes): a quiet icon button just before Save,
+   shown only while there are unsaved changes. */
+#helix-ultimate .hu-panel-header .hu-panel-restore {
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 28px;
+	height: 28px;
+	margin-right: -2px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--sp-radius);
+	color: var(--sp-icon);
+	background: transparent;
+	cursor: pointer;
+}
+
+#helix-ultimate .hu-panel-header .hu-panel-restore:hover,
+#helix-ultimate .hu-panel-header .hu-panel-restore:focus-visible {
+	color: var(--sp-danger, #dc2626);
+	background: color-mix(in srgb, var(--sp-danger, #dc2626) 10%, transparent);
+}
+
+/* Draft status: the spinner takes Restore's place while a change is drafted,
+   so the header does not shift. */
+#helix-ultimate .hu-panel-header .hu-loading-msg {
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 28px;
+	height: 28px;
+	margin-right: -2px;
+	color: var(--sp-muted);
 }

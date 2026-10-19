@@ -58,9 +58,21 @@ $headerTitle = isset($panelHeadings[$headerTitle])
 <div class="hu-edit-panel <?php echo strtolower($fieldset->name); ?>-panel">
 	<div class="hu-panel-header">
 		<span class="hu-panel-title"><?php echo $headerTitle; ?></span>
+		<?php // Draft status, one slot before Save: a spinner while a change is drafted, then Restore while a draft exists. ?>
+		<span class="hu-loading-msg" role="status" style="display: none;">
+			<?php echo \HelixUltimate\Framework\Platform\Icon::get('spinner', ['class' => 'hu-spin']); ?>
+			<span class="visually-hidden"><?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_DRAFTING'); ?></span>
+		</span>
+		<button type="button" class="hu-panel-restore action-reset-drafts" title="<?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_RESET_DRAFT'); ?>" aria-label="<?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_RESET_DRAFT'); ?>" style="display: none;">
+			<?php echo \HelixUltimate\Framework\Platform\Icon::get('history'); ?>
+		</button>
 		<button type="button" class="hu-btn hu-btn-primary hu-panel-save action-save-template" title="<?php echo Text::_('HELIX_ULTIMATE_SAVE_CHANGES'); ?> (Ctrl/⌘ S)">
-			<span class="hu-topbar-save-spinner hidden spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			<?php // The label keeps the button's width; while saving (and briefly after) an icon covers it. ?>
 			<span class="helix-topbar-save-text"><?php echo Text::_('HELIX_ULTIMATE_SAVE_CHANGES'); ?></span>
+			<span class="hu-panel-save-state" aria-hidden="true">
+				<?php echo \HelixUltimate\Framework\Platform\Icon::get('spinner', ['class' => 'hu-spin', 'size' => 14]); ?>
+				<?php echo \HelixUltimate\Framework\Platform\Icon::get('check', ['size' => 14]); ?>
+			</span>
 		</button>
 		<button type="button" role="button" class="hu-btn hu-btn-round hu-btn-round-sm hu-panel-close" data-sidebarclass="<?php echo 'hu-fieldset-' . $fieldset->name; ?>">
 			<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none"><path d="M9.708.292a.999.999 0 00-1.413 0l-3.289 3.29L1.717.291A.999.999 0 00.305 1.705l3.289 3.289-3.29 3.289a.999.999 0 101.413 1.412l3.29-3.289 3.288 3.29a.999.999 0 001.413-1.413l-3.29-3.29 3.29-3.288a.999.999 0 000-1.413z"/></svg>

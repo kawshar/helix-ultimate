@@ -143,7 +143,9 @@ class Platform
 				'version' 	=> $this->version,
 				'view' 		=> $this->view,
 				'iframe'	=> [
-					'url' => Uri::root(true) . '/index.php?templateStyle=' . $style->id . "&helixMode=edit",
+					// The site has no session for the admin user: the token lets the frame show the draft.
+					'url' => Uri::root(true) . '/index.php?templateStyle=' . $style->id . '&helixMode=edit&helixPreview='
+						. rawurlencode(Helper::createPreviewToken((int) $style->id, (int) $app->getIdentity()->id)),
 					'width' => '100%',
 					'height' => '100%'
 				]

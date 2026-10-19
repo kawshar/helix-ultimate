@@ -74,6 +74,14 @@ final class Phase06RemainingHardeningTest
 			{
 				$failures[] = 'Helper::loadTemplateData should enforce $canPreviewDraft.';
 			}
+			if (!str_contains($helperSource, "hash_equals(self::signPreviewToken("))
+			{
+				$failures[] = 'Helper::canPreviewDraft should verify the preview token signature with hash_equals.';
+			}
+			if (!str_contains($helperSource, '(int) $expires < time()'))
+			{
+				$failures[] = 'Helper::canPreviewDraft should reject expired preview tokens.';
+			}
 			if (str_contains($helperSource, "authorise('core.create', 'com_media') || \$user->authorise('core.edit', 'com_media')"))
 			{
 				$failures[] = 'Helper::authorizeAction should not fall back to core.create for core.manage media operations.';

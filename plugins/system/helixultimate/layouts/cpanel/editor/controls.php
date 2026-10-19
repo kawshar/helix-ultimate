@@ -30,25 +30,4 @@ $exitUrl = Route::_('index.php?option=com_templates&task=style.edit&id=' . (int)
 	<nav id="hu-options-panel" class="hu-sidebar-nav">
 		<?php echo $sidebar->renderBuilderControlBoard(); ?>
 	</nav>
-
-	<?php // The preview device switches sit on the settings that have a value per device (helix-ultimate.js). ?>
-	<div class="hu-sidebar-footer">
-		<div class="hu-response" aria-live="polite">
-			<div class="hu-loading-msg">
-				<div class="spinner-border spinner-border-sm" role="status">
-					<span class="visually-hidden">Drafting...</span>
-				</div>
-				<span class="hu-response-msg visually-hidden"><?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_DRAFTING'); ?></span>
-			</div>
-
-			<div class="hu-done-msg">
-				<?php echo \HelixUltimate\Framework\Platform\Icon::get('check-circle'); ?> <span class="hu-response-msg visually-hidden"><span class="hu-msg"><?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_DRAFTED'); ?></span></span>
-			</div>
-
-			<button type="button" role="button" class="hu-btn hu-btn-reset action-reset-drafts" title="<?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_RESET_DRAFT'); ?>">
-				<?php echo \HelixUltimate\Framework\Platform\Icon::get('history'); ?>
-				<span class="visually-hidden"><?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_RESET_DRAFT'); ?></span>
-			</button>
-		</div>
-	</div>
 </aside>

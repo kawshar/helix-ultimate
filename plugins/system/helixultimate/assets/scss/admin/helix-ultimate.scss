@@ -2209,7 +2209,6 @@ select:focus::-ms-value {
 }
 
 .hu-loading-msg,
-.hu-done-msg,
 .action-reset-drafts {
 	display: none;
 }
@@ -2324,41 +2323,11 @@ select:focus::-ms-value {
 	display: none;
 }
 
-.hu-sidebar-footer {
-	display: flex;
-	flex: 0 0 auto;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 0 10px;
-	border-top: 1px solid rgba(121, 131, 167, 0.2);
-}
 
 
-.hu-sidebar .hu-response {
-	display: flex;
-	justify-content: center;
-	min-height: 16px;
-	font-size: 11px;
-	line-height: 1.3;
-	color: #6b7194;
-}
 
-.hu-sidebar .hu-response .spinner-border-sm {
-	width: 10px;
-	height: 10px;
-	border-width: 2px;
-}
 
-.hu-sidebar .hu-done-msg .hu-icon-check-circle {
-	color: #12a150;
-}
 
-.hu-sidebar .action-reset-drafts {
-	padding: 0;
-	font-size: 11px;
-	color: rgb(var(--primary));
-}
 
 .hu-sidebar .action-save-template {
 	display: flex;
@@ -3196,39 +3165,31 @@ select:focus::-ms-value {
 	right: 15px;
 }
 
+// Three per row, spaced by the gap (no margins or padding to cancel out).
 .hu-header-list,
 .hu-offcanvas-list {
+	--hu-pick-gap: 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px var(--hu-pick-gap);
 	list-style: none;
+	margin: 0;
 	padding: 0;
-	margin: -10px;
 	text-align: center;
 }
 
 .hu-header-list>li,
 .hu-offcanvas-list>li {
-	margin: 10px;
-	display: block;
-	float: left;
-}
-
-.hu-header-list,
-.hu-offcanvas-list {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	display: flex;
-	flex-wrap: wrap;
-}
-
-.hu-header-list>li,
-.hu-offcanvas-list>li {
-	margin: 0;
-	padding: 5px;
-	border-radius: 1px;
-	display: block;
-	cursor: pointer;
 	position: relative;
-	flex: 0 0 33.333%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	flex: 0 0 calc((100% - 2 * var(--hu-pick-gap)) / 3);
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
 }
 
 .hu-header-list>li img,
@@ -3245,8 +3206,6 @@ select:focus::-ms-value {
 .hu-offcanvas-list>li>.hu-predefined-offcanvas-title,
 .hu-header-list>li>.hu-predefined-headers-title {
 	display: block;
-	margin-top: 5px;
-	margin-bottom: 5px;
 }
 
 .hu-header-list>li>.img-wrap:after,

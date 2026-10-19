@@ -9,8 +9,7 @@
 	box-shadow: inset -1px 0 0 var(--sp-divider);
 }
 
-#helix-ultimate .hu-sidebar-brand,
-#helix-ultimate .hu-sidebar-footer {
+#helix-ultimate .hu-sidebar-brand {
 	border-color: var(--sp-divider);
 }
 
@@ -63,22 +62,8 @@
 	color: var(--sp-text);
 }
 
-/* Draft status: icon plus text for assistive tech, colour never alone */
-#helix-ultimate .hu-sidebar .hu-response {
-	color: var(--sp-muted);
-}
 
-#helix-ultimate .hu-sidebar .hu-done-msg .hu-icon-check-circle {
-	color: var(--sp-published);
-}
 
-#helix-ultimate .hu-sidebar .action-reset-drafts {
-	width: 28px;
-	height: 28px;
-	border-radius: var(--sp-radius);
-	color: var(--sp-icon);
-	background: var(--sp-input);
-}
 
 /* Top: back to the template style, on the same line as the panel header. */
 #helix-ultimate .hu-sidebar-brand {

@@ -289,36 +289,43 @@ document.addEventListener('DOMContentLoaded', () => {
 	/** The preset editor step that is open, if any. */
 	let editor: ReturnType<typeof Joomla.helixSubpanel.open> | null = null;
 
-	function reflectPresetChanges(data: PresetColors, name: string, originalContainer: HTMLElement, editedContainer: HTMLElement): void {
-		presetsData[name].data = data;
+	/**
+	 * Use a preset's colours: store them, repaint its tile and pick it, which
+	 * drafts the change so the preview shows it (the global Save keeps it).
+	 */
+	function reflectPresetChanges(data: PresetColors, name: string): void {
+		presetsData[name].data = { ...data };
 		dataElement.value = JSON.stringify(presetsData);
 
 		const presetElement = document.querySelector<HTMLElement>(`.hu-preset[data-preset="${name}"]`);
 
-		if (presetElement) {
-			Object.entries(data).forEach(([key, value]) => presetElement.setAttribute(`data-${key}`, value));
+		if (!presetElement) return;
 
-			// The next edit starts from these colours, not the ones the page loaded with.
-			presetElement.querySelector('.hu-edit-preset')?.setAttribute('data-preset_data', JSON.stringify({ name, data: { ...data } }));
-		}
+		Object.entries(data).forEach(([key, value]) => presetElement.setAttribute(`data-${key}`, value));
 
-		/**
-		 * Keep the edited fields as the new original, so the next time the
-		 * modal opens it shows the last changes.
-		 */
-		originalContainer.replaceChildren(...editedContainer.querySelectorAll(':scope > div'));
+		// The next edit starts from these colours, not the ones the page loaded with.
+		presetElement.querySelector('.hu-edit-preset')?.setAttribute('data-preset_data', JSON.stringify({ name, data: { ...data } }));
 
 		window.purgeCss?.();
-		editor?.close();
 
-		if (presetElement) {
-			const majorColor = detectMajorColor(data);
+		presetElement.style.backgroundColor = detectMajorColor(data);
+		renderPresetPreview(presetElement);
+		presetElement.click();
+	}
 
-			presetElement.style.backgroundColor = majorColor;
-			renderPresetPreview(presetElement);
+	/** Show colours in a preset's fields (and their swatches). */
+	function setPresetFields(container: HTMLElement, data: PresetColors): void {
+		container.querySelectorAll<HTMLInputElement>('input.preset-control').forEach(input => {
+			if (!(input.name in data)) return;
 
-			presetElement.click();
-		}
+			input.value = data[input.name];
+			input.setAttribute('value', data[input.name]);
+
+			const wrapper = input.parentElement;
+			if (wrapper?.classList.contains('clr-field')) wrapper.style.color = data[input.name];
+
+			input.dispatchEvent(new Event('input'));
+		});
 	}
 
 	delegate(document, 'click', '.hu-edit-preset', (event, button) => {
@@ -339,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		editor?.close();
 
-		// Edit a copy, so going back leaves the original untouched.
+		// Edit a copy laid out for the editor; the original stays the source for the next edit.
 		const container = originalContainer.cloneNode(true) as HTMLElement;
 
 		// Avoid duplicate ids between the copy and the original.
@@ -358,11 +365,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			title: label,
 			body: container,
 			backLabel: 'Back to presets',
-			footer:
-				`<button type="button" class="hu-btn hu-btn-primary hu-save-preset">${Joomla.utils.icon('check')} Apply</button>` +
-				`<button type="button" class="hu-btn hu-btn-link helix-preset-reset">${Joomla.utils.icon('refresh')} Reset to default</button>`,
+			headerActions: `<button type="button" class="hu-subpanel-action helix-preset-reset" title="Reset to default">${Joomla.utils.icon('refresh')}<span>Reset</span></button>`,
 			onClose: () => {
 				if (editor === step) editor = null;
+				// The fields the next edit is copied from show the latest colours.
+				setPresetFields(originalContainer, data);
 				// Back on the pencil that opened the editor.
 				button.focus({ preventScroll: true });
 			},
@@ -371,25 +378,26 @@ document.addEventListener('DOMContentLoaded', () => {
 		editor = step;
 		Joomla.initColorPicker?.();
 
-		// Collect the edited colours.
+		// Each colour applies at once; the global Save keeps it.
 		container.querySelectorAll<HTMLInputElement>('input.preset-control').forEach(input => {
 			input.addEventListener('change', () => {
+				if (data[input.name] === input.value) return;
+
 				data[input.name] = input.value;
+				reflectPresetChanges(data, name);
 			});
 		});
 
-		step.footer?.querySelector('.hu-save-preset')?.addEventListener('click', applyEvent => {
-			applyEvent.preventDefault();
-			reflectPresetChanges(data, name, originalContainer, container);
-		});
-
-		step.footer?.querySelector('.helix-preset-reset')?.addEventListener('click', resetEvent => {
+		step.header.querySelector('.helix-preset-reset')?.addEventListener('click', resetEvent => {
 			resetEvent.preventDefault();
 
-			if (window.confirm('Do you really want to reset your changes to default?')) {
-				const defaults: Record<string, PresetColors> = JSON.parse((document.getElementById('default-values') as HTMLInputElement).value);
-				reflectPresetChanges(defaults[name], name, originalContainer, container);
-			}
+			if (!window.confirm('Do you really want to reset your changes to default?')) return;
+
+			const defaults: Record<string, PresetColors> = JSON.parse((document.getElementById('default-values') as HTMLInputElement).value);
+
+			Object.assign(data, defaults[name]);
+			setPresetFields(container, data);
+			reflectPresetChanges(data, name);
 		});
 	});
 });

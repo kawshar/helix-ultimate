@@ -292,6 +292,123 @@ class Helper
     }
 
     /**
+     * A signed token that lets the customizer's preview frame show the draft of
+     * a template style. The admin and site sessions are separate, so the frame
+     * has no logged-in user of its own; the token stands in for the editor.
+     *
+     * Format: "<styleId>.<userId>.<expires>.<hmac>", signed with the site secret.
+     *
+     * @param   int  $styleId  The template style ID.
+     * @param   int  $userId   The editing user.
+     * @param   int  $ttl      Lifetime in seconds.
+     *
+     * @return  string
+     * @since   2.2.11
+     */
+    public static function createPreviewToken(int $styleId, int $userId, int $ttl = 43200): string
+    {
+        $payload = $styleId . '.' . $userId . '.' . (time() + $ttl);
+
+        return $payload . '.' . self::signPreviewToken($payload);
+    }
+
+    private static function signPreviewToken(string $payload): string
+    {
+        return hash_hmac('sha256', 'helix-preview|' . $payload, (string) Factory::getApplication()->get('secret'));
+    }
+
+    /**
+     * May this request see the draft of a template style? Only in the preview
+     * (helixMode=edit), for a logged-in user who can edit templates, or with a
+     * valid preview token (see createPreviewToken()) for this style whose user
+     * still can edit templates.
+     *
+     * @param   int  $styleId  The template style ID.
+     *
+     * @return  bool
+     * @since   2.2.11
+     */
+    public static function canPreviewDraft(int $styleId): bool
+    {
+        $app = Factory::getApplication();
+
+        if ($app->input->get('helixMode', '') !== 'edit') {
+            return false;
+        }
+
+        $canEdit = static fn ($user) => $user && $user->id && ! $user->block
+            && ($user->authorise('core.edit', 'com_templates') || $user->authorise('core.admin'));
+
+        if ($canEdit($app->getIdentity())) {
+            return true;
+        }
+
+        $parts = explode('.', $app->input->get('helixPreview', '', 'STRING'));
+
+        if (\count($parts) !== 4 || ! ctype_digit($parts[0] . $parts[1] . $parts[2])) {
+            return false;
+        }
+
+        [$tokenStyle, $tokenUser, $expires, $signature] = $parts;
+
+        if ((int) $tokenStyle !== $styleId || (int) $expires < time()) {
+            return false;
+        }
+
+        if (! hash_equals(self::signPreviewToken($tokenStyle . '.' . $tokenUser . '.' . $expires), $signature)) {
+            return false;
+        }
+
+        try {
+            $user = Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById((int) $tokenUser);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return $canEdit($user);
+    }
+
+    /**
+     * In the customizer preview, show the mega menus drafted with the style
+     * (not saved to their menu items yet) instead of the stored ones.
+     *
+     * @return  void
+     * @since   2.2.11
+     */
+    public static function applyDraftedMegaMenus()
+    {
+        $app = Factory::getApplication();
+
+        if (! $app->isClient('site') || $app->input->get('helixMode', '') !== 'edit') {
+            return;
+        }
+
+        // The draft only loads for users who may preview it.
+        $template = self::loadTemplateData();
+        $params   = $template->params ?? null;
+
+        if (! $params instanceof Registry) {
+            return;
+        }
+
+        $drafts = \json_decode((string) $params->get('megamenu_drafts', ''), true);
+
+        if (! \is_array($drafts)) {
+            return;
+        }
+
+        $menu = $app->getMenu();
+
+        foreach ($drafts as $itemId => $settings) {
+            $item = $menu->getItem((int) $itemId);
+
+            if ($item && \is_array($settings)) {
+                $item->getParams()->set('helixultimatemenulayout', \json_encode(self::sanitizeMegaMenuSettings($settings)));
+            }
+        }
+    }
+
+    /**
      * Load template data from cache or database.
      *
      * @return    object    Template style object
@@ -342,8 +459,7 @@ class Helper
              * Check the fetch destination. If it is iframe and the user is authorized,
              * then load the settings from draft. Otherwise load from saved cache or database.
              */
-            $user              = $app->getIdentity();
-            $canPreviewDraft   = $user && $user->id && ($user->authorise('core.edit', 'com_templates') || $user->authorise('core.admin'));
+            $canPreviewDraft   = self::canPreviewDraft((int) $templateId);
             $requestFromIframe = ($app->input->get('helixMode', '') === 'edit') && $canPreviewDraft;
 
             if ($cache->contains() && $requestFromIframe) {

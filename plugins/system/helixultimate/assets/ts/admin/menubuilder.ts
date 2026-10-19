@@ -36,6 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	const helixUrl = (action: string, extra = ''): string =>
 		`${config.base}/administrator/index.php?option=com_ajax&helix=ultimate&request=task&action=${action}${extra}&helix_id=${window.helixUltimateStyleId}`;
 
+	/** Mega menus edited in this session, drafted with the style until Save (see megamenu.js). */
+	const readDrafts = (): Record<string, unknown> => {
+		try {
+			return JSON.parse(document.querySelector<HTMLInputElement>('#hu-style-form [name="megamenu_drafts"]')?.value || '{}') || {};
+		} catch (error) {
+			return {};
+		}
+	};
+
 	const branchOf = (element: Element): HTMLElement | null => element.closest<HTMLElement>('.hu-menu-tree-branch');
 	const itemIdOf = (element: Element): number => Number(branchOf(element)?.dataset.itemid || 0);
 
@@ -123,7 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		const itemTitle = branch?.querySelector('.hu-branch-title')?.textContent?.trim() || '';
 
 		try {
-			const response = await request<HtmlResponse>(helixUrl('generateMegaMenuBody', `&id=${itemIdOf(link)}`));
+			// Open a drafted (not yet saved) mega menu as it was left.
+			const drafts = readDrafts();
+			const draft = drafts[itemIdOf(link)];
+			const response = await request<HtmlResponse>(
+				helixUrl('generateMegaMenuBody', `&id=${itemIdOf(link)}`),
+				draft ? { method: 'POST', data: param({ draft: JSON.stringify(draft) }) } : {}
+			);
 
 			if (!response.status) return;
 
@@ -157,9 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				headerActions: isMega
 					? `<button type="button" class="hu-subpanel-action hu-megamenu-settings-toggle" aria-pressed="false">${settingsIcon}<span>Settings</span></button>`
 					: undefined,
-				footer:
-					`<button type="button" class="hu-btn hu-btn-primary hu-megamenu-save-btn">${Joomla.utils.icon('check')} Save</button>` +
-					'<button type="button" class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>',
 			});
 
 			Joomla.helixMegaMenu?.run({ root: body, close: () => step.close() });

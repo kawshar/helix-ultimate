@@ -200,23 +200,27 @@
       else editor2.appendChild(list);
     }
     let editor = null;
-    function reflectPresetChanges(data, name, originalContainer, editedContainer) {
-      presetsData[name].data = data;
+    function reflectPresetChanges(data, name) {
+      presetsData[name].data = { ...data };
       dataElement.value = JSON.stringify(presetsData);
       const presetElement = document.querySelector(`.hu-preset[data-preset="${name}"]`);
-      if (presetElement) {
-        Object.entries(data).forEach(([key, value]) => presetElement.setAttribute(`data-${key}`, value));
-        presetElement.querySelector(".hu-edit-preset")?.setAttribute("data-preset_data", JSON.stringify({ name, data: { ...data } }));
-      }
-      originalContainer.replaceChildren(...editedContainer.querySelectorAll(":scope > div"));
+      if (!presetElement) return;
+      Object.entries(data).forEach(([key, value]) => presetElement.setAttribute(`data-${key}`, value));
+      presetElement.querySelector(".hu-edit-preset")?.setAttribute("data-preset_data", JSON.stringify({ name, data: { ...data } }));
       window.purgeCss?.();
-      editor?.close();
-      if (presetElement) {
-        const majorColor = detectMajorColor(data);
-        presetElement.style.backgroundColor = majorColor;
-        renderPresetPreview(presetElement);
-        presetElement.click();
-      }
+      presetElement.style.backgroundColor = detectMajorColor(data);
+      renderPresetPreview(presetElement);
+      presetElement.click();
+    }
+    function setPresetFields(container, data) {
+      container.querySelectorAll("input.preset-control").forEach((input) => {
+        if (!(input.name in data)) return;
+        input.value = data[input.name];
+        input.setAttribute("value", data[input.name]);
+        const wrapper = input.parentElement;
+        if (wrapper?.classList.contains("clr-field")) wrapper.style.color = data[input.name];
+        input.dispatchEvent(new Event("input"));
+      });
     }
     delegate(document, "click", ".hu-edit-preset", (event, button) => {
       event.preventDefault();
@@ -241,9 +245,10 @@
         title: label,
         body: container,
         backLabel: "Back to presets",
-        footer: `<button type="button" class="hu-btn hu-btn-primary hu-save-preset">${Joomla.utils.icon("check")} Apply</button><button type="button" class="hu-btn hu-btn-link helix-preset-reset">${Joomla.utils.icon("refresh")} Reset to default</button>`,
+        headerActions: `<button type="button" class="hu-subpanel-action helix-preset-reset" title="Reset to default">${Joomla.utils.icon("refresh")}<span>Reset</span></button>`,
         onClose: () => {
           if (editor === step) editor = null;
+          setPresetFields(originalContainer, data);
           button.focus({ preventScroll: true });
         }
       });
@@ -251,19 +256,18 @@
       Joomla.initColorPicker?.();
       container.querySelectorAll("input.preset-control").forEach((input) => {
         input.addEventListener("change", () => {
+          if (data[input.name] === input.value) return;
           data[input.name] = input.value;
+          reflectPresetChanges(data, name);
         });
       });
-      step.footer?.querySelector(".hu-save-preset")?.addEventListener("click", (applyEvent) => {
-        applyEvent.preventDefault();
-        reflectPresetChanges(data, name, originalContainer, container);
-      });
-      step.footer?.querySelector(".helix-preset-reset")?.addEventListener("click", (resetEvent) => {
+      step.header.querySelector(".helix-preset-reset")?.addEventListener("click", (resetEvent) => {
         resetEvent.preventDefault();
-        if (window.confirm("Do you really want to reset your changes to default?")) {
-          const defaults = JSON.parse(document.getElementById("default-values").value);
-          reflectPresetChanges(defaults[name], name, originalContainer, container);
-        }
+        if (!window.confirm("Do you really want to reset your changes to default?")) return;
+        const defaults = JSON.parse(document.getElementById("default-values").value);
+        Object.assign(data, defaults[name]);
+        setPresetFields(container, data);
+        reflectPresetChanges(data, name);
       });
     });
   });
