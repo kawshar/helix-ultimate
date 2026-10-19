@@ -40,3 +40,22 @@
 	color: var(--sp-text);
 	background: var(--sp-divider);
 }
+
+/* Soft: the light pastel button for secondary actions (add item, add row…),
+   so solid blue stays for Save. */
+#helix-ultimate .hu-btn-soft {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 32px;
+	padding: 0 14px;
+	border: 0;
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-btn-soft:is(:hover, :focus) {
+	color: var(--sp-chip-text);
+	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
+}

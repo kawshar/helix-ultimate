@@ -224,29 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	/* ------------------------------------------------------------------ */
-	/* Delete                                                              */
-	/* ------------------------------------------------------------------ */
-
-	delegate(document, 'click', '.hu-branch-tools .hu-branch-tools-list-delete', async (event, link) => {
-		event.preventDefault();
-		closeToolbar();
-
-		if (!window.confirm('Are you sure to delete the item?')) return;
-
-		try {
-			await request(`${config.base}/administrator/index.php?option=com_menus&task=items.trash&cid[]=${itemIdOf(link)}`, {
-				responseType: 'text',
-			});
-			fetchMenuItems(menuType);
-		} catch (error) {
-			Joomla.HelixToaster.error('Something went wrong!', 'Error');
-		}
-
-		rebuildMenu();
-		Joomla.HelixToaster.error('Menu item has been successfully removed!', 'Success');
-	});
-
-	/* ------------------------------------------------------------------ */
 	/* Ordering and parents after sorting                                  */
 	/* ------------------------------------------------------------------ */
 
@@ -377,6 +354,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		frame.addEventListener('load', () => {
 			saveButton.disabled = false;
+
+			// The menu item form is a full admin page: drop its own card and grey page so it
+			// reads as the modal's body, not a box in a box.
+			try {
+				const doc = frame.contentDocument;
+
+				if (doc?.head && !doc.getElementById('hu-modal-frame-style')) {
+					const style = doc.createElement('style');
+					style.id = 'hu-modal-frame-style';
+					style.textContent = `
+						html, body { background: #fff !important; }
+						body { padding: 4px 8px !important; }
+						.main-card, .card { border: 0 !important; box-shadow: none !important; background: transparent !important; }
+						.subhead, #subhead-container { display: none !important; }`;
+					doc.head.appendChild(style);
+				}
+			} catch (error) {
+				// Another origin: leave it as it is.
+			}
 		});
 
 		saveButton.addEventListener(

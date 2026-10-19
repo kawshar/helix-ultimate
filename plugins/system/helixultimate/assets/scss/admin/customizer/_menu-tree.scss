@@ -37,3 +37,69 @@
 #helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-drag-handler:hover {
 	background: var(--sp-input);
 }
+
+/* ------------------------------------------------------------------ */
+/* Row tools: a tight toolbar at the row's end, shown on hover / focus   */
+/* (no animation), on a fade from the row's hover colour.               */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate #hu-menu-tree .hu-branch-drag-handler {
+	transition: none;
+}
+
+#helix-ultimate #hu-menu-tree .hu-branch-drag-handler .hu-branch-tools {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+	align-items: center;
+	padding: 0 3px 0 28px;
+	border-radius: 0 6px 6px 0;
+	background: linear-gradient(to right, transparent, var(--sp-input) 24px);
+	transform: none;
+	animation: none;
+}
+
+#helix-ultimate #hu-menu-tree .hu-branch-drag-handler:is(:hover, :focus-within) .hu-branch-tools {
+	display: flex;
+}
+
+#helix-ultimate #hu-menu-tree .hu-branch-tools .hu-branch-tools-list {
+	display: flex;
+	gap: 2px;
+	margin: 0;
+}
+
+#helix-ultimate #hu-menu-tree .hu-branch-tools .hu-branch-tools-list > li {
+	margin: 0;
+}
+
+#helix-ultimate #hu-menu-tree .hu-branch-tools .hu-branch-tools-list a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 6px;
+	color: var(--sp-icon);
+	transition: none;
+}
+
+#helix-ultimate #hu-menu-tree .hu-branch-tools .hu-branch-tools-list a:is(:hover, :focus-visible) {
+	color: var(--sp-blue);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 3px rgba(17, 24, 39, 0.16);
+}
+
+/* Unpublished rows keep their own (muted) colour under the fade. */
+#helix-ultimate #hu-menu-tree .hu-megamenu-branch-muted .hu-branch-tools {
+	background: linear-gradient(to right, transparent, #d9deeb 24px);
+}
+
+/* "Add new item" sits at the right, under the tree. */
+#helix-ultimate #hu-menu-builder .hu-add-menu-item {
+	display: flex;
+	width: fit-content;
+	margin: 12px 0 0 auto;
+}

@@ -470,3 +470,102 @@
   background-color: #007bff;
   transition: width 0.6s ease;
 }
+
+/* ------------------------------------------------------------------ */
+/* Customizer look: white shell, quiet header and footer               */
+/* ------------------------------------------------------------------ */
+.hu-modal-overlay,
+.hu-options-modal-overlay {
+  position: fixed;
+  background: rgba(17, 24, 39, 0.45);
+}
+
+.hu-modal,
+.hu-options-modal {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--sp-panel, #fff);
+  box-shadow: 0 24px 60px rgba(17, 24, 39, 0.25);
+  font-family: var(--sp-font, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+.hu-modal-header,
+.hu-options-modal-header {
+  height: 52px;
+  padding: 0 10px 0 20px;
+  border-radius: 0;
+  background: var(--sp-panel, #fff);
+  box-shadow: inset 0 -1px 0 var(--sp-divider, #e5e7eb);
+}
+
+.hu-modal-header-title,
+.hu-options-modal-header-title {
+  color: var(--sp-text, #111827);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.action-hu-modal-close,
+.action-hu-options-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--sp-icon, #6b7280);
+  line-height: 1;
+  transition: none;
+}
+
+.action-hu-modal-close:hover,
+.action-hu-options-modal-close:hover {
+  color: var(--sp-text, #111827);
+  background: var(--sp-input, #f3f4f6);
+}
+
+.hu-modal-footer,
+.hu-options-modal-footer {
+  gap: 8px;
+  height: 60px;
+  padding: 0 16px;
+  border-radius: 0;
+  background: var(--sp-panel, #fff);
+  box-shadow: inset 0 1px 0 var(--sp-divider, #e5e7eb);
+}
+
+.hu-modal-footer .hu-btn,
+.hu-options-modal-footer .hu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--sp-radius, 8px);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Cancel: a light button, not a link. */
+.hu-modal-footer .hu-btn-link,
+.hu-modal-footer .hu-megamenu-cancel-btn {
+  color: var(--sp-text, #111827);
+  background: var(--sp-input, #f3f4f6);
+}
+
+.hu-modal-footer .hu-btn-link:hover,
+.hu-modal-footer .hu-megamenu-cancel-btn:hover {
+  color: var(--sp-text, #111827);
+  background: var(--sp-divider, #e5e7eb);
+}
+
+/* A page in an iframe fills the space between header and footer (no tinted frame). */
+.hu-modal-content:has(> .hu-modal-frame-container) {
+  inset: 52px 0 60px;
+}
+
+.hu-modal-inner {
+  border-radius: 0;
+}

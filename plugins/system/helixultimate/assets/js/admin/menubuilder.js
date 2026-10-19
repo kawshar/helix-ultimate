@@ -141,21 +141,6 @@
         Joomla.HelixToaster.error("Something went wrong!", "Error");
       }
     });
-    delegate(document, "click", ".hu-branch-tools .hu-branch-tools-list-delete", async (event, link) => {
-      event.preventDefault();
-      closeToolbar();
-      if (!window.confirm("Are you sure to delete the item?")) return;
-      try {
-        await request(`${config.base}/administrator/index.php?option=com_menus&task=items.trash&cid[]=${itemIdOf(link)}`, {
-          responseType: "text"
-        });
-        fetchMenuItems(menuType);
-      } catch (error) {
-        Joomla.HelixToaster.error("Something went wrong!", "Error");
-      }
-      rebuildMenu();
-      Joomla.HelixToaster.error("Menu item has been successfully removed!", "Success");
-    });
     async function handleBranchOrdering(parent) {
       const tree = Joomla.sortable;
       if (!tree) return;
@@ -244,6 +229,20 @@
       modal.querySelector(".hu-cancel-btn")?.addEventListener("click", () => Joomla.helixModal.close());
       frame.addEventListener("load", () => {
         saveButton.disabled = false;
+        try {
+          const doc = frame.contentDocument;
+          if (doc?.head && !doc.getElementById("hu-modal-frame-style")) {
+            const style = doc.createElement("style");
+            style.id = "hu-modal-frame-style";
+            style.textContent = `
+						html, body { background: #fff !important; }
+						body { padding: 4px 8px !important; }
+						.main-card, .card { border: 0 !important; box-shadow: none !important; background: transparent !important; }
+						.subhead, #subhead-container { display: none !important; }`;
+            doc.head.appendChild(style);
+          }
+        } catch (error) {
+        }
       });
       saveButton.addEventListener(
         "click",

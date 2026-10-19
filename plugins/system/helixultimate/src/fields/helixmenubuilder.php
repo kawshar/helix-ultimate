@@ -38,7 +38,7 @@ class JFormFieldHelixMenuBuilder extends FormField
 		$html[] = '<div id="hu-menu-builder-container"></div>';
 		// Mega menus edited here, by menu item ID: drafted with the style, written to the items on Save.
 		$html[] = '<input type="hidden" name="megamenu_drafts" class="hu-megamenu-drafts" value="">';
-		$html[] = '<button type="button" class="hu-btn hu-btn-primary hu-add-menu-item">' . \HelixUltimate\Framework\Platform\Icon::get('plus') . ' ' . Text::_('HELIX_ULTIMATE_ADD_NEW_MENU_ITEM') . '</button>';
+		$html[] = '<button type="button" class="hu-btn hu-btn-soft hu-add-menu-item">' . \HelixUltimate\Framework\Platform\Icon::get('plus') . ' ' . Text::_('HELIX_ULTIMATE_ADD_NEW_MENU_ITEM') . '</button>';
 		$html[] = '</div>';
 
 		return implode("\n", $html);
