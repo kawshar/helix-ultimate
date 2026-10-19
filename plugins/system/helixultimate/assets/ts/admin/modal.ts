@@ -43,7 +43,14 @@ export interface SettingsModalOptions {
 	footerButtons?: string[];
 }
 
-const escapeAttr = (value: unknown): string => String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+/** Escape text for HTML (element content or a quoted attribute). */
+const escapeAttr = (value: unknown): string =>
+	String(value ?? '')
+		.replace(/&/g, '&amp;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;');
 
 const removeModals = (selector = '.hu-modal-overlay, .hu-modal'): void => {
 	document.querySelectorAll(selector).forEach(element => element.remove());
@@ -71,7 +78,7 @@ function megamenu(options: MegamenuModalOptions = {}): void {
 		<div class="hu-modal-overlay"></div>
 		<div class="hu-modal ${escapeAttr(className)}" data-target_type="${escapeAttr(targetType)}" data-target="${escapeAttr(target)}">
 			<div class="hu-modal-header">
-				<h4 class="hu-modal-header-title">${title}</h4>
+				<h4 class="hu-modal-header-title">${escapeAttr(title)}</h4>
 				${closeButton('action-hu-modal-close')}
 			</div>
 			<div class="hu-modal-inner">
@@ -98,7 +105,7 @@ function frame(options: FrameModalOptions = {}): void {
 		<div class="hu-modal-overlay"></div>
 		<div class="hu-modal ${escapeAttr(className)}" data-target_type="${escapeAttr(targetType)}" data-target="${escapeAttr(target)}">
 			<div class="hu-modal-header">
-				<h4 class="hu-modal-header-title">${title}</h4>
+				<h4 class="hu-modal-header-title">${escapeAttr(title)}</h4>
 				${closeButton('action-hu-modal-close')}
 			</div>
 			<div class="hu-modal-inner">
@@ -166,7 +173,7 @@ function settings(options: SettingsModalOptions = {}): void {
 		<div class="hu-options-modal-overlay"></div>
 		<div class="hu-options-modal ${escapeAttr(className)}" data-target="#${escapeAttr(target)}">
 			<div class="hu-options-modal-header">
-				<span class="hu-options-modal-header-title">${title}</span>
+				<span class="hu-options-modal-header-title">${escapeAttr(title)}</span>
 				${closeButton('action-hu-options-modal-close')}
 			</div>
 			<div class="hu-options-modal-inner">

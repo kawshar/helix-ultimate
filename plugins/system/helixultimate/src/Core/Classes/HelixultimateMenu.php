@@ -321,7 +321,7 @@ class HelixultimateMenu
 		{
 			if ($this->_params->get('menu_animation') !== 'none')
 			{
-				$animation = ' ' . $this->_params->get('menu_animation');
+				$animation = ' ' . preg_replace('/[^A-Za-z0-9_-]/', '', (string) $this->_params->get('menu_animation'));
 			}
 			else
 			{
@@ -368,7 +368,7 @@ class HelixultimateMenu
 		$this->menu .= $this->start_el(array('item' => $item));
 		$this->menu .= $this->item($item);
 
-		$menulayout = json_decode(Helper::CheckNull($item->getParams()->get('helixultimatemenulayout')));
+		$menulayout = Helper::megaMenuSettings($item->getParams()->get('helixultimatemenulayout'));
 
 		if (isset($menulayout->megamenu) && $menulayout->megamenu)
 		{
@@ -398,11 +398,20 @@ class HelixultimateMenu
 
 		// Menu_show
 		$menu_show = $this->getMenuShow($item->id);
-		$dropdown_width = $this->_params->get('dropdown_width', '240px');
-		$dropdown_width = preg_match("@(px|em|rem|%|vw|vh|auto)$@", $dropdown_width) ? $dropdown_width : $dropdown_width . 'px';
+		$dropdown_width = trim((string) $this->_params->get('dropdown_width', '240px'));
+
+		// A CSS length only (it goes into a style attribute).
+		if (preg_match('/^\d+(\.\d+)?$/', $dropdown_width))
+		{
+			$dropdown_width .= 'px';
+		}
+		elseif (!preg_match('/^\d+(\.\d+)?(px|em|rem|%|vw|vh)$|^auto$/', $dropdown_width))
+		{
+			$dropdown_width = '240px';
+		}
 		$dropdown_alignment = 'right';
 		$dropdown_style = 'width: ' . $dropdown_width . ';';
-		$layout = json_decode(Helper::CheckNull($this->_items[$item->id]->getParams()->get('helixultimatemenulayout')));
+		$layout = Helper::megaMenuSettings($this->_items[$item->id]->getParams()->get('helixultimatemenulayout'));
 
 		if (isset($layout->dropdown) && $layout->dropdown === 'left')
 		{
@@ -416,7 +425,7 @@ class HelixultimateMenu
 
 		if ((int) $menu_show !== 0)
 		{
-			$this->menu .= '<div class="' . $class . ' sp-menu-' . $dropdown_alignment . '" style="' . $dropdown_style . '">';
+			$this->menu .= '<div class="' . $class . ' sp-menu-' . $dropdown_alignment . '" style="' . htmlspecialchars($dropdown_style, ENT_QUOTES, 'UTF-8') . '">';
 			$this->menu .= '<div class="sp-dropdown-inner">';
 			$this->navigation($item, $firstitem, 0,  'sp-dropdown-items');
 			$this->menu .= '</div>';
@@ -461,11 +470,14 @@ class HelixultimateMenu
 		$items     = isset($this->children[$item->id]) ? $this->children[$item->id] : array();
 		$firstitem = count($items) ? $items[0]->id : 0;
 
-		$mega = json_decode($item->getParams()->get('helixultimatemenulayout') ?? "");
+		$mega = Helper::megaMenuSettings($item->getParams()->get('helixultimatemenulayout'));
+		$mega->width = $mega->width ?? '600px';
+		$mega->menualign = $mega->menualign ?? 'full';
 
 		$layout = $mega->layout ?? [];
 
-		$mega_style = 'width: ' . (preg_match("@(px|em|rem|%|vw|vh|auto)$@", $mega->width) ? $mega->width : $mega->width . 'px');
+		// Width and alignment are validated by megaMenuSettings(); escaped again where printed.
+		$mega_style = 'width: ' . $mega->width;
 		$mega_style .= ';';
 
 		if ($mega->menualign === 'center')
@@ -479,7 +491,7 @@ class HelixultimateMenu
 			$mega->menualign = $mega->menualign . ' container';
 		}
 
-		$this->menu .= '<div class="sp-dropdown sp-dropdown-main sp-dropdown-mega sp-menu-' . $mega->menualign . '" style="' . $mega_style . '">';
+		$this->menu .= '<div class="sp-dropdown sp-dropdown-main sp-dropdown-mega sp-menu-' . htmlspecialchars($mega->menualign, ENT_QUOTES, 'UTF-8') . '" style="' . htmlspecialchars($mega_style, ENT_QUOTES, 'UTF-8') . '">';
 		$this->menu .= '<div class="sp-dropdown-inner">';
 
 		foreach ($layout as $row)
@@ -488,7 +500,7 @@ class HelixultimateMenu
 
 			foreach ($row->attr as $col)
 			{
-				$this->menu .= '<div class="col-sm-' . $col->colGrid . '">';
+				$this->menu .= '<div class="col-sm-' . (int) $col->colGrid . '">';
 
 				if (!empty($col->items))
 				{
@@ -516,7 +528,7 @@ class HelixultimateMenu
 							$li_head
 						);
 
-						$this->menu .= '<li class="' . implode(' ', $item_class) . '">';
+						$this->menu .= '<li class="' . htmlspecialchars(implode(' ', $item_class), ENT_QUOTES, 'UTF-8') . '">';
 
 						if ($builder_item->type === 'module')
 						{
@@ -605,7 +617,7 @@ class HelixultimateMenu
 		// Menu show
 		$menu_show = $this->getMenuShow($args['item']->id);
 
-		$layout = json_decode(Helper::CheckNull($item->getParams()->get('helixultimatemenulayout')));
+		$layout = Helper::megaMenuSettings($item->getParams()->get('helixultimatemenulayout'));
 
 		$item->hasChild = 0;
 
@@ -693,7 +705,7 @@ class HelixultimateMenu
 			$linktitle = $item->title;
 		}
 
-		$layout = json_decode(Helper::CheckNull($item->getParams()->get('helixultimatemenulayout')));
+		$layout = Helper::megaMenuSettings($item->getParams()->get('helixultimatemenulayout'));
 
 		$showmenutitle = (isset($layout->showtitle)) ? $layout->showtitle : 1;
 		$icon = Helper::sanitizeMegaMenuFaIcon(isset($layout->faicon) ? $layout->faicon : '');

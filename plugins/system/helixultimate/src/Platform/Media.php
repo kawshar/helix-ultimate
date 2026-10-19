@@ -67,9 +67,9 @@ class Media
             $crumb_url .= '/' . $crumb;
 
             if (count($crumbs) === ($key + 1)) {
-                $breadcrumb .= '<li class="hu-media-breadcrumb-item active" data-path="' . $crumb_url . '">' . preg_replace('/[-_]+/', ' ', $crumb) . '</li>';
+                $breadcrumb .= '<li class="hu-media-breadcrumb-item active" data-path="' . htmlspecialchars($crumb_url, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars(preg_replace('/[-_]+/', ' ', $crumb), ENT_QUOTES, 'UTF-8') . '</li>';
             } else {
-                $breadcrumb .= '<li class="hu-media-breadcrumb-item" data-path="' . $crumb_url . '"><a href="#" data-path="' . $crumb_url . '">' . preg_replace('/[-_]+/', ' ', $crumb) . '</a></li>';
+                $breadcrumb .= '<li class="hu-media-breadcrumb-item" data-path="' . htmlspecialchars($crumb_url, ENT_QUOTES, 'UTF-8') . '"><a href="#" data-path="' . htmlspecialchars($crumb_url, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars(preg_replace('/[-_]+/', ' ', $crumb), ENT_QUOTES, 'UTF-8') . '</a></li>';
             }
         }
 
@@ -115,20 +115,20 @@ class Media
 
             foreach ($files as $key => $file) {
                 if ($file['type'] === 'folder') {
-                    $output .= '<li class="hu-media-folder" data-path="' . $file['folder'] . '">';
+                    $output .= '<li class="hu-media-folder" data-path="' . htmlspecialchars($file['folder'], ENT_QUOTES, 'UTF-8') . '">';
                     $output .= '<div class="hu-media-thumb">';
                     $output .= '<svg width="160" height="160" viewBox="0 0 160 160"><g fill="none" fill-rule="evenodd"><path d="M77.955 53h50.04A3.002 3.002 0 0 1 131 56.007v58.988a4.008 4.008 0 0 1-4.003 4.005H39.003A4.002 4.002 0 0 1 35 114.995V45.99c0-2.206 1.79-3.99 3.997-3.99h26.002c1.666 0 3.667 1.166 4.49 2.605l3.341 5.848s1.281 2.544 5.12 2.544l.005.003z" fill="#71B9F4"></path><path d="M77.955 52h50.04A3.002 3.002 0 0 1 131 55.007v58.988a4.008 4.008 0 0 1-4.003 4.005H39.003A4.002 4.002 0 0 1 35 113.995V44.99c0-2.206 1.79-3.99 3.997-3.99h26.002c1.666 0 3.667 1.166 4.49 2.605l3.341 5.848s1.281 2.544 5.12 2.544l.005.003z" fill="#92CEFF"></path></g></svg>';
                     $output .= '</div>';
                     $output .= '<span class="hu-media-select">' . \HelixUltimate\Framework\Platform\Icon::get('check') . '</span>';
-                    $output .= '<div class="hu-media-label">' . $file['name'] . '</div>';
+                    $output .= '<div class="hu-media-label">' . htmlspecialchars($file['name'], ENT_QUOTES, 'UTF-8') . '</div>';
                     $output .= '</li>';
                 } else {
-                    $output .= '<li class="hu-media-image" data-path="' . $file['path'] . '" data-preview="' . $file['preview'] . '">';
+                    $output .= '<li class="hu-media-image" data-path="' . htmlspecialchars($file['path'], ENT_QUOTES, 'UTF-8') . '" data-preview="' . htmlspecialchars($file['preview'], ENT_QUOTES, 'UTF-8') . '">';
                     $output .= '<div class="hu-media-thumb">';
-                    $output .= '<img src="' . $file['preview'] . '" alt="">';
+                    $output .= '<img src="' . htmlspecialchars($file['preview'], ENT_QUOTES, 'UTF-8') . '" alt="">';
                     $output .= '</div>';
                     $output .= '<span class="hu-media-select">' . \HelixUltimate\Framework\Platform\Icon::get('check') . '</span>';
-                    $output .= '<div class="hu-media-label">' . $file['name'] . '</div>';
+                    $output .= '<div class="hu-media-label">' . htmlspecialchars($file['name'], ENT_QUOTES, 'UTF-8') . '</div>';
                     $output .= '</li>';
                 }
             }
@@ -163,7 +163,7 @@ class Media
         $input        = Factory::getApplication()->input;
         $path         = $input->post->get('path', '/images', 'PATH');
         $type         = $input->post->get('type', 'file', 'STRING');
-        $absolutePath = Helper::resolveMediaPath($path);
+        $absolutePath = Helper::resolveMediaPath($path, false);
 
         if ($absolutePath === null) {
             $output['message'] = 'Invalid media path';

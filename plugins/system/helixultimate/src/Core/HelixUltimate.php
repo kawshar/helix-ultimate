@@ -1120,16 +1120,30 @@ class HelixUltimate
 			$css = $scss . '.css';
 		}
 
+		/**
+		 * The customizer preview renders an unsaved draft: compile it into its own
+		 * folder under cache/, so the template's public CSS (served to every visitor)
+		 * never carries draft styles.
+		 */
+		$templateData = Helper::loadTemplateData();
+		$draft        = !empty($templateData->helixDraft);
+		$previewDir   = 'cache/com_templates/templates/' . $this->template->template . '/preview-' . (int) ($templateData->id ?? 0);
+
+		if ($draft && !$this->params->get('scssoption'))
+		{
+			$draft = false;
+		}
+
 		if ($this->params->get('scssoption'))
 		{
-			$needsCompile = $this->needScssCompile($scss, $vars);
+			$needsCompile = $this->needScssCompile($scss, $vars, $draft ? 'preview-' . (int) ($templateData->id ?? 0) . '/' . $scss : null);
 
-			if ($forceCompile || $needsCompile)
+			if ($forceCompile || $needsCompile || ($draft && !file_exists(JPATH_ROOT . '/' . $previewDir . '/' . $css)))
 			{
 				$compiler = new Compiler;
-				$template = Helper::loadTemplateData()->template;
+				$template = $templateData->template;
 				$scss_path = JPATH_THEMES . '/' . $template . '/scss';
-				$css_path = JPATH_THEMES . '/' . $template . '/css';
+				$css_path = $draft ? JPATH_ROOT . '/' . $previewDir : JPATH_THEMES . '/' . $template . '/css';
 
 				if (file_exists($scss_path . '/' . $scss . '.scss'))
 				{
@@ -1161,7 +1175,7 @@ class HelixUltimate
 					$getComplinedCss = $compiledCss->getCss();
 					File::write($out, $getComplinedCss);
 
-					$cache_path = JPATH_ROOT . '/cache/com_templates/templates/' . $template . '/' . $scss . '.scss.cache';
+					$cache_path = JPATH_ROOT . '/cache/com_templates/templates/' . $template . '/' . ($draft ? 'preview-' . (int) ($templateData->id ?? 0) . '/' : '') . $scss . '.scss.cache';
 					$scssCache = array();
 					$scssCache['imports'] = $this->parseIncludedFiles($compiledCss->getIncludedFiles());
 					$scssCache['vars'] = $vars;
@@ -1169,6 +1183,18 @@ class HelixUltimate
 					File::write($cache_path, $jsonScssCache);
 				}
 			}
+		}
+
+		if ($draft)
+		{
+			$previewFile = JPATH_ROOT . '/' . $previewDir . '/' . $css;
+
+			if (is_file($previewFile))
+			{
+				$this->doc->addStylesheet(Uri::root(true) . '/' . $previewDir . '/' . $css . '?' . filemtime($previewFile));
+			}
+
+			return;
 		}
 
 		$this->add_css($css);
@@ -1209,9 +1235,9 @@ class HelixUltimate
 	 * @return	boolean
 	 * @since	1.0.0
 	 */
-	public function needScssCompile($scss, $vars = array())
+	public function needScssCompile($scss, $vars = array(), $cacheName = null)
 	{
-    	$cache_path = JPATH_ROOT . '/cache/com_templates/templates/' . $this->template->template . '/' . $scss . '.scss.cache';
+    	$cache_path = JPATH_ROOT . '/cache/com_templates/templates/' . $this->template->template . '/' . ($cacheName ?? $scss) . '.scss.cache';
 
     	// Always work with arrays
     	if (!is_array($vars)) {

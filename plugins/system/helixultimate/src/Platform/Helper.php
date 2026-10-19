@@ -40,6 +40,34 @@ class Helper
      * @return    object        Template data object.
      * @since    1.0.0
      */
+    /**
+     * Is this a site template style of a Helix Ultimate template? Actions that
+     * change a style (save, draft, import, layouts...) only work on those.
+     *
+     * @param   int  $id  The template style ID.
+     *
+     * @return  bool
+     * @since   2.2.11
+     */
+    public static function isHelixStyle(int $id): bool
+    {
+        $style = $id > 0 ? self::getTemplateStyle($id) : null;
+
+        if (! $style || empty($style->template) || ! preg_match('/^[A-Za-z0-9_-]+$/', (string) $style->template)) {
+            return false;
+        }
+
+        $path = JPATH_SITE . '/templates/' . $style->template;
+
+        if (file_exists($path . '/options.json')) {
+            return true;
+        }
+
+        $index = @file_get_contents($path . '/index.php');
+
+        return $index !== false && strpos($index, 'helixultimate/bootstrap.php') !== false;
+    }
+
     public static function getTemplateStyle($id = 0)
     {
         static $cache = [];
@@ -387,7 +415,8 @@ class Helper
         $template = self::loadTemplateData();
         $params   = $template->params ?? null;
 
-        if (! $params instanceof Registry) {
+        // Only a draft rendered for an editor (never saved or imported params).
+        if (empty($template->helixDraft) || ! $params instanceof Registry) {
             return;
         }
 
@@ -464,6 +493,11 @@ class Helper
 
             if ($cache->contains() && $requestFromIframe) {
                 $template = $cache->loadData();
+
+                // Rendering the draft: compiled output (CSS) must not replace the public files.
+                if (\is_object($template)) {
+                    $template->helixDraft = true;
+                }
             } else {
                 $keyOptions = [
                     'option' => 'com_ajax',
@@ -1190,7 +1224,7 @@ class Helper
      * @return  string|null  Absolute filesystem path or null if invalid.
      * @since   2.2.3
      */
-    public static function resolveMediaPath(string $path): ?string
+    public static function resolveMediaPath(string $path, bool $allowRoot = true): ?string
     {
         $path = trim(str_replace('\\', '/', $path));
 
@@ -1237,6 +1271,19 @@ class Helper
 
         if (! $isAllowed) {
             return null;
+        }
+
+        // A media root itself (e.g. images/) can be listed, but not deleted.
+        if (! $allowRoot) {
+            foreach ($allowedRoots as $root) {
+                $rootPath = Path::clean(JPATH_ROOT . '/' . $root);
+                $realRoot = realpath($rootPath);
+                $realPath = realpath($fullPath);
+
+                if ($fullPath === $rootPath || ($realRoot !== false && $realPath === $realRoot)) {
+                    return null;
+                }
+            }
         }
 
         try
@@ -1319,20 +1366,56 @@ class Helper
      * @return  string
      * @since   2.2.3
      */
+    /**
+     * A link from a setting, escaped for an href, or '' for a script URL
+     * (javascript:, data:, vbscript:).
+     *
+     * @param   mixed  $url  The URL.
+     *
+     * @return  string
+     * @since   2.2.11
+     */
+    public static function safeUrl($url): string
+    {
+        $url = trim((string) $url);
+
+        // Browsers ignore whitespace and control characters inside a scheme ("java\tscript:").
+        $scheme = strtolower(preg_replace('/[\x00-\x20]+/', '', (string) strstr(html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8') . ':', ':', true)));
+
+        if (\in_array($scheme, ['javascript', 'data', 'vbscript'], true)) {
+            return '';
+        }
+
+        return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+    }
+
     public static function sanitizeEmbed(string $html): string
     {
         if ($html === '') {
             return '';
         }
 
+        /**
+         * Allow only these tags and attributes (everything else is removed). Joomla's
+         * automatic XSS list is off here because it removes every iframe, which embeds
+         * need; the allowlist alone keeps scripts, event handlers, srcdoc and
+         * javascript:/data: URLs out.
+         */
         $filter = InputFilter::getInstance(
             ['iframe', 'audio', 'video', 'source', 'a', 'img'],
-            ['src', 'href', 'type', 'controls', 'width', 'height', 'allow', 'allowfullscreen', 'frameborder', 'alt', 'class', 'style'],
-            1,
-            1
+            ['src', 'href', 'type', 'width', 'height', 'allow', 'frameborder', 'alt', 'class', 'title'],
+            InputFilter::ONLY_ALLOW_DEFINED_TAGS,
+            InputFilter::ONLY_ALLOW_DEFINED_ATTRIBUTES,
+            0
         );
 
-        return $filter->clean($html, 'html');
+        $html = $filter->clean($html, 'html');
+
+        // Attributes without a value don't survive the filter: players get them back.
+        $html = preg_replace('#<(audio|video)\b(?![^>]*\bcontrols\b)#i', '<$1 controls', $html);
+        $html = preg_replace('#<iframe\b(?![^>]*\ballowfullscreen\b)#i', '<iframe allowfullscreen', $html);
+
+        return $html;
     }
 
     /**
@@ -1439,7 +1522,32 @@ class Helper
      */
     public static function sanitizeMegaMenuBadge($value): string
     {
-        return htmlspecialchars(trim(strip_tags((string) $value)), ENT_QUOTES, 'UTF-8');
+        // Plain text (escaped where it is printed). Older values were stored escaped: decode those once.
+        return trim(strip_tags(html_entity_decode((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    }
+
+    /**
+     * A menu item's mega menu settings, sanitized for rendering. The stored JSON
+     * can come from the menu item form (any menu editor), so it is never trusted.
+     *
+     * @param   mixed  $json  The helixultimatemenulayout param.
+     *
+     * @return  \stdClass
+     * @since   2.2.11
+     */
+    public static function megaMenuSettings($json): \stdClass
+    {
+        $settings = \json_decode((string) self::CheckNull($json), true);
+
+        if (! \is_array($settings)) {
+            $settings = [];
+        }
+
+        // Keep "not set" values unset, so callers' defaults still apply.
+        $clean = self::sanitizeMegaMenuSettings($settings);
+        $clean = array_intersect_key($clean, $settings + ['layout' => true]);
+
+        return \json_decode(\json_encode($clean));
     }
 
     /**

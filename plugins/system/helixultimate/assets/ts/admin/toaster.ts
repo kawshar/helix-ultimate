@@ -88,15 +88,20 @@ const HelixToaster = {
 		const titleClass = `${this.options.prefix}-title ${this.options.titleClass}`;
 		const messageClass = `${this.options.prefix}-message ${this.options.messageClass}`;
 
+		// Title and message are text (they can carry names, aliases or server messages), never markup.
 		toasterElement.innerHTML = `
 			<div class="hu-toaster-info-icon">${INFO_ICON}</div>
 			<div class="hu-toaster-wrap">
-				<div class="${titleClass}">${title}</div>
-				<div class="${messageClass}">${message}</div>
+				<div class="${titleClass}"></div>
+				<div class="${messageClass}"></div>
 			</div>
 			<div class="hu-toaster-close">${CLOSE_ICON}</div>
 
 		`;
+
+		const [titleElement, messageElement] = toasterElement.querySelectorAll<HTMLElement>('.hu-toaster-wrap > div');
+		titleElement.textContent = title ?? '';
+		messageElement.textContent = message ?? '';
 
 		toasterElement.style.animationName = 'huFadeInUp';
 		toasterElement.style.animationDuration = '.35s';

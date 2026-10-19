@@ -172,11 +172,15 @@
           parts.push(`<span class="hu-flag hu-flag-text">${text}</span>`);
         }
         const background = row.dataset.background_color;
-        if (background) {
-          parts.push(`<span class="hu-flag hu-flag-swatch" title="Background ${background}" style="--hu-flag-color: ${background.replace(/[^#\w(),.%\s-]/g, "")}"></span>`);
-        }
         if (HIDE_KEYS.some((key) => isOn(row, key))) parts.push(`<span class="hu-flag hu-flag-icon" title="Hidden on some devices">${flagIcons.hidden}</span>`);
         flags.innerHTML = parts.join("");
+        if (background) {
+          const swatch = document.createElement("span");
+          swatch.className = "hu-flag hu-flag-swatch";
+          swatch.title = `Background ${background}`;
+          swatch.style.setProperty("--hu-flag-color", background.replace(/[^#\w(),.%\s-]/g, ""));
+          flags.insertBefore(swatch, flags.querySelector(".hu-flag-icon"));
+        }
       }
       columnsOfRow(row).forEach((column) => {
         const card = column.querySelector(":scope > .hu-column");
@@ -547,7 +551,7 @@
       });
       columns.slice(sizes.length).forEach((column) => column.remove());
       if (row instanceof HTMLElement) layoutRowHandles(row);
-      Joomla.HelixToaster.success(`Grid pattern updated to <strong>${sizes.join("+")}</strong>`, "Layout Settings");
+      Joomla.HelixToaster.success(`Grid pattern updated to ${sizes.join("+")}`, "Layout Settings");
       updateLayoutField();
     }
     const setActiveLayout = (list, layoutButton) => {

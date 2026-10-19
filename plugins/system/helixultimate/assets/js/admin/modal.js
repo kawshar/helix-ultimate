@@ -8,7 +8,7 @@
    * @copyright Copyright (c) 2010 - 2025 JoomShaper
    * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
    */
-  var escapeAttr = (value) => String(value ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  var escapeAttr = (value) => String(value ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   var removeModals = (selector = ".hu-modal-overlay, .hu-modal") => {
     document.querySelectorAll(selector).forEach((element) => element.remove());
   };
@@ -27,7 +27,7 @@
 		<div class="hu-modal-overlay"></div>
 		<div class="hu-modal ${escapeAttr(className)}" data-target_type="${escapeAttr(targetType)}" data-target="${escapeAttr(target)}">
 			<div class="hu-modal-header">
-				<h4 class="hu-modal-header-title">${title}</h4>
+				<h4 class="hu-modal-header-title">${escapeAttr(title)}</h4>
 				${closeButton("action-hu-modal-close")}
 			</div>
 			<div class="hu-modal-inner">
@@ -49,7 +49,7 @@
 		<div class="hu-modal-overlay"></div>
 		<div class="hu-modal ${escapeAttr(className)}" data-target_type="${escapeAttr(targetType)}" data-target="${escapeAttr(target)}">
 			<div class="hu-modal-header">
-				<h4 class="hu-modal-header-title">${title}</h4>
+				<h4 class="hu-modal-header-title">${escapeAttr(title)}</h4>
 				${closeButton("action-hu-modal-close")}
 			</div>
 			<div class="hu-modal-inner">
@@ -107,7 +107,7 @@
 		<div class="hu-options-modal-overlay"></div>
 		<div class="hu-options-modal ${escapeAttr(className)}" data-target="#${escapeAttr(target)}">
 			<div class="hu-options-modal-header">
-				<span class="hu-options-modal-header-title">${title}</span>
+				<span class="hu-options-modal-header-title">${escapeAttr(title)}</span>
 				${closeButton("action-hu-options-modal-close")}
 			</div>
 			<div class="hu-options-modal-inner">

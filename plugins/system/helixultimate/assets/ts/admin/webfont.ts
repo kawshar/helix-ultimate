@@ -34,9 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	/** Add a Google font stylesheet once, so the preview can use it. */
 	const loadGoogleFont = (family: string, subset = ''): void => {
-		const url = `//fonts.googleapis.com/css?family=${family.replace(/ /g, '+')}:${FONT_WEIGHTS}${subset ? `&subset=${subset}` : ''}&display=swap`;
+		const url = `//fonts.googleapis.com/css?family=${encodeURIComponent(family).replace(/%20/g, '+')}:${FONT_WEIGHTS}${subset ? `&subset=${encodeURIComponent(subset)}` : ''}&display=swap`;
 
-		if (document.querySelector(`link[href="${url}"]`)) return;
+		if (document.querySelector(`link[href="${CSS.escape(url)}"]`)) return;
 
 		const link = document.createElement('link');
 		link.rel = 'stylesheet';
@@ -184,12 +184,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		const icon = document.createElement('span');
 		icon.className = 'hu-btn-spinner';
 		icon.innerHTML = Joomla.utils.icon('spinner', { className: 'hu-spin', size: 14 });
+		// The server sends "<p class='font-update-…'>text</p>" (the text can come from Google's API): show it as text.
 		const showMessage = (html: string) => {
-			button.insertAdjacentHTML('afterend', html);
+			const parsed = new DOMParser().parseFromString(html, 'text/html');
+			const kind = parsed.querySelector('p')?.className.match(/^font-update-(success|failed)$/)?.[0];
+			const message = document.createElement('p');
 
-			const message = button.nextElementSibling;
+			if (kind) message.className = kind;
+			message.textContent = parsed.body.textContent ?? '';
+			button.after(message);
 
-			setTimeout(() => message && message.remove(), 2300);
+			setTimeout(() => message.remove(), 2300);
 		};
 
 		if (own) own.classList.add('hu-spin');

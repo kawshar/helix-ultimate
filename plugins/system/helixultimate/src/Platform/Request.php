@@ -116,6 +116,17 @@ class Request
 
 		Helper::guardAjaxRequest($this->action);
 
+		// Actions on a template style: only a Helix site style (not another template's).
+		$styleActions = ['save-tmpl-style', 'draft-tmpl-style', 'reset-drafted-settings', 'save-layout', 'render-layout', 'remove-layout-file', 'purge-css-file', 'import-tmpl-style', 'update-font-list'];
+
+		if (\in_array($this->action, $styleActions, true) && !Helper::isHelixStyle((int) $this->id))
+		{
+			$this->report['message'] = 'Invalid template style';
+			echo json_encode($this->report);
+
+			return;
+		}
+
 		switch ($this->action)
 		{
 			case 'save-tmpl-style':
@@ -275,7 +286,17 @@ class Request
 			'id' => $this->id
 		];
 
-		Helper::saveLicenseInfo($inputs);
+		/**
+		 * The license is stored on the update site (an installer setting): only for users
+		 * who may manage extensions, and for this style's template (from the database).
+		 */
+		$user = $this->app->getIdentity();
+
+		if ($user && ($user->authorise('core.admin') || $user->authorise('core.manage', 'com_installer')))
+		{
+			$style = Helper::getTemplateStyle($this->id);
+			Helper::saveLicenseInfo(array_merge($inputs, ['template' => $style->template ?? '']));
+		}
 
 		$key = Helper::generateKey($keyOptions);
 		$cache = new HelixCache($key);
@@ -603,11 +624,14 @@ class Request
 			return;
 		}
 
-		$settings 	= $this->data['settings'];
-		$data 		= json_decode($settings ?? "");
+		$settings 	= $this->data['settings'] ?? '';
+		$data 		= json_decode($settings ?: '');
 
-		if (json_last_error() === JSON_ERROR_NONE)
+		if (json_last_error() === JSON_ERROR_NONE && \is_object($data))
 		{
+			// Customizer-only keys never come from a file.
+			unset($data->megamenu_drafts);
+
 			$update = Helper::updateTemplateStyle($this->id, $data);
 
 			if ($update)
@@ -819,7 +843,7 @@ class Request
 				$html .= '<div class="settings-section clearfix">';
 				$html .= '<div class="settings-left pull-left">';
 				$html .= '<a class="row-move" href="#">' . \HelixUltimate\Framework\Platform\Icon::get('sort') . '</a>';
-				$html .= '<strong class="section-title">' . $name . '</strong>';
+				$html .= '<strong class="section-title">' . htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8') . '</strong>';
 				$html .= '</div>';
 				$html .= '<div class="settings-right pull-right">';
 				$html .= '<ul class="button-group">';
@@ -851,7 +875,7 @@ class Request
 				}
 
 				$html .= '<li>';
-				$html .= '<a href="#" class="hasTooltip column-layout-custom column-layout custom ' . $active . '" data-layout="' . $customLayout . '" data-type="custom" data-original-title="<strong>Custom Layout</strong>"></a>';
+				$html .= '<a href="#" class="hasTooltip column-layout-custom column-layout custom ' . $active . '" data-layout="' . htmlspecialchars((string) $customLayout, ENT_QUOTES, 'UTF-8') . '" data-type="custom" data-original-title="<strong>Custom Layout</strong>"></a>';
 				$html .= '</li>';
 				$html .= '</ul>';
 				$html .= '</li>';
@@ -867,7 +891,7 @@ class Request
 				{
 					$colSettings = $this->getSettings($column->settings);
 
-					$html .= '<div class="' . $column->className . '" ' . $colSettings . '>';
+					$html .= '<div class="' . htmlspecialchars((string) $column->className, ENT_QUOTES, 'UTF-8') . '" ' . $colSettings . '>';
 					$html .= '<div class="column">';
 
 					if (isset($column->settings->column_type) && $column->settings->column_type)
@@ -881,7 +905,7 @@ class Request
 							$column->settings->name = 'none';
 						}
 
-						$html .= '<h6 class="col-title pull-left">' . $column->settings->name . '</h6>';
+						$html .= '<h6 class="col-title pull-left">' . htmlspecialchars((string) $column->settings->name, ENT_QUOTES, 'UTF-8') . '</h6>';
 					}
 
 					$html .= '<a class="col-ops-set pull-right" href="#" >' . \HelixUltimate\Framework\Platform\Icon::get('settings') . '</a>';

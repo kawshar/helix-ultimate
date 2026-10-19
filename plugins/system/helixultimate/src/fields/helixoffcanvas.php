@@ -77,7 +77,7 @@ class JFormFieldHelixOffcanvas extends FormField
 					$html .= '</li>';
 				}
 
-				$html .= '<input type="hidden" name="' . $this->name . '" value=\'' . $this->value . '\' id="' . $this->id . '">';
+				$html .= '<input type="hidden" name="' . $this->name . '" value="' . htmlspecialchars((string) $this->value, ENT_QUOTES, 'UTF-8') . '" id="' . $this->id . '">';
 				$html .= '</div>';
 			}
 		}

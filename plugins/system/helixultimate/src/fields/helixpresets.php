@@ -83,9 +83,9 @@ class JFormFieldHelixpresets extends FormField
 		$data = json_encode($data);
 
 		$html .= $htmlString;
-		$html .= '<input id="default-values" type="hidden" class="default-values" value=\'' . json_encode($presetXml) . '\' />';
-		$html .= '<input id="presets-data" type="hidden" name="presets-data" class="hu-presets-data" value=\'' . $data . '\' />';
-		$html .= '<input id="' . $this->id . '" type="hidden" name="' . $this->name . '" class="hu-input-preset" value=\'' . $this->value . '\' />';
+		$html .= '<input id="default-values" type="hidden" class="default-values" value="' . htmlspecialchars((string) json_encode($presetXml), ENT_QUOTES, 'UTF-8') . '" />';
+		$html .= '<input id="presets-data" type="hidden" name="presets-data" class="hu-presets-data" value="' . htmlspecialchars((string) $data, ENT_QUOTES, 'UTF-8') . '" />';
+		$html .= '<input id="' . $this->id . '" type="hidden" name="' . $this->name . '" class="hu-input-preset" value="' . htmlspecialchars((string) $this->value, ENT_QUOTES, 'UTF-8') . '" />';
 		$html .= '</div>';
 		
 

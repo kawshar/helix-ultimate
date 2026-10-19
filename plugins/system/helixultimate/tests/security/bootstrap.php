@@ -58,10 +58,49 @@ if (!class_exists('Joomla\\CMS\\Component\\ComponentHelper'))
 	class_alias(JoomlaComponentHelperStub::class, 'Joomla\\CMS\\Component\\ComponentHelper');
 }
 
+/**
+ * Use Joomla's real InputFilter when the site's libraries are next to the plugin:
+ * a stub can't show how the filter modes really behave (sanitizeEmbed once had them reversed).
+ */
+$joomlaRoot = dirname(__DIR__, 5);
+
+if (!class_exists('Joomla\\CMS\\Filter\\InputFilter') && is_file($joomlaRoot . '/libraries/vendor/autoload.php') && is_file($joomlaRoot . '/libraries/src/Filter/InputFilter.php'))
+{
+	if (!defined('_JEXEC'))
+	{
+		define('_JEXEC', 1);
+	}
+
+	// Only the filter and what it needs (Factory, Uri... stay stubbed for the other tests).
+	$filterPaths = [
+		'Joomla\\Filter\\'        => $joomlaRoot . '/libraries/vendor/joomla/filter/src/',
+		'Joomla\\String\\'        => $joomlaRoot . '/libraries/vendor/joomla/string/src/',
+		'Joomla\\CMS\\String\\'   => $joomlaRoot . '/libraries/src/String/',
+		'enshrined\\svgSanitize\\' => $joomlaRoot . '/libraries/vendor/enshrined/svg-sanitize/src/',
+	];
+
+	spl_autoload_register(static function (string $class) use ($filterPaths): void {
+		foreach ($filterPaths as $prefix => $path)
+		{
+			if (strpos($class, $prefix) === 0 && is_file($file = $path . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php'))
+			{
+				require_once $file;
+
+				return;
+			}
+		}
+	});
+
+	require_once $joomlaRoot . '/libraries/src/Filter/InputFilter.php';
+}
+
 if (!class_exists('Joomla\\CMS\\Filter\\InputFilter'))
 {
 	class JoomlaInputFilterStub
 	{
+		public const ONLY_ALLOW_DEFINED_TAGS = 0;
+		public const ONLY_ALLOW_DEFINED_ATTRIBUTES = 0;
+
 		private array $allowedTags;
 
 		public function __construct(array $allowedTags)
@@ -69,7 +108,7 @@ if (!class_exists('Joomla\\CMS\\Filter\\InputFilter'))
 			$this->allowedTags = $allowedTags;
 		}
 
-		public static function getInstance(array $tags, array $attributes, int $tagsFlag, int $attrFlag): self
+		public static function getInstance(array $tags, array $attributes, int $tagsFlag, int $attrFlag, int $xssAuto = 1): self
 		{
 			return new self($tags);
 		}

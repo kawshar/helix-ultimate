@@ -90,14 +90,15 @@ class MegaMenuBuilder extends Builder
 	 */
 	public function getMegaMenuSettings()
 	{
-		$megaMenu = $this->params->get('helixultimatemenulayout', new \stdClass);
+		$megaMenu = $this->params->get('helixultimatemenulayout', '');
 
-		if (!empty($megaMenu) && \is_string($megaMenu))
+		if (!\is_string($megaMenu))
 		{
-			$megaMenu = \json_decode($megaMenu ?? "");
+			$megaMenu = \json_encode($megaMenu);
 		}
 
-		return $megaMenu;
+		// Stored settings can come from the menu item form: always sanitized before use.
+		return Helper::megaMenuSettings($megaMenu);
 	}
 
 	/**

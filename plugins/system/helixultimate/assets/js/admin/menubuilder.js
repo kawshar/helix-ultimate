@@ -226,9 +226,7 @@
       let error = "";
       if (noscript) {
         const messages = new DOMParser().parseFromString(noscript.textContent ?? "", "text/html");
-        if (messages.querySelector(".alert-danger")) {
-          error = noscript.innerHTML;
-        }
+        error = messages.querySelector(".alert-danger")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
       }
       return {
         type: heading ? heading.textContent ?? "" : "",

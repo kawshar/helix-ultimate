@@ -18,8 +18,8 @@
       return element ? element.value : "";
     };
     const loadGoogleFont = (family, subset = "") => {
-      const url = `//fonts.googleapis.com/css?family=${family.replace(/ /g, "+")}:${FONT_WEIGHTS}${subset ? `&subset=${subset}` : ""}&display=swap`;
-      if (document.querySelector(`link[href="${url}"]`)) return;
+      const url = `//fonts.googleapis.com/css?family=${encodeURIComponent(family).replace(/%20/g, "+")}:${FONT_WEIGHTS}${subset ? `&subset=${encodeURIComponent(subset)}` : ""}&display=swap`;
+      if (document.querySelector(`link[href="${CSS.escape(url)}"]`)) return;
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = url;
@@ -121,9 +121,13 @@
       icon.className = "hu-btn-spinner";
       icon.innerHTML = Joomla.utils.icon("spinner", { className: "hu-spin", size: 14 });
       const showMessage = (html) => {
-        button.insertAdjacentHTML("afterend", html);
-        const message = button.nextElementSibling;
-        setTimeout(() => message && message.remove(), 2300);
+        const parsed = new DOMParser().parseFromString(html, "text/html");
+        const kind = parsed.querySelector("p")?.className.match(/^font-update-(success|failed)$/)?.[0];
+        const message = document.createElement("p");
+        if (kind) message.className = kind;
+        message.textContent = parsed.body.textContent ?? "";
+        button.after(message);
+        setTimeout(() => message.remove(), 2300);
       };
       if (own) own.classList.add("hu-spin");
       else button.prepend(icon);

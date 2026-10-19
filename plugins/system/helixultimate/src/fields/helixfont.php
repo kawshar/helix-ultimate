@@ -169,7 +169,7 @@ class JFormFieldHelixfont extends FormField
 
 		$html .= '</div>';
 
-		$html .= '<input type="hidden" name="' . $this->name . '" value=\'' . $this->value . '\' class="hu-webfont-input" id="' . $this->id . '">';
+		$html .= '<input type="hidden" name="' . $this->name . '" value="' . htmlspecialchars((string) $this->value, ENT_QUOTES, 'UTF-8') . '" class="hu-webfont-input" id="' . $this->id . '">';
 		$html .= '</div>';
 
 		return $html;

@@ -24,16 +24,19 @@ $params = $template->params;
 		?>
 		<div class="d-flex">
 			<div class="flex-shrink-0">
-				<img class="me-3" src="https://www.gravatar.com/avatar/<?php echo md5($author->get('email')); ?>?s=64&d=identicon&r=PG" alt="<?php echo $author->name; ?>">
+				<img class="me-3" src="https://www.gravatar.com/avatar/<?php echo md5($author->get('email')); ?>?s=64&d=identicon&r=PG" alt="<?php echo htmlspecialchars((string) $author->name, ENT_QUOTES, 'UTF-8'); ?>">
 			</div>
 			<div class="flex-grow-1 ms-3">
-				<h5 class="mt-0"><?php echo $author->name; ?></h5>
+				<h5 class="mt-0"><?php echo htmlspecialchars((string) $author->name, ENT_QUOTES, 'UTF-8'); ?></h5>
 				<?php if(isset($profile->profile['aboutme']) && $profile->profile['aboutme']) : ?>
 					<div class="author-bio">
 						<?php echo $profile->profile['aboutme']; ?>
-						<?php if(isset($profile->profile['website']) && $profile->profile['website']) : ?>
+						<?php $website = trim(strip_tags((string) ($profile->profile['website'] ?? ''))); ?>
+						<?php // Only web links (no javascript: or data: URLs). ?>
+						<?php if($website !== '' && preg_match('#^https?://#i', $website)) : ?>
+							<?php $website = htmlspecialchars($website, ENT_QUOTES, 'UTF-8'); ?>
 							<div class="author-website mt-2">
-								<strong><?php echo Text::_('HELIX_ULTIMATE_BLOG_AUTHOR_WEBSITE'); ?>:</strong> <a target="_blank" rel="noopener noreferrer" href="<?php echo strip_tags($profile->profile['website'], ''); ?>"><?php echo strip_tags($profile->profile['website'], ''); ?></a>
+								<strong><?php echo Text::_('HELIX_ULTIMATE_BLOG_AUTHOR_WEBSITE'); ?>:</strong> <a target="_blank" rel="noopener noreferrer" href="<?php echo $website; ?>"><?php echo $website; ?></a>
 							</div>
 						<?php endif; ?>
 					</div>

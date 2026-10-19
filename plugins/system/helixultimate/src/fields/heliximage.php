@@ -59,7 +59,7 @@ class JFormFieldHeliximage extends FormField
 				$src = Uri::root(true) . '/' . dirname($data_src) . '/' . File::stripExt($basename) . '_thumbnail.' . $this->getExt($basename);
 			}
 
-			$output .= '<img src="' . $src . '" data-src="' . $data_src . '" alt="">';
+			$output .= '<img src="' . htmlspecialchars($src, ENT_QUOTES, 'UTF-8') . '" data-src="' . htmlspecialchars((string) $data_src, ENT_QUOTES, 'UTF-8') . '" alt="">';
 		}
 
 		$output .= '</div>';

@@ -111,7 +111,7 @@ class HelixUltimateFeatureLogo
 			{
 				$customLink = $this->params->get('logo_custom_link');
 				if ($customLink) {
-					$logoUrl = htmlspecialchars($customLink, ENT_QUOTES, 'UTF-8');
+					$logoUrl = Helper::safeUrl($customLink) ?: Uri::base(true) . '/';
 				} else {
 					$logoUrl = Uri::base(true) . '/';
 				}

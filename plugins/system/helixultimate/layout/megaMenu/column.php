@@ -25,7 +25,7 @@ if (!empty($column->items))
 
 ?>
 
-<div class="hu-megamenu-col col-<?php echo $column->colGrid; ?>" data-rowid="<?php echo $rowId; ?>" data-columnid="<?php echo $columnId; ?>">
+<div class="hu-megamenu-col col-<?php echo (int) $column->colGrid; ?>" data-rowid="<?php echo (int) $rowId; ?>" data-columnid="<?php echo (int) $columnId; ?>">
 	<div class="hu-megamenu-column-contents-wrapper">
 		<div class="hu-megamenu-column-toolbar hu-megamenu-column-drag-handler">
 			<?php echo \HelixUltimate\Framework\Platform\Icon::get('sort-horizontal'); ?>

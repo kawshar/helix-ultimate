@@ -40,6 +40,13 @@ class Response
 		$input = Factory::getApplication()->input;
 		$menuType = $input->get('menutype', 'mainmenu', 'STRING');
 
+		if (!self::canEditMenuType($menuType)) {
+			return [
+				'status'  => false,
+				'message' => Text::_('JERROR_ALERTNOAUTHOR')
+			];
+		}
+
 		$items = self::getItems($menuType);
 
 		return [
@@ -60,8 +67,27 @@ class Response
 		$input = Factory::getApplication()->input;
 		$itemId = $input->post->get('id', 0, 'INT');
 		$parentId = $input->post->get('parent', 0, 'INT');
+		$data = null;
 
 		if ($itemId > 0 && $parentId > 0) {
+			$item   = self::loadMenuRow($itemId);
+			$parent = self::loadMenuRow($parentId);
+
+			/**
+			 * Only a site menu item, moved under the root or under another item of the
+			 * same menu (not itself or one of its own children), by a user who may edit that menu.
+			 */
+			$validParent = $parent && ((int) $parent->id === 1
+				|| ((int) $parent->client_id === 0 && $parent->menutype === ($item->menutype ?? null)
+					&& !((int) $parent->lft >= (int) $item->lft && (int) $parent->rgt <= (int) $item->rgt)));
+
+			if (!$item || (int) $item->client_id !== 0 || (int) $item->id === 1 || !$validParent || !self::canEditMenuType((string) $item->menutype)) {
+				return [
+					'status'  => false,
+					'message' => Text::_('JERROR_ALERTNOAUTHOR')
+				];
+			}
+
 			$data = new \stdClass;
 			$data->id = $itemId;
 			$data->parent_id = $parentId;
@@ -81,6 +107,90 @@ class Response
 			'status' => true,
 			'data' => [$data]
 		];
+	}
+
+	/**
+	 * Column sizes of a grid pattern such as "4+8": whole numbers from 1 to 12.
+	 *
+	 * @param	string	$layout		The pattern.
+	 *
+	 * @return	array<int, string>
+	 * @since	2.2.11
+	 */
+	private static function gridSizes(string $layout): array
+	{
+		$sizes = [];
+
+		foreach (explode('+', $layout) as $size) {
+			$size = (int) $size;
+			$sizes[] = (string) max(1, min(12, $size ?: 12));
+		}
+
+		return $sizes ?: ['12'];
+	}
+
+	/**
+	 * A row of #__menu (for permission and tree checks).
+	 *
+	 * @param	int		$id		The menu item ID.
+	 *
+	 * @return	object|null
+	 * @since	2.2.11
+	 */
+	private static function loadMenuRow(int $id)
+	{
+		try {
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
+			$query = $db->getQuery(true)
+				->select($db->quoteName(['id', 'menutype', 'client_id', 'lft', 'rgt']))
+				->from($db->quoteName('#__menu'))
+				->where($db->quoteName('id') . ' = ' . (int) $id);
+
+			return $db->setQuery($query)->loadObject() ?: null;
+		} catch (\Throwable $e) {
+			return null;
+		}
+	}
+
+	/**
+	 * May the current user edit the items of a menu? Super users, or core.edit on
+	 * that menu's asset (com_menus.menu.<id>), not the broad component permission.
+	 *
+	 * @param	string	$menuType	The menu type.
+	 *
+	 * @return	bool
+	 * @since	2.2.11
+	 */
+	private static function canEditMenuType(string $menuType): bool
+	{
+		$user = Factory::getApplication()->getIdentity();
+
+		if (!$user || !$user->id) {
+			return false;
+		}
+
+		if ($user->authorise('core.admin')) {
+			return true;
+		}
+
+		$menuTypeId = 0;
+
+		if ($menuType !== '') {
+			try {
+				$db = Factory::getContainer()->get(DatabaseInterface::class);
+				$query = $db->getQuery(true)
+					->select($db->quoteName('id'))
+					->from($db->quoteName('#__menu_types'))
+					->where($db->quoteName('menutype') . ' = ' . $db->quote($menuType))
+					->where($db->quoteName('client_id') . ' = 0');
+				$db->setQuery($query);
+				$menuTypeId = (int) $db->loadResult();
+			} catch (\Throwable $e) {
+				$menuTypeId = 0;
+			}
+		}
+
+		return $menuTypeId > 0 && $user->authorise('core.edit', 'com_menus.menu.' . $menuTypeId);
 	}
 
 	/**
@@ -151,6 +261,7 @@ class Response
 			$query->select('id, title, menutype, alias, parent_id, level, lft, rgt, published')
 				->from($db->qn('#__menu'))
 				->where($db->qn('menutype') . ' = ' . $db->q($menuType))
+				->where($db->qn('client_id') . ' = 0')
 				->where($db->qn('published') . ' IN (0,1)');
 			$query->order($db->qn('lft') . ' ASC');
 
@@ -234,6 +345,15 @@ class Response
 	{
 		$input = Factory::getApplication()->input;
 		$itemId = $input->get('id', 0, 'INT');
+		$row = self::loadMenuRow($itemId);
+
+		if (!$row || (int) $row->client_id !== 0 || !self::canEditMenuType((string) $row->menutype)) {
+			return [
+				'status'  => false,
+				'message' => Text::_('JERROR_ALERTNOAUTHOR')
+			];
+		}
+
 		$layout = new FileLayout('megaMenu.container', HELIX_LAYOUT_PATH);
 		$builder = new MegaMenuBuilder($itemId);
 
@@ -299,31 +419,7 @@ class Response
 		}
 
 		// Enforce menu type asset authority (com_menus.menu.<id>)
-		$canEdit = false;
-
-		if ($user->authorise('core.admin')) {
-			$canEdit = true;
-		} else {
-			$menuTypeId = 0;
-
-			if (!empty($item->menutype)) {
-				try {
-					$db = Factory::getContainer()->get(DatabaseInterface::class);
-					$query = $db->getQuery(true)
-						->select($db->quoteName('id'))
-						->from($db->quoteName('#__menu_types'))
-						->where($db->quoteName('menutype') . ' = ' . $db->quote($item->menutype));
-					$db->setQuery($query);
-					$menuTypeId = (int) $db->loadResult();
-				} catch (\Throwable $e) {
-					$menuTypeId = 0;
-				}
-			}
-
-			if ($menuTypeId > 0 && $user->authorise('core.edit', 'com_menus.menu.' . $menuTypeId)) {
-				$canEdit = true;
-			}
-		}
+		$canEdit = self::canEditMenuType((string) ($item->menutype ?? ''));
 
 		if (!$canEdit) {
 			return [
@@ -374,8 +470,17 @@ class Response
 		$itemId = $input->post->get('itemId', 0, 'INT');
 
 		$rowData = \json_decode($rowData ?? "");
+
+		if (!\is_object($rowData)) {
+			$rowData = (object) ['type' => 'row', 'attr' => []];
+		}
+
+		if (!isset($rowData->attr) || !\is_array($rowData->attr)) {
+			$rowData->attr = [];
+		}
+
 		$layout = \preg_replace("@\s@", '', $layout);
-		$layoutArray = explode('+', $layout);
+		$layoutArray = self::gridSizes($layout);
 
 		$columns = [];
 
@@ -434,7 +539,7 @@ class Response
 
 		$layout = \preg_replace("@\s@", '', $layout);
 
-		$layoutArray = explode('+', $layout);
+		$layoutArray = self::gridSizes($layout);
 
 		$rowData = new \stdClass;
 		$rowData->type = 'row';
@@ -521,7 +626,7 @@ class Response
 			$html[] = '<select class="hu-input hu-megamenu-module" data-type="module" data-husearch="1">';
 			$html[] = '<option value="">Select Module</option>';
 			foreach ($modules as $module) {
-				$html[] = '<option value="' . $module->id . '">' . $module->title . '</option>';
+				$html[] = '<option value="' . (int) $module->id . '">' . htmlspecialchars((string) $module->title, ENT_QUOTES, 'UTF-8') . '</option>';
 			}
 
 			$html[] = '</select>';
@@ -532,7 +637,7 @@ class Response
 			$html[] = '<option value="">Select Menu Item</option>';
 
 			foreach ($children as $child) {
-				$html[] = '<option value="' . $child->id . '">' . $child->title . '</option>';
+				$html[] = '<option value="' . (int) $child->id . '">' . htmlspecialchars((string) $child->title, ENT_QUOTES, 'UTF-8') . '</option>';
 			}
 
 			$html[] = '</select>';

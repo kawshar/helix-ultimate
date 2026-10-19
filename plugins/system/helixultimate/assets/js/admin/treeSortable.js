@@ -124,7 +124,7 @@
         if (!item) return;
         const dragged = item;
         if (aliasExists) {
-          Joomla.HelixToaster.error(`Can't set the same alias <strong>${dragged.dataset.alias}</strong> in the same menu level!`, "Error");
+          Joomla.HelixToaster.error(`Can't set the same alias "${dragged.dataset.alias}" in the same menu level!`, "Error");
         }
         const children = bus ? [...bus.children] : [];
         dragged.after(...children);

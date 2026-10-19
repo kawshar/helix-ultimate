@@ -30,7 +30,7 @@ $sidebar = new Settings;
 			<input type="hidden" name="template" value="<?php echo $style->template; ?>">
 			<input type="hidden" name="client_id" value="<?php echo $style->client_id; ?>">
 			<input type="hidden" name="home" value="<?php echo $style->home; ?>">
-			<input type="hidden" name="title" value="<?php echo $style->title; ?>">
+			<input type="hidden" name="title" value="<?php echo htmlspecialchars((string) $style->title, ENT_QUOTES, 'UTF-8'); ?>">
 		</form>
 	</div>
 	<div class="hu-container">

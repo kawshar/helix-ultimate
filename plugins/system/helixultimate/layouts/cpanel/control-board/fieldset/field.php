@@ -59,7 +59,7 @@ extract($displayData);
 
 	if ($showon)
 	{
-		$attribs .= ' data-showon=\'' . json_encode(Settings::parseShowOnConditions($showon)) . '\'';
+		$attribs .= ' data-showon=\'' . htmlspecialchars(json_encode(Settings::parseShowOnConditions($showon)), ENT_QUOTES, 'UTF-8') . '\'';
 	}
 
 	$setvalue = '';
@@ -124,8 +124,8 @@ extract($displayData);
 			<?php if ($type === 'checkbox' && $checkboxStyle === 'plain'): ?>
 				<label class="control-label">
 					<div class="controls <?php echo $hasTrack ? 'trackable' : ''; ?>"
-						data-safepoint='<?php echo $isValidDataField ? $setvalue : ''; ?>'
-						data-currpoint='<?php echo $isValidDataField ? $setvalue : ''; ?>'
+						data-safepoint='<?php echo $isValidDataField ? htmlspecialchars((string) $setvalue, ENT_QUOTES, 'UTF-8') : ''; ?>'
+						data-currpoint='<?php echo $isValidDataField ? htmlspecialchars((string) $setvalue, ENT_QUOTES, 'UTF-8') : ''; ?>'
 						data-selector="#<?php echo $field->id; ?>">
 						<?php echo $field->input; ?>
 					</div>
@@ -157,8 +157,8 @@ extract($displayData);
 				<?php endif; ?>
 
 				<div class="controls <?php echo $hasTrack ? 'trackable' : ''; ?>"
-					data-safepoint='<?php echo $isValidDataField ? $setvalue : ''; ?>'
-					data-currpoint='<?php echo $isValidDataField ? $setvalue : ''; ?>'
+					data-safepoint='<?php echo $isValidDataField ? htmlspecialchars((string) $setvalue, ENT_QUOTES, 'UTF-8') : ''; ?>'
+					data-currpoint='<?php echo $isValidDataField ? htmlspecialchars((string) $setvalue, ENT_QUOTES, 'UTF-8') : ''; ?>'
 					data-selector="#<?php echo $field->id; ?>">
 					<?php echo $field->input; ?>
 				</div>

@@ -12,7 +12,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 $articleView = $displayData['articleView'];
-$author = ($displayData['item']->created_by_alias ?: $displayData['item']->author);
+// Author names and aliases are user input: escaped like core does.
+$author = htmlspecialchars((string) ($displayData['item']->created_by_alias ?: $displayData['item']->author), ENT_QUOTES, 'UTF-8');
 ?>
 <span class="createdby"<?php echo ($articleView != 'intro') ? ' itemprop="author" itemscope itemtype="https://schema.org/Person"' : ''; ?> title="<?php echo Text::sprintf('COM_CONTENT_WRITTEN_BY', $author); ?>">
 	<?php $author = '<span itemprop="name">' . $author . '</span>'; ?>

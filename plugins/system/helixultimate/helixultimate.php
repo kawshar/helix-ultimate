@@ -184,6 +184,20 @@ class PlgSystemHelixultimate extends CMSPlugin
 	 */
 	public function onContentBeforeSave(string $typeAlias, $table, bool $isNew, $data = [])
 	{
+	    // Mega menu settings saved through the menu item form are sanitized like the customizer's.
+	    if ($typeAlias === 'com_menus.item') {
+	        $params = new Registry($table->params ?? '');
+	        $layout = $params->get('helixultimatemenulayout', '');
+
+	        if ($layout !== '' && $layout !== null) {
+	            $settings = json_decode(\is_string($layout) ? $layout : json_encode($layout), true);
+	            $params->set('helixultimatemenulayout', \is_array($settings) ? json_encode(Helper::sanitizeMegaMenuSettings($settings)) : '');
+	            $table->params = $params->toString();
+	        }
+
+	        return true;
+	    }
+
 	    //Only handle com_content form type
 	    if ($typeAlias !== 'com_content.form') {
 	        return true;

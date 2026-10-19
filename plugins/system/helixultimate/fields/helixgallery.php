@@ -82,7 +82,7 @@ class JFormFieldHelixgallery extends FormField
 					$src = Uri::root(true) . '/' . dirname($value) . '/' . File::stripExt($basename) . '_small.' . File::getExt($basename);
 				}
 
-				$output .= '<li class="hu-gallery-item" data-src="' . $data_src . '"><a href="#" class="btn btn-mini btn-danger btn-hu-remove-gallery-image">' . \HelixUltimate\Framework\Platform\Icon::get('close') . '</a><img src="' . $src . '" alt=""></li>';
+				$output .= '<li class="hu-gallery-item" data-src="' . htmlspecialchars((string) $data_src, ENT_QUOTES, 'UTF-8') . '"><a href="#" class="btn btn-mini btn-danger btn-hu-remove-gallery-image">' . \HelixUltimate\Framework\Platform\Icon::get('close') . '</a><img src="' . htmlspecialchars((string) $src, ENT_QUOTES, 'UTF-8') . '" alt=""></li>';
 			}
 		}
 

@@ -346,9 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (noscript) {
 			const messages = new DOMParser().parseFromString(noscript.textContent ?? '', 'text/html');
 
-			if (messages.querySelector('.alert-danger')) {
-				error = noscript.innerHTML;
-			}
+			// As text: the toaster shows text only.
+			error = messages.querySelector('.alert-danger')?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 		}
 
 		return {

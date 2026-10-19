@@ -53,12 +53,15 @@
       toasterElement.innerHTML = `
 			<div class="hu-toaster-info-icon">${INFO_ICON}</div>
 			<div class="hu-toaster-wrap">
-				<div class="${titleClass}">${title}</div>
-				<div class="${messageClass}">${message}</div>
+				<div class="${titleClass}"></div>
+				<div class="${messageClass}"></div>
 			</div>
 			<div class="hu-toaster-close">${CLOSE_ICON}</div>
 
 		`;
+      const [titleElement, messageElement] = toasterElement.querySelectorAll(".hu-toaster-wrap > div");
+      titleElement.textContent = title ?? "";
+      messageElement.textContent = message ?? "";
       toasterElement.style.animationName = "huFadeInUp";
       toasterElement.style.animationDuration = ".35s";
       this.toasts.push(toasterElement);
