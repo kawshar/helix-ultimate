@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const settings = Joomla.getOptions('data') || {};
 	const meta = Joomla.getOptions('meta') || {};
 	const form = document.getElementById('hu-style-form');
-	const previewFrame = document.getElementById('hu-template-preview');
+	// The preview iframe. Reloading swaps in a new one (see reloadPreview()), so always read it from here.
+	let previewFrame = document.getElementById('hu-template-preview');
 
 	/**
 	 * Colour pickers (Coloris).
@@ -77,44 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Preview                                                             */
 	/* ------------------------------------------------------------------ */
 
-	/**
-	 * Reload the preview iframe at the same scroll position.
-	 * Resolves once the new page has loaded (at once when nothing was reloaded).
-	 */
-	function reloadPreview() {
-		const win = previewFrame.contentWindow;
-		const url = win.location.href;
-
-		// Only reload when the iframe has really loaded something.
-		if (!url.length || url === 'about:blank') return Promise.resolve();
-
-		const { scrollX, scrollY } = win;
-
-		return new Promise(resolve => {
-			const done = () => {
-				clearTimeout(timeout);
-				previewFrame.removeEventListener('load', onLoad);
-				resolve();
-			};
-			const onLoad = () => {
-				previewFrame.contentWindow.scrollTo(scrollX, scrollY);
-				done();
-			};
-			// Never leave the status spinning when the preview does not load.
-			const timeout = setTimeout(done, 15000);
-
-			previewFrame.addEventListener('load', onLoad);
-			previewFrame.src = previewFrame.getAttribute('src');
-		});
-	}
-
-	Joomla.reloadPreview = reloadPreview;
-
 	// The preview token (see Helper::createPreviewToken()) lets the site show the draft.
 	const previewToken = new URL(previewFrame.getAttribute('src'), location.href).searchParams.get('helixPreview');
 
-	previewFrame.addEventListener('load', () => {
-		const iDocument = previewFrame.contentWindow.document;
+	/** Prepare a page the preview shows (on every load, also pages opened inside it). */
+	function onPreviewLoad(frame) {
+		let iDocument;
+
+		try {
+			iDocument = frame.contentWindow.document;
+		} catch (error) {
+			return; // Not this site.
+		}
 
 		/**
 		 * Tag every link to this site inside the preview with `helixMode=edit` (and
@@ -137,16 +112,133 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		// Lets the template tell the backend preview apart from the real site.
-		iDocument.body.classList.add('back-panel');
-	});
+		iDocument.body?.classList.add('back-panel');
+
+		// Other panels (e.g. typography defaults) read the new page.
+		if (frame === previewFrame) document.dispatchEvent(new CustomEvent('helix:preview-load', { detail: { frame } }));
+	}
+
+	function watchPreview(frame) {
+		frame.addEventListener('load', () => onPreviewLoad(frame));
+	}
+
+	watchPreview(previewFrame);
+
+	if (previewFrame.contentDocument?.readyState === 'complete' && previewFrame.contentWindow.location.href !== 'about:blank') {
+		onPreviewLoad(previewFrame);
+	}
+
+	let pendingFrame = null;
+
+	/**
+	 * Show the current page again (with the latest draft) without a blank flash:
+	 * the page loads in a hidden iframe laid over the visible one, scrolls to the
+	 * same place, and only then replaces it. (Moving an iframe reloads it, so the
+	 * new one is created where it stays.)
+	 * Resolves once the new page shows (at once when nothing was loaded yet).
+	 */
+	function reloadPreview() {
+		const current = previewFrame;
+		let url = '';
+		let scrollX = 0;
+		let scrollY = 0;
+
+		try {
+			const win = current.contentWindow;
+			url = win.location.href;
+			({ scrollX, scrollY } = win);
+		} catch (error) {
+			url = '';
+		}
+
+		// Only reload when the iframe has really loaded something.
+		if (!url || url === 'about:blank') return Promise.resolve();
+
+		// Stay on the page being previewed, unless it lost the preview parameters.
+		if (!url.includes('helixMode=edit')) url = current.getAttribute('src');
+
+		// A newer reload replaces one that is still loading.
+		if (pendingFrame) {
+			pendingFrame.remove();
+			pendingFrame = null;
+		}
+
+		const next = document.createElement('iframe');
+		next.className = 'hu-template-preview-next';
+		next.setAttribute('frameborder', '0');
+		next.setAttribute('aria-hidden', 'true');
+		next.tabIndex = -1;
+		next.style.cssText = current.style.cssText;
+		Object.assign(next.style, {
+			position: 'absolute',
+			left: `${current.offsetLeft}px`,
+			top: `${current.offsetTop}px`,
+			width: `${current.offsetWidth}px`,
+			height: `${current.offsetHeight}px`,
+			visibility: 'hidden',
+			pointerEvents: 'none',
+			transition: 'none',
+		});
+
+		pendingFrame = next;
+		current.after(next);
+
+		return new Promise(resolve => {
+			const finish = () => {
+				clearTimeout(timeout);
+
+				if (pendingFrame === next) pendingFrame = null;
+				resolve();
+			};
+
+			const reveal = () => {
+				if (pendingFrame !== next) return finish(); // Replaced by a newer reload.
+
+				try {
+					// "instant": the template's smooth scrolling would animate from the top after the swap.
+					next.contentWindow.scrollTo({ left: scrollX, top: scrollY, behavior: 'instant' });
+				} catch (error) {
+					// Not this site: nothing to scroll.
+				}
+
+				// Becomes the preview: same place and size as the old one, which goes away.
+				next.style.cssText = current.style.cssText;
+				next.removeAttribute('aria-hidden');
+				next.removeAttribute('tabindex');
+				next.className = current.className;
+				current.remove();
+				next.id = 'hu-template-preview';
+				previewFrame = next;
+
+				watchPreview(next);
+				onPreviewLoad(next);
+				finish();
+			};
+
+			next.addEventListener('load', reveal, { once: true });
+
+			// A page that never loads: keep the old one and stop waiting.
+			const timeout = setTimeout(() => {
+				if (pendingFrame === next) {
+					next.remove();
+					pendingFrame = null;
+				}
+
+				finish();
+			}, 15000);
+
+			next.src = url;
+		});
+	}
+
+	Joomla.reloadPreview = reloadPreview;
 
 	document.querySelectorAll('.reload-preview-iframe').forEach(button => {
 		button.addEventListener('click', event => {
 			event.preventDefault();
 
-			reloadPreview();
 			button.classList.add('spin');
-			previewFrame.addEventListener('load', () => button.classList.remove('spin'), { once: true });
+			reloadPreview().then(() => button.classList.remove('spin'));
 		});
 	});
 
@@ -227,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		webfontData();
 
 		const presetInput = document.querySelector('.hu-input-preset');
-		const activePreset = document.querySelector('.hu-preset.active');
+		const activePreset = document.querySelector('.hu-preset.active:not(.hu-custom-preset)');
 
 		if (presetInput) {
 			presetInput.value = JSON.stringify(readData(activePreset));
@@ -502,7 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			if (data.status) {
 				saved = true;
-				previewFrame.contentWindow.location.reload();
+				reloadPreview();
 				Joomla.HelixToaster.success('Changes have been successfully saved!', 'Success');
 
 				// Only a saved draft is gone: after a failure the changes stay drafted.
@@ -854,21 +946,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	});
 
-	/** Preset colour groups only show when "Custom Style" is on. */
-	const customStyle = document.getElementById('custom_style');
-	const presetGroups = () => document.querySelectorAll('.hu-fieldset-presets .hu-group-wrap');
-
-	if (customStyle) {
-		const syncPresetGroups = () => presetGroups().forEach(group => toggle(group, customStyle.checked));
-
-		syncPresetGroups();
-		customStyle.addEventListener('change', syncPresetGroups);
-	}
-
-	delegate(document, 'click', '.hu-preset', (event, preset) => {
+	// The custom style's row and editor live in presets.ts (it is the last row of the list).
+	delegate(document, 'click', '.hu-preset:not(.hu-custom-preset)', (event, preset) => {
 		event.preventDefault();
 
-		document.querySelectorAll('.hu-preset').forEach(item => item.classList.remove('active'));
+		document.querySelectorAll('.hu-preset:not(.hu-custom-preset)').forEach(item => item.classList.remove('active'));
 		preset.classList.add('active');
 
 		draftChanges();

@@ -60,6 +60,8 @@ class Icon
 		'grid'           => '<rect x="2.75" y="2.75" width="4.25" height="4.25" rx="1"/><rect x="9" y="2.75" width="4.25" height="4.25" rx="1"/><rect x="2.75" y="9" width="4.25" height="4.25" rx="1"/><rect x="9" y="9" width="4.25" height="4.25" rx="1"/>',
 		'eraser'         => '<path d="M6.5 13.25h6.75M3.6 10.4l5.65-5.65a1.5 1.5 0 0 1 2.1 0l1.55 1.55a1.5 1.5 0 0 1 0 2.1L8.4 12.9a1.5 1.5 0 0 1-1.05.35H5.8a1.5 1.5 0 0 1-1.05-.45l-1.15-1.15a.9.9 0 0 1 0-1.25z"/><path d="M6.25 7.75l3.5 3.5"/>',
 		'menu'           => '<path d="M2.75 4h10.5M2.75 8h10.5M2.75 12h10.5"/>',
+		// Leave (the customizer): a door on the right, the arrow heading out to the left.
+		'exit'           => '<path d="M9.75 2.75h2.5a1 1 0 0 1 1 1v8.5a1 1 0 0 1-1 1h-2.5M10.25 8H2.75M5.5 5.25L2.75 8l2.75 2.75"/>',
 		// Sorting: up / down for lists that reorder vertically, left / right for columns.
 		'sort'           => '<path d="M5 6l3-3 3 3M5 10l3 3 3-3"/>',
 		'sort-horizontal'=> '<path d="M6 5L3 8l3 3M10 5l3 3-3 3"/>',

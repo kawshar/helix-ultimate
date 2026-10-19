@@ -3679,80 +3679,140 @@ svg.hu-icon :is(path, circle, rect) {
   margin-bottom: 12px;
 }
 
-/* Presets: a calmer mini site. Header with the logo dot, then one accent-tinted
-   block with a heading bar and a button. No topbar, menu, subtitle or text lines. */
-#helix-ultimate .hu-preset-mock {
-  height: 60px;
-  gap: 0;
+/* Presets as a list: one row per preset with its name, dots of its main
+   colours and, on hover, the edit button. The selected row has
+   a blue outline and a check after the name. Overrides the grid in _presets. */
+#helix-ultimate .hu-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#helix-ultimate .hu-presets .hu-preset {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 8px;
+}
+
+#helix-ultimate .hu-presets .hu-preset > .hu-preset-title,
+#helix-ultimate .hu-presets .hu-preset.active > .hu-preset-title {
+  order: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-start;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#helix-ultimate .hu-presets .hu-preset.active > .hu-preset-title::after {
+  flex: 0 0 14px;
+  height: 14px;
+  background-size: 14px;
+}
+
+#helix-ultimate .hu-presets .hu-preset > .hu-preset-contents {
+  order: 1;
+  flex: 0 0 auto;
+}
+
+/* The palette: small overlapping dots (as in the editor's colour groups). */
+#helix-ultimate .hu-preset-palette {
+  display: inline-flex;
+  align-items: center;
+}
+
+#helix-ultimate .hu-preset-palette i {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: 0 0 0 2px var(--sp-panel), inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+}
+
+#helix-ultimate .hu-preset-palette i:first-child {
+  margin-left: 0;
+}
+
+/* Edit takes no room: on hover (or keyboard focus) it appears over the end of
+   the row, on a fade from the row colour that covers the dots. */
+#helix-ultimate .hu-presets .hu-preset::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 96px;
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(to right, transparent, var(--sp-panel) 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-presets .hu-preset > .hu-edit-preset {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  box-shadow: none;
+  background: transparent;
+  color: var(--sp-icon);
+  transform: translateY(-50%);
+}
+
+#helix-ultimate .hu-presets .hu-preset > .hu-edit-preset:hover {
+  color: var(--sp-blue);
+  background: var(--sp-chip);
+}
+
+#helix-ultimate .hu-presets .hu-preset:is(:hover, :focus-within)::after {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  #helix-ultimate .hu-presets .hu-preset::after {
+    opacity: 1;
+  }
+}
+/* Custom style: the last row. Its switch and colour groups are replaced by the
+   row and its editor (presets.ts), so the originals are hidden. */
+#helix-ultimate .hu-custom-style-source {
+  display: none !important;
+}
+
+/* While the custom style is on, the saved preset is not the one in use. */
+#helix-ultimate .hu-presets.is-custom .hu-preset.active:not(.hu-custom-preset) {
+  border-color: var(--sp-divider);
   box-shadow: none;
 }
 
-#helix-ultimate .hu-preset-mock :is(.hu-preset-mock__topbar, .hu-preset-mock__menu, .hu-preset-mock__body),
-#helix-ultimate .hu-preset-mock__hero i:nth-child(2) {
-  display: none;
+#helix-ultimate .hu-presets.is-custom .hu-preset.active:not(.hu-custom-preset) .hu-preset-title {
+  font-weight: 500;
 }
 
-#helix-ultimate .hu-preset-mock__header {
-  flex: 0 0 18px;
-  padding: 0 8px;
+#helix-ultimate .hu-presets.is-custom .hu-preset.active:not(.hu-custom-preset) .hu-preset-title::after {
+  content: none;
 }
 
-#helix-ultimate .hu-preset-mock__logo {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+#helix-ultimate .hu-presets:not(.is-custom) .hu-custom-preset.active .hu-preset-title::after {
+  content: none;
 }
 
-#helix-ultimate .hu-preset-mock__hero {
-  flex: 1 1 auto;
-  gap: 6px;
-  margin: 0 6px 6px;
-  padding: 0 8px;
-  background: color-mix(in srgb, var(--p-accent) 10%, var(--p-bg));
-}
-
-#helix-ultimate .hu-preset-mock__hero i:first-child {
-  width: 55%;
-  height: 4px;
-  opacity: 0.9;
-}
-
-#helix-ultimate .hu-preset-mock__button {
-  width: 20px;
-  height: 7px;
-  margin-top: 0;
-}
-
-/* Preset tile spacing: an even 8px frame; the logo dot, the hero's contents
-   and the name share one left edge. */
-#helix-ultimate .hu-presets .hu-preset {
-  padding: 8px;
-}
-
-#helix-ultimate .hu-preset-mock {
-  height: auto;
-  border-radius: 6px;
-}
-
-#helix-ultimate .hu-preset-mock__header {
-  flex: 0 0 auto;
-  height: 8px;
-  margin-bottom: 6px;
-  padding: 0 10px;
-}
-
-#helix-ultimate .hu-preset-mock__hero {
-  flex: 0 0 auto;
-  height: 40px;
-  gap: 6px;
-  margin: 0;
-  padding: 0 10px;
-  border-radius: 6px;
-}
-
-#helix-ultimate .hu-presets .hu-preset .hu-preset-title,
-#helix-ultimate .hu-presets .hu-preset.active .hu-preset-title {
-  padding: 8px 0 0 2px;
+/* The separator under the presets divided them from the Custom Style switch,
+   which is now a row of the list. */
+#helix-ultimate .hu-field-separator:has(.hu-presets) {
+  border-bottom: 0;
 }
 
 /* Mega menu settings: same fields as the rest of the panel, one per row. */

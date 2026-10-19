@@ -568,10 +568,11 @@
       });
       const refreshSoon = Joomla.utils.debounce(refresh, 150);
       refresh();
-      frame?.addEventListener("load", () => {
+      document.addEventListener("helix:preview-load", (event) => {
+        const next = event.detail?.frame;
         refresh();
         try {
-          frame.contentWindow?.addEventListener("resize", refreshSoon);
+          next?.contentWindow?.addEventListener("resize", refreshSoon);
         } catch (e) {
         }
       });

@@ -867,12 +867,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		refresh();
 
-		// The preview reloads after a save, and resizes on a device switch.
-		frame?.addEventListener('load', () => {
+		// The preview shows a new page after each change (a new iframe: see reloadPreview()), and resizes on a device switch.
+		document.addEventListener('helix:preview-load', event => {
+			const next = (event as CustomEvent<{ frame: HTMLIFrameElement }>).detail?.frame;
+
 			refresh();
 
 			try {
-				frame.contentWindow?.addEventListener('resize', refreshSoon);
+				next?.contentWindow?.addEventListener('resize', refreshSoon);
 			} catch (e) {
 				// Cross-origin preview: no live updates.
 			}

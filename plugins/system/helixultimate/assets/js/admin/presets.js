@@ -18,60 +18,53 @@
       presetsData = JSON.parse(dataElement.value);
     }
     function detectMajorColor(presetData) {
-      const frequency = Object.values(presetData).reduce((accumulator, color2) => {
-        accumulator[color2] = (accumulator[color2] || 0) + 1;
+      const frequency = Object.values(presetData).reduce((accumulator, color) => {
+        accumulator[color] = (accumulator[color] || 0) + 1;
         return accumulator;
       }, {});
       let max = 0;
-      return Object.entries(frequency).reduce((major, [color2, count]) => {
+      return Object.entries(frequency).reduce((major, [color, count]) => {
         if (count >= max) {
           max = count;
-          major = color2;
+          major = color;
         }
         return major;
       }, "");
     }
-    const color = (tile, key, fallback) => tile.getAttribute(`data-${key}`) || fallback;
     function renderPresetPreview(tile) {
       const contents = tile.querySelector(".hu-preset-contents");
       if (!contents) return;
-      const accent = color(tile, "link_color", "#1f3bff");
-      contents.setAttribute("aria-hidden", "true");
-      contents.innerHTML = `
-			<span class="hu-preset-mock">
-				<span class="hu-preset-mock__topbar"></span>
-				<span class="hu-preset-mock__header">
-					<span class="hu-preset-mock__logo"></span>
-					<span class="hu-preset-mock__menu"><i></i><i></i><i></i></span>
-				</span>
-				<span class="hu-preset-mock__hero">
-					<i></i><i></i>
-					<span class="hu-preset-mock__button"></span>
-				</span>
-				<span class="hu-preset-mock__body"><i></i><i></i><i></i></span>
-			</span>`;
-      const mock = contents.querySelector(".hu-preset-mock");
-      const vars = {
-        "--p-topbar": color(tile, "topbar_bg_color", "#333"),
-        "--p-header": color(tile, "header_bg_color", "#fff"),
-        "--p-logo": color(tile, "logo_text_color", accent),
-        "--p-menu": color(tile, "menu_text_color", "#252525"),
-        "--p-bg": color(tile, "bg_color", "#fff"),
-        "--p-text": color(tile, "text_color", "#252525"),
-        "--p-accent": accent
-      };
-      Object.entries(vars).forEach(([name, value]) => mock.style.setProperty(name, value));
-      tile.style.setProperty("--p-accent", accent);
+      const counts = /* @__PURE__ */ new Map();
+      [...tile.attributes].forEach(({ name, value }) => {
+        if (!/^data-.+_color$/.test(name) || !value.trim()) return;
+        const key = value.trim().toLowerCase();
+        const entry = counts.get(key) ?? { value: value.trim(), count: 0 };
+        entry.count++;
+        counts.set(key, entry);
+      });
+      const palette = document.createElement("span");
+      palette.className = "hu-preset-palette";
+      palette.setAttribute("aria-hidden", "true");
+      [...counts.values()].sort((first, second) => second.count - first.count).slice(0, 5).reverse().forEach(({ value }) => {
+        const swatch = document.createElement("i");
+        swatch.title = value;
+        swatch.style.setProperty("--swatch", value);
+        palette.appendChild(swatch);
+      });
+      contents.replaceChildren(palette);
+      tile.style.setProperty("--p-accent", tile.getAttribute("data-link_color") || "");
     }
     function syncPresetState() {
+      const customOn = presetsGrid.classList.contains("is-custom");
       document.querySelectorAll(".hu-presets .hu-preset").forEach((tile) => {
-        const active = tile.classList.contains("active");
+        const active = tile.classList.contains("active") && customOn === tile.classList.contains("hu-custom-preset");
         tile.setAttribute("aria-checked", String(active));
         tile.tabIndex = active ? 0 : -1;
       });
     }
     const presetsGrid = dataElement.closest(".hu-presets");
     const tiles = [...presetsGrid.querySelectorAll(".hu-preset")];
+    const activeTile = () => tiles.find((tile) => tile.getAttribute("aria-checked") === "true");
     presetsGrid.setAttribute("role", "radiogroup");
     presetsGrid.setAttribute("aria-label", "Presets");
     tiles.forEach((tile) => {
@@ -97,7 +90,7 @@
         tile.click();
         return;
       }
-      const steps = { ArrowRight: 1, ArrowDown: 2, ArrowLeft: -1, ArrowUp: -2 };
+      const steps = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
       const step = steps[event.key];
       if (!step) return;
       event.preventDefault();
@@ -141,14 +134,18 @@
         fields: ["menu_dropdown_bg_color", "menu_dropdown_text_color", "menu_dropdown_text_hover_color", "menu_dropdown_text_active_color"]
       },
       { key: "body", label: ["HELIX_ULTIMATE_PRESET_GROUP_BODY", "Body"], fields: ["bg_color", "text_color", "link_color", "link_hover_color"] },
-      { key: "footer", label: ["HELIX_ULTIMATE_PRESET_GROUP_FOOTER", "Footer"], fields: ["footer_bg_color", "footer_text_color", "footer_link_color", "footer_link_hover_color"] }
+      { key: "footer", label: ["HELIX_ULTIMATE_PRESET_GROUP_FOOTER", "Footer"], fields: ["footer_bg_color", "footer_text_color", "footer_link_color", "footer_link_hover_color"] },
+      {
+        key: "offcanvas",
+        label: ["HELIX_ULTIMATE_PRESET_GROUP_OFFCANVAS", "Off-canvas menu"],
+        fields: ["offcanvas_menu_bg_color", "offcanvas_menu_icon_color", "offcanvas_menu_items_and_items_color", "offcanvas_menu_active_menu_item_color"]
+      }
     ];
     const presetText = (key, fallback) => {
       const value = Joomla.Text ? Joomla.Text._(key) : "";
       return value && value !== key ? value : fallback;
     };
-    function groupPresetEditor(editor2) {
-      const rows = [...editor2.querySelectorAll(".group-style-no-group")].filter((row) => row.querySelector("input.preset-control"));
+    function groupPresetEditor(editor2, rows = [...editor2.querySelectorAll(".group-style-no-group")].filter((row) => row.querySelector("input.preset-control"))) {
       const byField = new Map(rows.map((row) => [row.querySelector("input.preset-control").name, row]));
       const used = /* @__PURE__ */ new Set();
       const sections = [];
@@ -270,5 +267,93 @@
         reflectPresetChanges(data, name);
       });
     });
+    const customToggle = document.getElementById("custom_style");
+    const presetsPanel = presetsGrid.closest(".hu-edit-panel");
+    const customRows = presetsPanel ? [...presetsPanel.querySelectorAll(".hu-group-wrap .control-group")].filter((row) => row.querySelector("input.preset-control")) : [];
+    if (customToggle && presetsPanel && customRows.length) {
+      let openCustomEditor2 = function() {
+        if (!presetsPanel || customStep) return;
+        customStep = Joomla.helixSubpanel.open({
+          host: presetsPanel,
+          title: label,
+          body: customEditor,
+          backLabel: "Back to presets",
+          onClose: () => {
+            home.appendChild(customEditor);
+            customStep = null;
+            custom.querySelector(".hu-edit-custom")?.focus({ preventScroll: true });
+          }
+        });
+      };
+      var openCustomEditor = openCustomEditor2;
+      const toggleRow = customToggle.closest(".control-group");
+      const label = (toggleRow?.querySelector(".control-label")?.firstChild?.textContent ?? "").trim() || "Custom Style";
+      const inputs = customRows.map((row) => row.querySelector("input.preset-control"));
+      toggleRow?.classList.add("hu-custom-style-source");
+      customRows.forEach((row) => row.closest(".hu-group-wrap")?.classList.add("hu-custom-style-source"));
+      const custom = document.createElement("div");
+      custom.className = "hu-preset hu-custom-preset";
+      custom.setAttribute("role", "radio");
+      custom.setAttribute("aria-label", label);
+      custom.innerHTML = `
+			<a href="#" class="hu-edit-preset hu-edit-custom" role="button" title="Edit colours">${Joomla.utils.icon("pen")}</a>
+			<div class="hu-preset-title"></div>
+			<div class="hu-preset-contents"></div>`;
+      custom.querySelector(".hu-preset-title").textContent = label;
+      custom.querySelector(".hu-edit-custom").setAttribute("aria-label", `Edit ${label}`);
+      const lastTile = tiles[tiles.length - 1];
+      if (lastTile) lastTile.after(custom);
+      else presetsGrid.appendChild(custom);
+      tiles.push(custom);
+      const paintCustom = () => {
+        inputs.forEach((input) => custom.setAttribute(`data-${input.name}`, input.value));
+        renderPresetPreview(custom);
+      };
+      inputs.forEach((input) => {
+        input.addEventListener("input", paintCustom);
+        input.addEventListener("change", paintCustom);
+      });
+      const syncCustom = () => {
+        const on = customToggle.checked;
+        custom.classList.toggle("active", on);
+        presetsGrid.classList.toggle("is-custom", on);
+        syncPresetState();
+        if (!activeTile()) (tiles.find((tile) => tile.classList.contains("active")) ?? tiles[0]).tabIndex = 0;
+      };
+      const setCustom = (on) => {
+        if (customToggle.checked === on) return;
+        customToggle.checked = on;
+        customToggle.dispatchEvent(new Event("change", { bubbles: true }));
+      };
+      customToggle.addEventListener("change", syncCustom);
+      presetsGrid.addEventListener(
+        "click",
+        (event) => {
+          const tile = event.target instanceof Element ? event.target.closest(".hu-preset") : null;
+          if (!tile || event.target.closest(".hu-edit-preset:not(.hu-edit-custom)")) return;
+          if (tile === custom) {
+            event.preventDefault();
+            event.stopPropagation();
+            setCustom(true);
+            requestAnimationFrame(syncCustom);
+            if (event.target.closest(".hu-edit-custom")) openCustomEditor2();
+            return;
+          }
+          setCustom(false);
+        },
+        true
+      );
+      const home = document.createElement("div");
+      home.className = "hu-custom-style-home";
+      home.hidden = true;
+      presetsGrid.after(home);
+      const customEditor = document.createElement("div");
+      customEditor.className = "hu-preset-editor hu-custom-style-editor";
+      groupPresetEditor(customEditor, customRows);
+      home.appendChild(customEditor);
+      let customStep = null;
+      paintCustom();
+      syncCustom();
+    }
   });
 })();
