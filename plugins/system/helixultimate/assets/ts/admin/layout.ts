@@ -526,6 +526,69 @@ document.addEventListener('DOMContentLoaded', () => {
 	builder.querySelectorAll<HTMLElement>('.hu-layout-section').forEach(layoutRowHandles);
 
 	/* ------------------------------------------------------------------ */
+	/* Header: shown first, not part of the layout                          */
+	/* ------------------------------------------------------------------ */
+
+	/*
+	 * With a predefined header (Basic > Header) the template adds the header
+	 * above these rows by itself. A fixed first row says so, names the header
+	 * style and links to its settings. It sits outside the sortable rows.
+	 */
+	(function headerRow(): void {
+		const predefined = document.querySelector<HTMLInputElement>('input[name="predefined_header"]');
+
+		if (!predefined) return;
+
+		const groupTitle = document.querySelector('.basic-panel .hu-group-header > .hu-group-header-box');
+		const label = groupTitle?.textContent?.replace(/\s+/g, ' ').trim() || 'Header';
+
+		const row = document.createElement('div');
+		row.className = 'hu-layout-header-row';
+		row.innerHTML = `
+			<div class="hu-section-settings">
+				<div><span class="hu-section-title"></span><span class="hu-flag hu-flag-text">Automatic</span></div>
+			</div>
+			<div class="hu-layout-column col-12 hu-layout-header-card">
+				<div class="hu-column" tabindex="0" role="button">
+					<span class="hu-column-title hu-layout-header-name"></span>
+					<a href="#" class="hu-column-options hu-layout-header-edit">${Joomla.utils.icon('pen', { size: 14 })}</a>
+				</div>
+			</div>`;
+
+		row.querySelector('.hu-section-title')!.textContent = label;
+		row.querySelector('.hu-flag')!.setAttribute('title', 'Added by the template, from the header settings');
+
+		// The card (like a column) opens the header settings; the pencil shows on hover.
+		const card = row.querySelector<HTMLElement>('.hu-column')!;
+		const edit = row.querySelector<HTMLElement>('.hu-layout-header-edit')!;
+		const openHeader = (event: Event) => {
+			event.preventDefault();
+			Joomla.helixOpenPanel?.('basic', 'header');
+		};
+
+		card.setAttribute('aria-label', `Edit ${label.toLowerCase()}`);
+		edit.title = `Edit ${label.toLowerCase()}`;
+		edit.tabIndex = -1;
+		card.addEventListener('click', openHeader);
+		card.addEventListener('keydown', event => {
+			if (event.key === 'Enter' || event.key === ' ') openHeader(event);
+		});
+
+		const name = row.querySelector<HTMLElement>('.hu-layout-header-name')!;
+
+		const sync = () => {
+			name.textContent = document.querySelector('.hu-header-item.active .hu-predefined-headers-title')?.textContent?.trim() || label;
+			row.hidden = !predefined.checked;
+		};
+
+		builder.before(row);
+		sync();
+
+		predefined.addEventListener('change', sync);
+		delegate(document, 'click', '.hu-header-item', () => requestAnimationFrame(sync));
+	})();
+
+	/* ------------------------------------------------------------------ */
 	/* Settings modals                                                     */
 	/* ------------------------------------------------------------------ */
 
@@ -668,6 +731,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	delegate(document, 'click', '.hu-column-options', (event, button) => {
+		// The header row above the builder looks like a column but isn't one.
+		if (!builder.contains(button)) return;
+
 		event.preventDefault();
 
 		const column = button.closest<HTMLElement>('.hu-layout-column');

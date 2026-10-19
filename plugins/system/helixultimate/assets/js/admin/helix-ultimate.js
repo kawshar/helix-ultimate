@@ -1180,10 +1180,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Open a panel (and optionally a group inside it) from the URL,
 	 * e.g. `&panel=basic&group=logo`. Used by the template style details page.
 	 */
-	(function openRequestedPanel() {
-		const params = new URLSearchParams(window.location.search);
-		const panel = (params.get('panel') || '').replace(/[^a-z0-9_-]/gi, '').toLowerCase();
-		const group = (params.get('group') || '').replace(/[^a-z0-9_-]/gi, '').toLowerCase();
+	/** Open a panel (e.g. "basic") and, optionally, one of its groups (e.g. "header"). */
+	function openPanelGroup(panelName, groupName = '') {
+		const panel = String(panelName || '').replace(/[^a-z0-9_-]/gi, '').toLowerCase();
+		const group = String(groupName || '').replace(/[^a-z0-9_-]/gi, '').toLowerCase();
 
 		if (!panel) return;
 
@@ -1200,5 +1200,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (groupWrap && !groupWrap.classList.contains('active')) {
 			groupWrap.querySelector(':scope > .hu-group-header-box').click();
 		}
+
+		groupWrap?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+	}
+
+	Joomla.helixOpenPanel = openPanelGroup;
+
+	// ?panel=…&group=… opens that panel (links into the customizer).
+	(function openRequestedPanel() {
+		const params = new URLSearchParams(window.location.search);
+
+		openPanelGroup(params.get('panel'), params.get('group'));
 	})();
 });

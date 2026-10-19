@@ -337,6 +337,48 @@
       if (row) commitWidths(row, 0);
     });
     builder.querySelectorAll(".hu-layout-section").forEach(layoutRowHandles);
+    (function headerRow() {
+      const predefined = document.querySelector('input[name="predefined_header"]');
+      if (!predefined) return;
+      const groupTitle = document.querySelector(".basic-panel .hu-group-header > .hu-group-header-box");
+      const label = groupTitle?.textContent?.replace(/\s+/g, " ").trim() || "Header";
+      const row = document.createElement("div");
+      row.className = "hu-layout-header-row";
+      row.innerHTML = `
+			<div class="hu-section-settings">
+				<div><span class="hu-section-title"></span><span class="hu-flag hu-flag-text">Automatic</span></div>
+			</div>
+			<div class="hu-layout-column col-12 hu-layout-header-card">
+				<div class="hu-column" tabindex="0" role="button">
+					<span class="hu-column-title hu-layout-header-name"></span>
+					<a href="#" class="hu-column-options hu-layout-header-edit">${Joomla.utils.icon("pen", { size: 14 })}</a>
+				</div>
+			</div>`;
+      row.querySelector(".hu-section-title").textContent = label;
+      row.querySelector(".hu-flag").setAttribute("title", "Added by the template, from the header settings");
+      const card = row.querySelector(".hu-column");
+      const edit = row.querySelector(".hu-layout-header-edit");
+      const openHeader = (event) => {
+        event.preventDefault();
+        Joomla.helixOpenPanel?.("basic", "header");
+      };
+      card.setAttribute("aria-label", `Edit ${label.toLowerCase()}`);
+      edit.title = `Edit ${label.toLowerCase()}`;
+      edit.tabIndex = -1;
+      card.addEventListener("click", openHeader);
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") openHeader(event);
+      });
+      const name = row.querySelector(".hu-layout-header-name");
+      const sync = () => {
+        name.textContent = document.querySelector(".hu-header-item.active .hu-predefined-headers-title")?.textContent?.trim() || label;
+        row.hidden = !predefined.checked;
+      };
+      builder.before(row);
+      sync();
+      predefined.addEventListener("change", sync);
+      delegate(document, "click", ".hu-header-item", () => requestAnimationFrame(sync));
+    })();
     function setInputValue(input, value) {
       if (input instanceof HTMLInputElement && input.type === "checkbox") {
         input.checked = looseEq(value, "1");
@@ -420,6 +462,7 @@
       card.querySelector(".hu-column-options")?.click();
     });
     delegate(document, "click", ".hu-column-options", (event, button) => {
+      if (!builder.contains(button)) return;
       event.preventDefault();
       const column = button.closest(".hu-layout-column");
       if (!column) return;

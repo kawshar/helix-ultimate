@@ -52,6 +52,7 @@ declare global {
 		helixSwitchDevice?: (device: string) => void;
 		helixLoading?: unknown;
 		helixDraftChanges?: () => void;
+		helixOpenPanel?: (panel: string, group?: string) => void;
 		[member: string]: unknown;
 	}
 

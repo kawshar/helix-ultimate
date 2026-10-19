@@ -597,3 +597,66 @@
 	padding-right: 18px;
 	padding-left: 18px;
 }
+
+/* ------------------------------------------------------------------ */
+/* Tighter spacing: less canvas around the row boxes and inside them     */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate #hu-layout-builder {
+	padding: 10px 10px 40px;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) {
+	margin-bottom: 8px;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) .hu-layout-section-inner,
+#helix-ultimate .hu-layout-header-row {
+	padding: 8px;
+	border-radius: 12px;
+}
+
+#helix-ultimate .hu-row-container {
+	padding-top: 6px;
+}
+
+/* The grip sits in the 10px canvas margin. */
+#helix-ultimate #hu-layout-builder .hu-move-row {
+	left: -11px;
+	width: 11px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Header: first, fixed (added by the template), with a link to edit it */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-layout-header-row {
+	margin: 10px 10px 0;
+	border: 1px solid var(--sp-divider);
+	background: var(--sp-panel);
+}
+
+#helix-ultimate .hu-layout-header-row[hidden] {
+	display: none;
+}
+
+/* Same gap under the header as between rows. */
+#helix-ultimate .hu-layout-header-row:not([hidden]) + #hu-layout-builder {
+	padding-top: 8px;
+}
+
+#helix-ultimate .hu-layout-header-row .hu-section-settings > div {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* The header card is a column card (same classes); it opens settings, it doesn't drag. */
+#helix-ultimate .hu-layout-header-card {
+	margin-top: 6px;
+	padding: 0;
+}
+
+#helix-ultimate .hu-layout-header-card .hu-column {
+	cursor: pointer;
+}
