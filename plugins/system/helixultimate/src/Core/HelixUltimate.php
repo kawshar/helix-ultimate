@@ -1173,14 +1173,14 @@ class HelixUltimate
 
 					$compiledCss = $compiler->compileString('@import "' . $scss . '.scss"');
 					$getComplinedCss = $compiledCss->getCss();
-					File::write($out, $getComplinedCss);
+					$this->writeAtomic($out, $getComplinedCss);
 
 					$cache_path = JPATH_ROOT . '/cache/com_templates/templates/' . $template . '/' . ($draft ? 'preview-' . (int) ($templateData->id ?? 0) . '/' : '') . $scss . '.scss.cache';
 					$scssCache = array();
 					$scssCache['imports'] = $this->parseIncludedFiles($compiledCss->getIncludedFiles());
 					$scssCache['vars'] = $vars;
 					$jsonScssCache = json_encode($scssCache);
-					File::write($cache_path, $jsonScssCache);
+					$this->writeAtomic($cache_path, $jsonScssCache);
 				}
 			}
 		}
@@ -1214,7 +1214,21 @@ class HelixUltimate
 
 		foreach ($files as $file)
 		{
-			if (!empty($file) && \file_exists($file))
+			// scssphp 2 reports the files it loaded as URLs ("file:///…/master.scss"), not paths.
+			$file = (string) $file;
+
+			if (stripos($file, 'file://') === 0)
+			{
+				$file = rawurldecode((string) parse_url($file, PHP_URL_PATH));
+
+				// Windows: "/C:/…" → "C:/…".
+				if (preg_match('#^/[A-Za-z]:/#', $file))
+				{
+					$file = substr($file, 1);
+				}
+			}
+
+			if ($file !== '' && \file_exists($file))
 			{
 				$realPath = realpath($file);
 				if ($realPath !== false) {
@@ -1224,6 +1238,40 @@ class HelixUltimate
 		}
 
 		return $parsedFiles;
+	}
+
+	/**
+	 * Write a file in one step: a request reading it never sees it half written
+	 * (another visitor's request may be compiling at the same time).
+	 *
+	 * @param	string	$path		The file.
+	 * @param	string	$content	The contents.
+	 *
+	 * @return	bool
+	 * @since	2.2.11
+	 */
+	private function writeAtomic(string $path, string $content) : bool
+	{
+		if (!is_dir(\dirname($path)))
+		{
+			Folder::create(\dirname($path));
+		}
+
+		$temp = $path . '.' . bin2hex(random_bytes(4)) . '.tmp';
+
+		if (@file_put_contents($temp, $content) === false)
+		{
+			return File::write($path, $content);
+		}
+
+		if (!@rename($temp, $path))
+		{
+			@unlink($temp);
+
+			return File::write($path, $content);
+		}
+
+		return true;
 	}
 
 	/**
@@ -1271,18 +1319,10 @@ class HelixUltimate
     	    }
     	}
 
-    	// Vars
-    	$cached_vars = [];
-    	if (isset($cache_file->vars)) {
-    	    if (is_object($cache_file->vars)) {
-    	        $cached_vars = (array) $cache_file->vars;
-    	    } elseif (is_array($cache_file->vars)) {
-    	        $cached_vars = $cache_file->vars;
-    	    }
-    	}
+    	// Vars: compared both ways, so an added, changed or removed variable recompiles.
+    	$cached_vars = json_decode($raw, true)['vars'] ?? [];
 
-    	// If variables changed, recompile
-    	if (!empty(array_diff_assoc((array) $vars, (array) $cached_vars))) {
+    	if (!is_array($cached_vars) || $cached_vars != (array) $vars) {
     	    return true;
     	}
 
