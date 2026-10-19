@@ -8,11 +8,18 @@
    * @copyright Copyright (c) 2010 - 2025 JoomShaper
    * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
    */
-  var INFO_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 20 20"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>';
-  var CLOSE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>';
+  var MAX_TOASTS = 3;
+  var svg = (paths) => `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
+  var ICONS = {
+    success: svg('<circle cx="8" cy="8" r="6.25"/><path d="M5.5 8.25l1.75 1.75 3.25-3.75"/>'),
+    error: svg('<circle cx="8" cy="8" r="6.25"/><path d="M8 4.75v3.75M8 11h.01"/>'),
+    warning: svg('<path d="M8 2.75l5.75 10H2.25z"/><path d="M8 6.75v2.75M8 11.25h.01"/>'),
+    info: svg('<circle cx="8" cy="8" r="6.25"/><path d="M8 7.25V11M8 5h.01"/>')
+  };
+  var CLOSE_ICON = svg('<path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/>');
   var HelixToaster = {
     options: {
-      timeout: 5e3,
+      timeout: 4e3,
       containerId: "hu-toaster-container",
       prefix: "hu-toaster",
       position: "hu-toaster-bottom-right",
@@ -21,8 +28,6 @@
       target: "body"
     },
     toasts: [],
-    toastIndex: 0,
-    elementTimeout: null,
     success(message, title, options) {
       this.createToaster({ type: "success", message, title, options });
     },
@@ -45,67 +50,61 @@
       document.querySelector(this.options.target)?.appendChild(container);
       return container;
     },
-    createToaster({ type, message, title }) {
-      const toasterElement = document.createElement("div");
-      toasterElement.setAttribute("class", this.options.prefix + " " + this.getTypeClass(type));
-      const titleClass = `${this.options.prefix}-title ${this.options.titleClass}`;
-      const messageClass = `${this.options.prefix}-message ${this.options.messageClass}`;
-      toasterElement.innerHTML = `
-			<div class="hu-toaster-info-icon">${INFO_ICON}</div>
-			<div class="hu-toaster-wrap">
-				<div class="${titleClass}"></div>
-				<div class="${messageClass}"></div>
-			</div>
-			<div class="hu-toaster-close">${CLOSE_ICON}</div>
-
-		`;
-      const [titleElement, messageElement] = toasterElement.querySelectorAll(".hu-toaster-wrap > div");
-      titleElement.textContent = title ?? "";
-      messageElement.textContent = message ?? "";
-      toasterElement.style.animationName = "huFadeInUp";
-      toasterElement.style.animationDuration = ".35s";
-      this.toasts.push(toasterElement);
-      this.toastIndex++;
-      this.getContainer().appendChild(toasterElement);
-      const dismiss = () => {
-        toasterElement.style.animationName = "huFadeInDown";
-        toasterElement.style.animationDuration = ".35s";
-        toasterElement.style.opacity = "0";
-        setTimeout(() => {
-          toasterElement.parentNode?.removeChild(toasterElement);
-        }, 450);
-      };
-      this.elementTimeout = setTimeout(dismiss, this.options.timeout);
-      toasterElement.addEventListener("click", (event) => {
-        event.preventDefault();
-        if (this.elementTimeout) clearTimeout(this.elementTimeout);
-        dismiss();
-      });
-    },
     getContainer() {
-      let container = document.querySelector(`#${this.options.containerId}`);
-      if (!container) {
-        container = this.createContainer();
+      return document.querySelector(`#${this.options.containerId}`) ?? this.createContainer();
+    },
+    createToaster({ type, message, title, options }) {
+      const key = `${type}|${title ?? ""}|${message ?? ""}`;
+      const timeout = options?.timeout ?? (type === "error" ? this.options.timeout * 2 : this.options.timeout);
+      const existing = this.toasts.find((toast2) => toast2.key === key);
+      if (existing) {
+        existing.element.classList.remove("is-bumped");
+        void existing.element.offsetWidth;
+        existing.element.classList.add("is-bumped");
+        this.startTimer(existing);
+        return;
       }
-      return container;
+      const element = document.createElement("div");
+      element.className = `${this.options.prefix} ${this.getTypeClass(type)}`;
+      element.setAttribute("role", type === "error" ? "alert" : "status");
+      element.innerHTML = `
+			<span class="hu-toaster-icon">${ICONS[type] ?? ICONS.info}</span>
+			<span class="hu-toaster-wrap">
+				<span class="${this.options.prefix}-title ${this.options.titleClass}"></span>
+				<span class="${this.options.prefix}-message ${this.options.messageClass}"></span>
+			</span>
+			<button type="button" class="hu-toaster-close" aria-label="Close">${CLOSE_ICON}</button>`;
+      const titleElement = element.querySelector(`.${this.options.prefix}-title`);
+      const messageElement = element.querySelector(`.${this.options.prefix}-message`);
+      const generic = ["success", "error", "saved", "updated"].includes((title ?? "").trim().toLowerCase());
+      const showTitle = Boolean(title) && !generic && type !== "success" && !(message ?? "").toLowerCase().startsWith((title ?? "").toLowerCase());
+      titleElement.textContent = showTitle ? title : "";
+      titleElement.hidden = !showTitle;
+      messageElement.textContent = message ?? "";
+      const toast = { element, key, timer: null, timeout };
+      this.toasts.push(toast);
+      this.getContainer().appendChild(element);
+      while (this.toasts.length > MAX_TOASTS) this.dismiss(this.toasts[0]);
+      element.querySelector(".hu-toaster-close").addEventListener("click", () => this.dismiss(toast));
+      element.addEventListener("mouseenter", () => toast.timer && clearTimeout(toast.timer));
+      element.addEventListener("mouseleave", () => this.startTimer(toast));
+      this.startTimer(toast);
     },
-    displayToaster() {
-      const container = this.getContainer();
-      container.innerHTML = "";
-      this.toasts.forEach((toast) => {
-        container.appendChild(toast);
-      });
+    startTimer(toast) {
+      if (toast.timer) clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => this.dismiss(toast), toast.timeout);
     },
-    delay(ms = 1e3) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
+    dismiss(toast) {
+      const index = this.toasts.indexOf(toast);
+      if (index === -1) return;
+      this.toasts.splice(index, 1);
+      if (toast.timer) clearTimeout(toast.timer);
+      toast.element.classList.add("is-leaving");
+      setTimeout(() => toast.element.remove(), 200);
     },
-    removeToaster(index) {
-      return new Promise((resolve) => {
-        this.toasts.splice(index, 1);
-        const container = document.querySelector(`#${this.options.containerId}`);
-        if (container && container.firstChild) container.removeChild(container.firstChild);
-        resolve({ status: true });
-      });
+    /** Close every toast. */
+    clear() {
+      [...this.toasts].forEach((toast) => this.dismiss(toast));
     }
   };
   Joomla.HelixToaster = HelixToaster;

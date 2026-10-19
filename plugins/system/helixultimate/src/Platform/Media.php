@@ -297,14 +297,24 @@ class Media
                     $error             = true;
                 }
 
-                // File formats (vector/icon types excluded to reduce stored XSS risk)
-                $accepted_file_formats = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                // File formats. SVG is accepted as a cleaned copy only (Helper::sanitizeSvg()).
+                $accepted_file_formats = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
 
                 // Upload if no error found
                 if (! $error) {
                     $file_ext = strtolower(Helper::getExt($file['name']));
 
-                    if (in_array($file_ext, $accepted_file_formats, true) && Helper::isValidImageContent($file['tmp_name'], $file_ext)) {
+                    $cleanSvg = null;
+
+                    if ($file_ext === 'svg') {
+                        $cleanSvg = Helper::sanitizeSvg((string) @file_get_contents($file['tmp_name']));
+                    }
+
+                    $isValid = $file_ext === 'svg'
+                        ? $cleanSvg !== null
+                        : Helper::isValidImageContent($file['tmp_name'], $file_ext);
+
+                    if (in_array($file_ext, $accepted_file_formats, true) && $isValid) {
                         $name        = $file['name'];
                         $source_path = $file['tmp_name'];
                         $folder      = ltrim(str_replace(JPATH_ROOT . '/', '', $uploadDir), '/');
@@ -323,17 +333,22 @@ class Media
                         } while (file_exists($dest));
 
                         // End Do not override
-                        if (File::upload($source_path, $dest, false)) {
+                        // An SVG is stored as the cleaned copy, never the uploaded file itself.
+                        $stored = $cleanSvg !== null
+                            ? File::write($dest, $cleanSvg)
+                            : File::upload($source_path, $dest, false);
+
+                        if ($stored) {
                             $report['src']    = Uri::root(true) . '/' . $src;
                             $report['status'] = true;
                             $report['title']  = $media_name;
                             $report['path']   = $src;
 
                             $output  = '<div class="hu-media-thumb">';
-                            $output .= '<img src="' . $report['src'] . '" alt="">';
+                            $output .= '<img src="' . htmlspecialchars($report['src'], ENT_QUOTES, 'UTF-8') . '" alt="">';
                             $output .= '</div>';
                             $output .= '<span class="hu-media-select">' . \HelixUltimate\Framework\Platform\Icon::get('check') . '</span>';
-                            $output .= '<div class="hu-media-label">' . $report['title'] . '</div>';
+                            $output .= '<div class="hu-media-label">' . htmlspecialchars($report['title'], ENT_QUOTES, 'UTF-8') . '</div>';
 
                             $report['output'] = $output;
                         } else {

@@ -43,7 +43,7 @@ class JFormFieldHelixexportimport extends FormField
 		$output  = '<div class="hu-importer-wrapper">';
 		$output .= '<a class="hu-btn hu-btn-primary" id="btn-hu-export-settings" rel="noopener noreferrer" target="_blank" href="' . $export_url . '">' . \HelixUltimate\Framework\Platform\Icon::get('download') . ' ' . Text::_("HELIX_ULTIMATE_SETTINGS_EXPORT") . '</a>';
 		$output .= '<input type="file" id="helix-import-file" accept="application/JSON" style="display: none;"/>';
-		$output .= '<a id="btn-hu-import-settings" class="hu-btn hu-btn-primary" rel="noopener noreferrer" data-template_id="' . $template_id . '" target="_blank" href="#">' . \HelixUltimate\Framework\Platform\Icon::get('upload') . ' ' . Text::_("HELIX_ULTIMATE_SETTINGS_IMPORT") . '</a>';
+		$output .= '<a id="btn-hu-import-settings" class="hu-btn hu-btn-ghost" rel="noopener noreferrer" data-template_id="' . $template_id . '" target="_blank" href="#">' . \HelixUltimate\Framework\Platform\Icon::get('upload') . ' ' . Text::_("HELIX_ULTIMATE_SETTINGS_IMPORT") . '</a>';
 		$output .= '</div>';
 
 		return $output;

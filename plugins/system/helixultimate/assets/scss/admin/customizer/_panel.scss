@@ -50,81 +50,20 @@ $hu-logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox=
 	text-overflow: ellipsis;
 }
 
-/* Save lives in every panel header, next to close. */
+/* Save: a primary button (.hu-btn-primary) with a fixed width, so "Save" and
+   "Saving…" don't move the header. On only while there are changes (helix-ultimate.js). */
 #helix-ultimate .hu-panel-save {
-	display: inline-flex;
 	flex: 0 0 auto;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
+	width: 76px;
 	height: 28px;
-	padding: 0 14px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	box-shadow: none;
+	padding: 0;
 	font-size: 12.5px;
-	font-weight: 600;
-	line-height: 1;
 }
 
-#helix-ultimate .hu-panel-save:hover {
-	color: var(--sp-blue-dark);
-	background: #e0e6ff;
-}
-
-#helix-ultimate .hu-panel-save:focus-visible {
-	outline: 2px solid var(--sp-blue);
-	outline-offset: 1px;
-}
-
-/* Saving: the label stays (keeping the width) but hidden, a spinner covers it;
-   after a save a check shows for a moment. Set by data-state in helix-ultimate.js. */
-#helix-ultimate .hu-panel-save {
-	position: relative;
-}
-
-#helix-ultimate .hu-panel-save-state {
-	position: absolute;
-	inset: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	visibility: hidden;
-}
-
-#helix-ultimate .hu-panel-save-state svg {
-	display: none;
-}
-
-#helix-ultimate .hu-panel-save:is([data-state="saving"], [data-state="saved"]) .helix-topbar-save-text {
-	visibility: hidden;
-}
-
-#helix-ultimate .hu-panel-save:is([data-state="saving"], [data-state="saved"]) .hu-panel-save-state {
-	visibility: visible;
-}
-
-#helix-ultimate .hu-panel-save[data-state="saving"] .hu-icon-spinner,
-#helix-ultimate .hu-panel-save[data-state="saved"] .hu-icon-check {
-	display: block;
-}
-
-#helix-ultimate .hu-panel-save[data-state="saving"] {
-	opacity: 1; // .hu-btn-primary:disabled fades it; the spinner says enough.
+/* Saving: disabled, but not faded like "nothing to save". */
+#helix-ultimate .hu-panel-save[aria-busy="true"] {
+	opacity: 1;
 	cursor: progress;
-}
-
-#helix-ultimate .hu-panel-save[data-state="saved"] {
-	color: #fff;
-	background: var(--sp-published);
-	transition: background-color 0.2s, color 0.2s;
-}
-
-#helix-ultimate .hu-panel-save:disabled:not([data-state]) {
-	opacity: 0.6;
-	cursor: not-allowed;
 }
 
 

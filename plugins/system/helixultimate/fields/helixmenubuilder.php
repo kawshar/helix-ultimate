@@ -63,7 +63,7 @@ class JFormFieldHelixMenuBuilder extends FormField
 		$html = [];
 		$html[] = '<div id="hu-menu-builder">';
 		$html[] = '<div id="hu-menu-builder-container"></div>';
-		$html[] = '<button class="hu-btn hu-btn-soft hu-add-menu-item">Add New Item</button>';
+		$html[] = '<button class="hu-btn hu-btn-primary hu-add-menu-item">Add New Item</button>';
 		$html[] = '</div>';
 
 		return implode("\n", $html);

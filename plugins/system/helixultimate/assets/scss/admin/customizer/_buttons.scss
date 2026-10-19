@@ -1,61 +1,84 @@
 // Buttons
 
 /* ------------------------------------------------------------------ */
-/* Buttons                                                             */
+/* Buttons: three kinds only                                            */
+/*   .hu-btn-primary  light blue: the main action (Save, Add, Apply…)    */
+/*   .hu-btn-ghost    no fill: secondary actions (Cancel, Remove icon…)  */
+/*   .hu-btn-danger   white with red text: destructive actions          */
 /* ------------------------------------------------------------------ */
 
-#helix-ultimate .hu-btn {
-	border-radius: var(--sp-radius);
-	font-family: var(--sp-font);
+.hu-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 32px;
+	padding: 0 14px;
+	border: 1px solid transparent;
+	border-radius: var(--sp-radius, 8px);
+	color: var(--sp-text);
+	background: transparent;
+	box-shadow: none;
+	font-family: var(--sp-font, inherit);
 	font-size: 13px;
 	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+	user-select: none;
 }
 
-#helix-ultimate .hu-btn-primary,
-#helix-ultimate .btn-primary {
-	border: 0;
-	color: #fff;
-	background: var(--sp-blue);
-	box-shadow: none;
+.hu-btn:hover,
+.hu-btn:focus {
+	text-decoration: none;
 }
 
-#helix-ultimate .hu-btn-primary::before,
-#helix-ultimate .hu-btn-primary::after {
-	display: none;
+.hu-btn:focus-visible {
+	outline: 2px solid var(--sp-blue);
+	outline-offset: 1px;
 }
 
-#helix-ultimate .hu-btn-primary:hover,
-#helix-ultimate .hu-btn-primary:focus,
-#helix-ultimate .btn-primary:hover {
-	color: #fff;
-	background: var(--sp-blue-dark);
+.hu-btn:is(:disabled, .disabled) {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
 }
 
-#helix-ultimate .hu-btn-secondary {
+.hu-btn-primary {
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+}
+
+.hu-btn-primary:is(:hover, :focus) {
+	color: var(--sp-chip-text);
+	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
+}
+
+.hu-btn-ghost {
+	color: var(--sp-text);
+	background: transparent;
+}
+
+.hu-btn-ghost:is(:hover, :focus) {
 	color: var(--sp-text);
 	background: var(--sp-input);
 }
 
-#helix-ultimate .hu-btn-secondary:hover {
-	color: var(--sp-text);
-	background: var(--sp-divider);
+.hu-btn-danger {
+	border-color: var(--sp-divider);
+	color: var(--sp-danger, #dc2626);
+	background: var(--sp-panel, #fff);
 }
 
-/* Soft: the light pastel button for secondary actions (add item, add row…),
-   so solid blue stays for Save. */
-#helix-ultimate .hu-btn-soft {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	height: 32px;
-	padding: 0 14px;
-	border: 0;
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	box-shadow: none;
+.hu-btn-danger:is(:hover, :focus) {
+	border-color: color-mix(in srgb, var(--sp-danger, #dc2626) 30%, transparent);
+	color: var(--sp-danger, #dc2626);
+	background: color-mix(in srgb, var(--sp-danger, #dc2626) 6%, var(--sp-panel, #fff));
 }
 
-#helix-ultimate .hu-btn-soft:is(:hover, :focus) {
-	color: var(--sp-chip-text);
-	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
+/* Font Awesome era ::before / ::after decorations on old buttons. */
+.hu-btn::before,
+.hu-btn::after {
+	content: none;
 }

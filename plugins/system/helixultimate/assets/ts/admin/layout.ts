@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	/** When the last drag ended: the click that ends a drag must not open settings. */
 	let lastDragEnd = 0;
 
-	function makeSortable(container: Element | null, options: Record<string, unknown>, message: string): void {
+	function makeSortable(container: Element | null, options: Record<string, unknown>): void {
 		if (!container || sortables.has(container) || !window.Sortable) return;
 
 		sortables.add(container);
@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 				if (event.oldIndex !== event.newIndex) {
 					updateLayoutField();
-					Joomla.HelixToaster.success(message, 'Layout Settings');
 				}
 
 				builder.querySelectorAll<HTMLElement>('.hu-layout-section').forEach(layoutRowHandles);
@@ -145,12 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Rows drag by their header bar, so dragging a column never moves the row.
 		makeSortable(
 			builder,
-			{ draggable: '.hu-layout-section', handle: '.hu-section-settings', filter: '.hu-row-option-list', direction: 'vertical' },
-			'Rows position changed!'
+			{ draggable: '.hu-layout-section', handle: '.hu-section-settings', filter: '.hu-row-option-list', direction: 'vertical' }
 		);
 
 		builder.querySelectorAll('.hu-layout-section [data-hu-layout-row]').forEach(row => {
-			makeSortable(row, { draggable: '.hu-layout-column', filter: '.hu-column-options', direction: 'horizontal' }, 'Columns position changed!');
+			makeSortable(row, { draggable: '.hu-layout-column', filter: '.hu-column-options', direction: 'horizontal' });
 		});
 	}
 
@@ -712,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			title: `Row: ${row.querySelector('.hu-section-title')?.textContent?.trim() || 'Row Options'}`,
 			target: row,
 			activeClass: 'row-active',
-			footerButtons: [`<button type="button" class="hu-btn hu-btn-link hu-settings-delete-row">${Joomla.utils.icon('trash')} Delete row</button>`],
+			footerButtons: [`<button type="button" class="hu-btn hu-btn-danger hu-settings-delete-row">${Joomla.utils.icon('trash')} Delete row</button>`],
 		});
 	});
 
@@ -748,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			target: column,
 			activeClass: 'column-active',
 			footerButtons: removable
-				? [`<button type="button" class="hu-btn hu-btn-link hu-settings-delete-column">${Joomla.utils.icon('trash')} ${layoutText('HELIX_ULTIMATE_MEGAMENU_REMOVE_COLUMN', 'Remove column')}</button>`]
+				? [`<button type="button" class="hu-btn hu-btn-danger hu-settings-delete-column">${Joomla.utils.icon('trash')} ${layoutText('HELIX_ULTIMATE_MEGAMENU_REMOVE_COLUMN', 'Remove column')}</button>`]
 				: [],
 		});
 
@@ -930,7 +928,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (row instanceof HTMLElement) layoutRowHandles(row);
 
-		Joomla.HelixToaster.success(`Grid pattern updated to ${sizes.join('+')}`, 'Layout Settings');
 		updateLayoutField();
 	}
 
@@ -998,7 +995,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		layoutRowHandles(row);
 
 		initSortables();
-		Joomla.HelixToaster.success('New row added!', 'Layout Settings');
 		updateLayoutField();
 	});
 
@@ -1036,7 +1032,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		row.remove();
 		closeSettings();
-		Joomla.HelixToaster.error('Row is removed!', 'Layout Settings');
 		updateLayoutField();
 	});
 });

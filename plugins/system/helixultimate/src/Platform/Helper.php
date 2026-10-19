@@ -1751,6 +1751,101 @@ class Helper
      * @return  bool  True if the file is a valid, supported raster image.
      * @since   2.2.9
      */
+    /**
+     * Clean an uploaded SVG: returns a safe copy to store, or null to refuse the file.
+     *
+     * SVG is XML that browsers run as a document when it is opened directly, so a
+     * file can carry scripts, event handlers, javascript: links, embedded HTML or
+     * external references. Three layers, failing closed:
+     *  1. Refuse what is never needed in an image: DOCTYPE / ENTITY declarations
+     *     (XXE, "billion laughs"), PHP tags, oversized files.
+     *  2. Rebuild the file through Joomla's bundled allowlist sanitizer
+     *     (enshrined/svg-sanitize): only known SVG elements and attributes stay,
+     *     remote references are removed.
+     *  3. Re-check the result: it must parse, its root must be <svg>, and no
+     *     script, handler, script URL, foreignObject, embedded document, external
+     *     URL or CSS import may be left. Anything found refuses the file.
+     *
+     * @param   string  $svg  The uploaded file's contents.
+     *
+     * @return  string|null
+     * @since   2.2.11
+     */
+    public static function sanitizeSvg(string $svg): ?string
+    {
+        // Icons and logos are small; a huge file is not worth parsing.
+        if ($svg === '' || \strlen($svg) > 2 * 1024 * 1024) {
+            return null;
+        }
+
+        // UTF-8 BOM / leading whitespace do not matter; NUL bytes and gzip (svgz) do.
+        $svg = ltrim(preg_replace('/^\xEF\xBB\xBF/', '', $svg));
+
+        if (strpos($svg, "\0") !== false || strncmp($svg, "\x1f\x8b", 2) === 0) {
+            return null;
+        }
+
+        if (preg_match('/<!DOCTYPE|<!ENTITY|<\?php|<\?=|<%/i', $svg)) {
+            return null;
+        }
+
+        if (! class_exists(\enshrined\svgSanitize\Sanitizer::class)) {
+            return null; // No sanitizer, no SVG.
+        }
+
+        $sanitizer = new \enshrined\svgSanitize\Sanitizer();
+        $sanitizer->removeRemoteReferences(true);
+        $sanitizer->removeXMLTag(true);
+
+        try {
+            $clean = $sanitizer->sanitize($svg);
+        } catch (\Throwable $e) {
+            return null; // E.g. not an SVG document at all.
+        }
+
+        if (! \is_string($clean) || trim($clean) === '') {
+            return null;
+        }
+
+        // The cleaned file has to be one <svg> document.
+        $document = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $loaded   = $document->loadXML($clean, LIBXML_NONET);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if (! $loaded || ! $document->documentElement || strtolower($document->documentElement->localName) !== 'svg') {
+            return null;
+        }
+
+        /*
+         * Belt and braces over the allowlist: patterns that must never survive.
+         * Entity-decoded first, so "&#106;avascript:" or "java&#x09;script:" are caught too.
+         */
+        $decoded = html_entity_decode($clean, ENT_QUOTES | ENT_HTML5 | ENT_XML1, 'UTF-8');
+        $compact = preg_replace('/[\x00-\x20]+/', '', $decoded);
+
+        $forbidden = [
+            '/<\s*(script|foreignObject|iframe|embed|object|applet|meta|link|base|form|input|button|textarea|handler|listener|set|animate\b[^>]*attributeName\s*=\s*["\']?(href|xlink:href|on))/i',
+            '/\son[a-z]+\s*=/i',
+            '/@import|expression\s*\(|-moz-binding|behavior\s*:/i',
+            '/url\s*\(\s*["\']?\s*(?!#)[a-z0-9+.-]+:/i',
+            '/(href|src)\s*=\s*["\']\s*(?!#)[a-z0-9+.-]+:/i',
+        ];
+
+        foreach ($forbidden as $pattern) {
+            if (preg_match($pattern, $decoded)) {
+                return null;
+            }
+        }
+
+        if (preg_match('/javascript:|vbscript:|livescript:|data:(?!image\/(png|jpe?g|gif|webp);base64,)/i', $compact)) {
+            return null;
+        }
+
+        return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . trim($clean) . "\n";
+    }
+
     public static function isValidImageContent(string $filePath, string $extension = ''): bool
     {
         if (! is_file($filePath) || filesize($filePath) === 0) {

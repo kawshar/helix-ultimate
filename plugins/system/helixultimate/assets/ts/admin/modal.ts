@@ -87,7 +87,7 @@ function megamenu(options: MegamenuModalOptions = {}): void {
 				</div>
 			</div>
 			<div class="hu-modal-footer footer-right">
-				<button class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>
+				<button class="hu-btn hu-btn-ghost hu-megamenu-cancel-btn">Cancel</button>
 				<button class="hu-btn hu-btn-primary hu-megamenu-save-btn">Save</button>
 			</div>
 		</div>`);
@@ -114,7 +114,7 @@ function frame(options: FrameModalOptions = {}): void {
 				</div>
 			</div>
 			<div class="hu-modal-footer footer-right">
-				<button class="hu-btn hu-btn-link hu-cancel-btn">Cancel</button>
+				<button class="hu-btn hu-btn-ghost hu-cancel-btn">Cancel</button>
 				<button class="hu-btn hu-btn-primary hu-save-btn">
 					<div class="hu-spinner hidden spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>
 					Save
@@ -135,16 +135,16 @@ function media(options: MediaModalOptions = {}): void {
 		<div class="hu-modal-overlay"></div>
 		<div class="hu-modal" data-target_type="${escapeAttr(target_type)}" data-target="${escapeAttr(target)}">
 			<div class="hu-modal-header">
-				<input type="file" id="hu-file-input" accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" style="display:none;" multiple>
+				<input type="file" id="hu-file-input" accept="image/png, image/jpg, image/jpeg, image/webp, image/gif, image/svg+xml, .svg" style="display:none;" multiple>
 				<div class="hu-modal-breadcrumbs"></div>
 				<div class="hu-modal-actions-left">
 					<a href="#" class="hu-btn hu-btn-primary hu-modal-action-select hu-mr-2">${Joomla.utils.icon('check')} Select</a>
-					<a href="#" class="hu-btn hu-btn-secondary hu-modal-action-cancel hu-mr-2">${Joomla.utils.icon('close')} Cancel</a>
+					<a href="#" class="hu-btn hu-btn-ghost hu-modal-action-cancel hu-mr-2">${Joomla.utils.icon('close')} Cancel</a>
 					<a href="#" class="hu-btn hu-btn-danger hu-btn-last hu-modal-action-delete">${Joomla.utils.icon('minus')} Delete</a>
 				</div>
 				<div class="hu-modal-actions-right">
 					<a href="#" class="hu-btn hu-btn-primary hu-modal-action-upload hu-mr-2">${Joomla.utils.icon('upload')} Upload</a>
-					<a href="#" class="hu-btn hu-btn-secondary hu-btn-last hu-modal-action-new-folder">${Joomla.utils.icon('plus')} New Folder</a>
+					<a href="#" class="hu-btn hu-btn-ghost hu-btn-last hu-modal-action-new-folder">${Joomla.utils.icon('plus')} New Folder</a>
 					${closeButton('action-hu-modal-close')}
 				</div>
 			</div>

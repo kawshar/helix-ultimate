@@ -1,109 +1,133 @@
 /* Generated from assets/scss/admin by `gulp css`. Edit the .scss source, not this file. */
+/* Compact dark toasts, bottom right, newest at the bottom (toaster.ts keeps at most three). */
 #hu-toaster-container {
   position: fixed;
   z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
 }
 
-@keyframes huFadeInDown {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-40px);
-  }
-}
-@keyframes huFadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 #hu-toaster-container.hu-toaster-bottom-right {
-  right: 12px;
-  bottom: 12px;
+  right: 16px;
+  bottom: 16px;
 }
 
 #hu-toaster-container.hu-toaster-top-right {
-  right: 12px;
-  top: 12px;
-}
-
-#hu-toaster-container.hu-toaster-top-left {
-  left: 12px;
-  top: 12px;
-}
-
-#hu-toaster-container.hu-toaster-bottom-left {
-  left: 12px;
-  bottom: 12px;
+  top: 16px;
+  right: 16px;
 }
 
 #hu-toaster-container .hu-toaster {
-  position: relative;
-  overflow: hidden;
-  width: 400px;
-  box-shadow: 0px 2px 4px rgba(20, 50, 80, 0.2);
-  padding: 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 0 0 20px;
-  transition: all 0.3s ease;
   display: flex;
-  font-size: 14px;
+  align-items: center;
+  gap: 10px;
+  max-width: min(380px, 100vw - 32px);
+  min-height: 40px;
+  padding: 8px 6px 8px 12px;
+  border-radius: 10px;
+  color: #f9fafb;
+  background: #111827;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.24), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  font-family: var(--sp-font, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 13px;
+  line-height: 18px;
+  pointer-events: auto;
+  animation: huToastIn 0.18s ease-out;
 }
 
-.hu-toaster-info-icon {
-  margin-right: 10px;
+#hu-toaster-container .hu-toaster.is-leaving {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-.hu-toaster-close {
-  margin-left: auto;
+/* The same message again: a small pulse instead of another toast. */
+#hu-toaster-container .hu-toaster.is-bumped {
+  animation: huToastBump 0.25s ease-out;
 }
 
-.hu-toaster-info-icon .bi.bi-info-circle {
-  width: 25px;
-  height: 25px;
+.hu-toaster-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
 }
 
-.hu-toaster-close .bi.bi-x {
-  width: 25px;
-  height: 25px;
+#hu-toaster-container .hu-toast-success .hu-toaster-icon {
+  color: #4ade80;
+}
+
+#hu-toaster-container .hu-toast-error .hu-toaster-icon {
+  color: #f87171;
+}
+
+#hu-toaster-container .hu-toast-warning .hu-toaster-icon {
+  color: #fbbf24;
+}
+
+#hu-toaster-container .hu-toast-info .hu-toaster-icon {
+  color: #93c5fd;
+}
+
+.hu-toaster-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .hu-toaster-title {
-  font-weight: 700;
-  margin-top: -5px;
-  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+/* "Failed: could not save": the title runs into the message. */
+.hu-toaster-title:not([hidden])::after {
+  content: " ";
 }
 
 .hu-toaster-message {
-  word-break: break-word;
-  opacity: 0.7;
-  font-size: 13px;
+  color: rgba(249, 250, 251, 0.88);
+  overflow-wrap: anywhere;
 }
 
-#hu-toaster-container .hu-toaster.hu-toast-success {
-  background-color: #D5E6DE;
-  color: #166C36;
+#hu-toaster-container .hu-toaster-close {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: rgba(249, 250, 251, 0.6);
+  background: transparent;
+  cursor: pointer;
 }
 
-#hu-toaster-container .hu-toaster.hu-toast-warning {
-  background-color: #FDF3D1;
-  color: #6C5A27;
+#hu-toaster-container .hu-toaster-close:hover,
+#hu-toaster-container .hu-toaster-close:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-#hu-toaster-container .hu-toaster.hu-toast-error {
-  background-color: #F3D8DA;
-  color: #8A3035;
+@keyframes huToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-
-#hu-toaster-container .hu-toaster.hu-toast-info {
-  background-color: #DCEAFB;
-  color: #1A4AAA;
+@keyframes huToastBump {
+  50% {
+    transform: scale(1.03);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #hu-toaster-container .hu-toaster,
+  #hu-toaster-container .hu-toaster.is-bumped {
+    animation: none;
+  }
 }

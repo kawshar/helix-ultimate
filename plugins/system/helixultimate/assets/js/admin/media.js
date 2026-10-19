@@ -178,22 +178,13 @@
         alert("Somethings wrong, Try again");
       }
     });
-    const ALLOWED_UPLOADS = ["png", "jpg", "jpeg", "webp", "gif"];
+    const ALLOWED_UPLOADS = ["png", "jpg", "jpeg", "webp", "gif", "svg"];
     const mediaText = (key, fallback) => {
       const value = Joomla.Text ? Joomla.Text._(key) : "";
       return value && value !== key ? value : fallback;
     };
     function canUpload(file) {
       const extension = (file.name.split(".").pop() ?? "").toLowerCase();
-      if (extension === "svg") {
-        alert(
-          Joomla.Text._(
-            "HELIX_ULTIMATE_MEDIA_SVG_NOT_SUPPORTED_FOR_UPLOAD",
-            "SVG is not supported for upload. Upload via Joomla Media, then select the file here."
-          )
-        );
-        return false;
-      }
       if (!ALLOWED_UPLOADS.includes(extension)) {
         alert(Joomla.Text._("COM_SPPAGEBUILDER_MEDIA_MANAGER_FILE_NOT_SUPPORTED", "File not supported"));
         return false;

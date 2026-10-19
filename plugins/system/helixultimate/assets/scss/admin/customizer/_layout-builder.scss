@@ -483,9 +483,10 @@
 
 #helix-ultimate #hu-layout-builder .hu-add-row:hover,
 #helix-ultimate #hu-layout-builder .hu-add-row:focus-visible {
-	border-color: var(--sp-blue);
-	color: var(--sp-panel);
-	background: var(--sp-blue);
+	/* The primary button's colours (light blue), not a solid fill. */
+	border-color: var(--sp-chip);
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
 }
 
 /* A row being dragged lifts like a column does. */
@@ -535,9 +536,10 @@
 
 #helix-ultimate .hu-add-column:hover,
 #helix-ultimate .hu-add-column:focus-visible {
-	border-color: var(--sp-blue);
-	color: var(--sp-panel);
-	background: var(--sp-blue);
+	/* The primary button's colours (light blue), not a solid fill. */
+	border-color: var(--sp-chip);
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
 }
 
 #helix-ultimate .hu-layout-section .hu-add-column:disabled {

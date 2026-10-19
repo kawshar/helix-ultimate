@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Uploads                                                             */
 	/* ------------------------------------------------------------------ */
 
-	const ALLOWED_UPLOADS = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+	const ALLOWED_UPLOADS = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'];
 
 	const mediaText = (key: string, fallback: string): string => {
 		const value = Joomla.Text ? Joomla.Text._(key) : '';
@@ -286,20 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	/**
 	 * Check a file before uploading; alerts and returns false when it can't be uploaded.
-	 * SVG is refused on purpose (stored XSS risk), as on the server.
+	 * SVG is allowed: the server stores a cleaned copy (Helper::sanitizeSvg()) or refuses it.
 	 */
 	function canUpload(file: File): boolean {
 		const extension = (file.name.split('.').pop() ?? '').toLowerCase();
-
-		if (extension === 'svg') {
-			alert(
-				Joomla.Text._(
-					'HELIX_ULTIMATE_MEDIA_SVG_NOT_SUPPORTED_FOR_UPLOAD',
-					'SVG is not supported for upload. Upload via Joomla Media, then select the file here.'
-				)
-			);
-			return false;
-		}
 
 		if (!ALLOWED_UPLOADS.includes(extension)) {
 			alert(Joomla.Text._('COM_SPPAGEBUILDER_MEDIA_MANAGER_FILE_NOT_SUPPORTED', 'File not supported'));

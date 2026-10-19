@@ -30,9 +30,11 @@ final class Phase04UploadHardeningTest
 
 		$mediaSource = file_get_contents(dirname(__DIR__, 2) . '/src/Platform/Media.php');
 
-		if ($mediaSource !== false && str_contains($mediaSource, "'svg'"))
+		// SVG may be uploaded only as a cleaned copy (see Phase10SvgSanitizeTest).
+		if ($mediaSource !== false && str_contains($mediaSource, "'svg'")
+			&& (!str_contains($mediaSource, 'Helper::sanitizeSvg(') || !str_contains($mediaSource, 'File::write($dest, $cleanSvg)')))
 		{
-			$failures[] = 'Media upload allowlist should not include svg.';
+			$failures[] = 'Media upload may accept svg only through Helper::sanitizeSvg(), storing the cleaned copy.';
 		}
 
 		$blogSource = file_get_contents(dirname(__DIR__, 2) . '/src/Platform/Blog.php');

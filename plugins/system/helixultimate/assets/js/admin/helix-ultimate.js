@@ -259,9 +259,32 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Opening the customizer drops any earlier draft, so it starts without one.
 	let hasDraft = false;
 
+	/**
+	 * Save buttons (one per panel header): on only while there is something to
+	 * save (a draft, or a change being drafted), "Saving…" and off while saving.
+	 */
+	let saving = false;
+	let drafting = false;
+	const saveButtons = () => [...document.querySelectorAll('.action-save-template')];
+	const saveLabel = saveButtons()[0]?.querySelector('.helix-topbar-save-text')?.textContent.trim() || 'Save';
+	const savingLabel = Joomla.Text._('HELIX_ULTIMATE_SAVING', 'Saving…');
+	const canSave = () => !saving && (hasDraft || drafting);
+
+	function refreshSaveButtons() {
+		saveButtons().forEach(button => {
+			const text = button.querySelector('.helix-topbar-save-text');
+
+			if (text) text.textContent = saving ? savingLabel : saveLabel;
+			button.disabled = !canSave();
+			button.setAttribute('aria-busy', String(saving));
+		});
+	}
+
 	/** No draft left (saved or restored). */
 	function hideStatus() {
 		hasDraft = false;
+		drafting = false;
+		refreshSaveButtons();
 
 		// Drafted mega menus are now saved to their items, or dropped.
 		const megaMenus = form.querySelector('[name="megamenu_drafts"]');
@@ -272,6 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	Joomla.helixLoading = function (status, draft) {
 		if (!status) hasDraft = !!draft;
+		drafting = Boolean(status);
+		refreshSaveButtons();
 		loadingEls().forEach(element => toggle(element, status, 'inline-flex'));
 		resetButtons().forEach(button => toggle(button, !status && hasDraft, 'inline-flex'));
 	};
@@ -551,38 +576,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Save                                                                */
 	/* ------------------------------------------------------------------ */
 
-	/**
-	 * Every Save button (one per panel header) shows the same state:
-	 * 'saving' (spinner, disabled), 'saved' (a check for a moment) or idle.
-	 */
-	let savedTimer = null;
-
-	function setSaveState(state) {
-		clearTimeout(savedTimer);
-
-		document.querySelectorAll('.action-save-template').forEach(button => {
-			button.disabled = state === 'saving';
-			button.setAttribute('aria-busy', String(state === 'saving'));
-
-			if (state) button.dataset.state = state;
-			else delete button.dataset.state;
-		});
-
-		if (state === 'saved') savedTimer = setTimeout(() => setSaveState(null), 1400);
-	}
-
-	let saving = false;
-
 	async function saveTemplate(event) {
 		if (event) event.preventDefault();
 
-		// One save at a time (a click while saving, or Ctrl/Cmd + S held down, is ignored).
-		if (saving) return;
+		// One save at a time, and only with changes (a click while saving, Ctrl/Cmd + S held
+		// down or with nothing changed does nothing).
+		if (!canSave()) return;
 
 		saving = true;
-		setSaveState('saving');
-
-		let saved = false;
+		refreshSaveButtons();
 
 		try {
 			// Save after the last draft, so a late draft does not undo the save.
@@ -593,7 +595,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			const data = await request(ajaxUrl('save-tmpl-style'), { method: 'POST', data: formData() });
 
 			if (data.status) {
-				saved = true;
 				reloadPreview();
 				Joomla.HelixToaster.success('Changes have been successfully saved!', 'Success');
 
@@ -609,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		saving = false;
-		setSaveState(saved ? 'saved' : null);
+		refreshSaveButtons();
 	}
 
 	document.querySelectorAll('.action-save-template').forEach(button => button.addEventListener('click', saveTemplate));
@@ -853,9 +854,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (!document.querySelector('.hu-edit-panel.active-panel')) {
 		openPanel(document.querySelector('.hu-fieldset-header[data-fieldset="basic"]') || document.querySelector('.hu-fieldset-header'));
 	}
-
-	// A panel cannot be closed, so its close button goes.
-	document.querySelectorAll('.hu-panel-close').forEach(button => button.remove());
 
 	/**
 	 * Accordion groups: exactly one open group per panel. Opening a group closes

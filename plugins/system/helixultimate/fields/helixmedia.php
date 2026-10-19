@@ -47,7 +47,7 @@ class JFormFieldHelixmedia extends FormField
 
 		$output .= '<input type="hidden" name="' . $this->name . '" id="' . $this->id . '" value="' . $this->value . '">';
 		$output .= '<a href="#" class="hu-media-picker hu-btn hu-btn-primary hu-mr-2" data-id="' . $this->id . '">' . \HelixUltimate\Framework\Platform\Icon::get('image') . ' Select</a>';
-		$output .= '<a href="#" class="hu-media-clear hu-btn hu-btn-secondary' . (empty($this->value) ? ' hide' : '') . '">' . \HelixUltimate\Framework\Platform\Icon::get('close') . ' Clear</a>';
+		$output .= '<a href="#" class="hu-media-clear hu-btn hu-btn-ghost' . (empty($this->value) ? ' hide' : '') . '">' . \HelixUltimate\Framework\Platform\Icon::get('close') . ' Clear</a>';
 
 		return $output;
 	}

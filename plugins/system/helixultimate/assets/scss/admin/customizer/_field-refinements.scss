@@ -36,16 +36,6 @@
 	white-space: nowrap;
 }
 
-#helix-ultimate .hu-importer-wrapper #btn-hu-import-settings {
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-}
-
-#helix-ultimate .hu-importer-wrapper #btn-hu-import-settings:hover {
-	color: var(--sp-chip-text);
-	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
-}
-
 /* "Inline" fields (logo/header heights, offsets, widths): label on top, field full width below. */
 #helix-ultimate .hu-edit-panel .control-group-inner.hu-inline-group {
 	display: flex;

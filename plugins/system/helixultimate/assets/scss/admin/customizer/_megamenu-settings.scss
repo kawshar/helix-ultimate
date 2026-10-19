@@ -129,24 +129,4 @@
 	display: block;
 }
 
-/* Add New Row: the light pastel button, not a solid primary one. */
-#helix-ultimate .hu-megamenu-add-row .hu-btn,
-#helix-ultimate .hu-megamenu-add-row .hu-btn.hu-btn-primary {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	height: 32px;
-	padding: 0 14px;
-	border: 0;
-	border-radius: var(--sp-radius);
-	color: var(--sp-chip-text);
-	background: var(--sp-chip);
-	box-shadow: none;
-	font-size: 13px;
-	font-weight: 600;
-}
 
-#helix-ultimate .hu-megamenu-add-row .hu-btn:hover {
-	color: var(--sp-chip-text);
-	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
-}
