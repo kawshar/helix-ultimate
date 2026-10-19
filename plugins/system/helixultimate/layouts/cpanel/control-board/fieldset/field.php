@@ -135,7 +135,7 @@ extract($displayData);
 
 						<!-- if description exists then show the help icon -->
 						<?php if (!empty($description)): ?>
-							<span class="hu-help-icon hu-ml-2 fas fa-info-circle"></span>
+							<span class="hu-help-icon hu-ml-2"><?php echo \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]); ?></span>
 						<?php endif ?>
 					<?php endif; ?>
 				</label>
@@ -146,7 +146,7 @@ extract($displayData);
 
 						<!-- if description exists then show the help icon -->
 						<?php if (!empty($description)): ?>
-							<span class="hu-help-icon hu-ml-2 fas fa-info-circle"></span>
+							<span class="hu-help-icon hu-ml-2"><?php echo \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]); ?></span>
 						<?php endif ?>
 					</label>
 

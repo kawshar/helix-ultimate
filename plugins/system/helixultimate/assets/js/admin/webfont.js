@@ -116,13 +116,17 @@
     });
     delegate(document, "click", "#update_fonts", async (event, button) => {
       event.preventDefault();
-      const icon = button.querySelector("span");
+      const own = button.querySelector(".hu-icon");
+      const icon = document.createElement("span");
+      icon.className = "hu-btn-spinner";
+      icon.innerHTML = Joomla.utils.icon("spinner", { className: "hu-spin", size: 14 });
       const showMessage = (html) => {
         button.insertAdjacentHTML("afterend", html);
         const message = button.nextElementSibling;
         setTimeout(() => message && message.remove(), 2300);
       };
-      if (icon) icon.classList.add("fa-spin");
+      if (own) own.classList.add("hu-spin");
+      else button.prepend(icon);
       try {
         const data = await task("update-font-list");
         showMessage(
@@ -131,7 +135,8 @@
       } catch (error) {
         showMessage("<p class='font-update-failed'>Unexpected error occurs. Please try again.</p>");
       }
-      if (icon) icon.classList.remove("fa-spin");
+      own?.classList.remove("hu-spin");
+      icon.remove();
     });
   });
 })();

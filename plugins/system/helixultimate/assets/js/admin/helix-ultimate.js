@@ -930,8 +930,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (button) {
 			spinner = document.createElement('span');
-			spinner.className = 'fas fa-circle-notch fa-spin';
-			spinner.setAttribute('aria-hidden', 'true');
+			spinner.className = 'hu-btn-spinner';
+			spinner.innerHTML = Joomla.utils.icon('spinner', { className: 'hu-spin', size: 14 });
 			button.appendChild(spinner);
 		}
 

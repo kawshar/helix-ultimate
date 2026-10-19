@@ -241,7 +241,7 @@
         title: label,
         body: container,
         backLabel: "Back to presets",
-        footer: '<button type="button" class="hu-btn hu-btn-primary hu-save-preset"><span class="fas fa-check" aria-hidden="true"></span> Apply</button><button type="button" class="hu-btn hu-btn-link helix-preset-reset"><span class="fas fa-sync-alt" aria-hidden="true"></span> Reset to default</button>',
+        footer: `<button type="button" class="hu-btn hu-btn-primary hu-save-preset">${Joomla.utils.icon("check")} Apply</button><button type="button" class="hu-btn hu-btn-link helix-preset-reset">${Joomla.utils.icon("refresh")} Reset to default</button>`,
         onClose: () => {
           if (editor === step) editor = null;
           button.focus({ preventScroll: true });

@@ -93,7 +93,7 @@
           className: isMega ? "hu-subpanel-megamenu" : "hu-subpanel-menu-settings",
           // Root items: the settings column can slide away to give the columns room.
           headerActions: isMega ? `<button type="button" class="hu-subpanel-action hu-megamenu-settings-toggle" aria-pressed="false">${settingsIcon}<span>Settings</span></button>` : void 0,
-          footer: '<button type="button" class="hu-btn hu-btn-primary hu-megamenu-save-btn"><span class="fas fa-check" aria-hidden="true"></span> Save</button><button type="button" class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>'
+          footer: `<button type="button" class="hu-btn hu-btn-primary hu-megamenu-save-btn">${Joomla.utils.icon("check")} Save</button><button type="button" class="hu-btn hu-btn-link hu-megamenu-cancel-btn">Cancel</button>`
         });
         Joomla.helixMegaMenu?.run({ root: body, close: () => step.close() });
         const toggle = step.header.querySelector(".hu-megamenu-settings-toggle");

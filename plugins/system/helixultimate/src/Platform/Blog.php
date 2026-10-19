@@ -159,7 +159,7 @@ class Blog
                         $report['index']  = $index;
 
                         if ($gallery) {
-                            $report['output']   = '<a href="#" class="btn btn-mini btn-danger btn-hu-remove-gallery-image"><span class="fas fa-times" aria-hidden="true"></span></a><img src="' . URI::root(true) . '/' . $src . '" alt="">';
+                            $report['output']   = '<a href="#" class="btn btn-mini btn-danger btn-hu-remove-gallery-image">' . \HelixUltimate\Framework\Platform\Icon::get('close') . '</a><img src="' . URI::root(true) . '/' . $src . '" alt="">';
                             $report['data_src'] = $data_src;
                         } else {
                             $report['output'] = '<img src="' . Uri::root(true) . '/' . $src . '" data-src="' . $data_src . '" alt="">';

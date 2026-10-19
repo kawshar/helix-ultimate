@@ -234,7 +234,7 @@
 	text-align: center;
 }
 
-.hu-modal-preloader .fas {
+.hu-modal-preloader .hu-icon {
 	display: table-cell;
 	vertical-align: middle;
 }
@@ -374,7 +374,7 @@
 	opacity: 1;
 }
 
-.hu-media-select > span {
+.hu-media-select > .hu-icon {
 	display: none;
 }
 
@@ -384,7 +384,7 @@
 	opacity: 1;
 }
 
-.hu-media-selected .hu-media-select > span {
+.hu-media-selected .hu-media-select > .hu-icon {
 	display: block;
 	color: #fff;
 	line-height: 24px;

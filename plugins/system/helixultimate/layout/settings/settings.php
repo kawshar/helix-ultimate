@@ -377,7 +377,7 @@ class RowColumnSettings
 
 			$output .= '<div class="hu-option-group hu-option-group-' . strtolower($key2) . $active . '">';
 			$output .= '<div class="hu-option-group-title">';
-			$output .= '<span class="fas fa-angle-right" aria-hidden="true"></span>' . Text::_('HELIX_ULTIMATE_OPTION_GROUP_' . strtoupper($key2));
+			$output .= \HelixUltimate\Framework\Platform\Icon::get('chevron-right') . \HelixUltimate\Framework\Platform\Icon::replaceFontAwesome(Text::_('HELIX_ULTIMATE_OPTION_GROUP_' . strtoupper($key2)));
 			$output .= '</div>';
 			$output .= '<div class="hu-option-group-list">';
 
@@ -443,7 +443,7 @@ class RowColumnSettings
 			$output .= '<div class="hu-option-group-title">';
 			// The breakpoint widths read as "Column width", not a Bootstrap grid.
 			$groupTitle = $key2 === 'grid' ? 'HELIX_ULTIMATE_OPTION_GROUP_COLUMN_WIDTH' : 'HELIX_ULTIMATE_OPTION_GROUP_' . strtoupper($key2);
-			$output .= '<span class="fas fa-angle-right" aria-hidden="true"></span>' . Text::_($groupTitle);
+			$output .= \HelixUltimate\Framework\Platform\Icon::get('chevron-right') . \HelixUltimate\Framework\Platform\Icon::replaceFontAwesome(Text::_($groupTitle));
 			$output .= '</div>';
 			$output .= '<div class="hu-option-group-list">';
 

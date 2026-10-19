@@ -233,3 +233,367 @@
 	user-select: none;
 }
 
+
+/* ------------------------------------------------------------------ */
+/* Columns as soft filled rows (a list-app look): no border, a faint   */
+/* grip on the right, a lifted card while dragging, a clean drop slot. */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .hu-row-container > .row {
+	row-gap: 8px;
+	margin-right: -4px;
+	margin-left: -4px;
+}
+
+#helix-ultimate .hu-layout-column {
+	padding-right: 4px;
+	padding-left: 4px;
+}
+
+#helix-ultimate .hu-layout-column .hu-column,
+#helix-ultimate .hu-layout-column:is(.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-12) .hu-column {
+	height: 44px;
+	padding: 0 8px 0 12px;
+	border: 0;
+	border-radius: 12px;
+	color: var(--sp-text);
+	background: #f3f4f7;
+	font-size: 13px;
+	font-weight: 500;
+	transition: background-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+#helix-ultimate .hu-layout-column .hu-column:hover {
+	background: #eceef3;
+}
+
+/* No grip: the grab cursor says the card drags. Settings show on hover. */
+#helix-ultimate .hu-layout-column .hu-column-options {
+	display: none;
+	margin: 0 -4px 0 auto;
+}
+
+#helix-ultimate .hu-layout-column:is(:hover, :focus-within) .hu-column-options {
+	display: inline-flex;
+}
+
+/* The component column: tinted, like a tag. */
+#helix-ultimate .hu-layout-column .hu-column.hu-column-component {
+	color: var(--sp-chip-text);
+	background: var(--sp-chip);
+	font-weight: 600;
+}
+
+#helix-ultimate .hu-layout-column .hu-column.hu-column-component:hover {
+	background: color-mix(in srgb, var(--sp-chip) 85%, var(--sp-chip-text));
+}
+
+/* While dragging: the card lifts (fully opaque; SortableJS fades it inline)... */
+.sortable-fallback.hu-layout-column {
+	opacity: 1 !important;
+}
+
+/* The floating copy lives in <body>, outside #helix-ultimate: it needs the card style itself. */
+.sortable-fallback.hu-layout-column {
+	padding: 0 4px;
+}
+
+.sortable-fallback.hu-layout-column .hu-column {
+	display: flex;
+	align-items: center;
+	height: 44px;
+	padding: 0 12px;
+	border: 0;
+	border-radius: 12px;
+	color: var(--sp-text, #111827);
+	font-family: var(--sp-font, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.sortable-fallback.hu-layout-column .hu-column-options {
+	display: none;
+}
+
+.sortable-fallback.hu-layout-column .hu-column,
+#helix-ultimate .hu-layout-column.hu-sortable-drag .hu-column {
+	background: #e6e8ee;
+	box-shadow: 0 10px 24px rgba(17, 24, 39, 0.16), 0 2px 6px rgba(17, 24, 39, 0.08);
+	transform: rotate(-1deg);
+}
+
+/* ...and its place in the row is an empty, outlined slot (beats the older dashed one). */
+#helix-ultimate #hu-layout-builder .hu-layout-column.ui-state-highlight {
+	border: 0;
+	background: transparent;
+}
+
+#helix-ultimate #hu-layout-builder .hu-layout-column.ui-state-highlight .hu-column {
+	border: 1px solid var(--sp-divider);
+	background: var(--sp-panel);
+	box-shadow: none;
+}
+
+#helix-ultimate .hu-layout-column.ui-state-highlight .hu-column > *,
+#helix-ultimate .hu-layout-column.ui-state-highlight .hu-column::after,
+#helix-ultimate .hu-layout-column.ui-state-highlight::after {
+	visibility: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/* Page wireframe: the builder reads like a miniature page. Each row    */
+/* is a rounded block on a light canvas, its name a small label; row    */
+/* actions show on hover and + sits on the gap to insert a row.        */
+/* ------------------------------------------------------------------ */
+
+#helix-ultimate .layout-panel .hu-groups-container {
+	background: var(--sp-canvas, #f6f7f9);
+}
+
+#helix-ultimate #hu-layout-builder {
+	padding: 14px 14px 56px;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) {
+	position: relative;
+	margin: 0 0 14px;
+	border: 0;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:not(.ui-sortable-helper) .hu-layout-section-inner {
+	padding: 10px 10px 10px;
+	border: 1px solid var(--sp-divider);
+	border-radius: 14px;
+	background: var(--sp-panel);
+	transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+#helix-ultimate #hu-layout-builder > .hu-layout-section:hover .hu-layout-section-inner {
+	border-color: var(--sp-handle-interactive);
+}
+
+/* Row label: small and quiet, with its flags beside it. */
+#helix-ultimate .hu-section-settings {
+	min-height: 24px;
+	padding: 0 0 0 4px;
+}
+
+#helix-ultimate .hu-section-title {
+	color: var(--sp-muted);
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+#helix-ultimate .hu-section-settings > div:first-child {
+	gap: 8px;
+	min-width: 0;
+}
+
+/* The grip sits just outside the block, on the canvas. */
+#helix-ultimate .hu-move-row {
+	top: 13px;
+	left: -14px;
+	width: 14px;
+}
+
+/* Row actions: only on hover / keyboard focus. */
+#helix-ultimate .hu-row-option-list {
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+#helix-ultimate .hu-layout-section:is(:hover, :focus-within) .hu-row-option-list,
+#helix-ultimate .hu-layout-section .hu-row-option-list:has(.hu-column-list[style*='block']) {
+	opacity: 1;
+}
+
+#helix-ultimate .hu-row-option-list > li > .hu-layout-builder-action {
+	width: 26px;
+	height: 26px;
+}
+
+#helix-ultimate .hu-row-container {
+	padding: 8px 0 0;
+}
+
+/* Columns inside a block: soft filled, a little shorter. */
+#helix-ultimate .hu-layout-column .hu-column,
+#helix-ultimate .hu-layout-column:is(.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-12) .hu-column {
+	height: 40px;
+	border-radius: 10px;
+}
+
+#helix-ultimate .hu-layout-column .hu-column:focus-visible {
+	outline: 1px solid var(--sp-blue) !important;
+	outline-offset: 0;
+}
+
+/* Flags */
+#helix-ultimate .hu-row-flags,
+#helix-ultimate .hu-column-flags {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: 4px;
+}
+
+#helix-ultimate .hu-row-flags:empty,
+#helix-ultimate .hu-column-flags:empty {
+	display: none;
+}
+
+#helix-ultimate .hu-column-flags {
+	margin-left: 6px;
+}
+
+#helix-ultimate .hu-flag {
+	display: inline-flex;
+	align-items: center;
+	color: var(--sp-muted);
+}
+
+#helix-ultimate .hu-flag-text {
+	height: 18px;
+	padding: 0 6px;
+	border-radius: 5px;
+	background: var(--sp-input);
+	font-size: 10.5px;
+	font-weight: 600;
+	letter-spacing: 0;
+}
+
+#helix-ultimate .hu-flag-swatch {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: var(--hu-flag-color);
+	box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.15);
+}
+
+/* Insert a row: a small round + on the gap below each block. */
+#helix-ultimate #hu-layout-builder .hu-add-row {
+	bottom: -7px;
+	margin-bottom: -13px;
+	border: 1px solid var(--sp-divider);
+	color: var(--sp-icon);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+}
+
+#helix-ultimate #hu-layout-builder .hu-add-row:hover,
+#helix-ultimate #hu-layout-builder .hu-add-row:focus-visible {
+	border-color: var(--sp-blue);
+	color: var(--sp-panel);
+	background: var(--sp-blue);
+}
+
+/* A row being dragged lifts like a column does. */
+#helix-ultimate #hu-layout-builder > .hu-layout-section.ui-state-highlight {
+	border: 1px solid var(--sp-divider);
+	border-radius: 14px;
+	background: var(--sp-panel);
+}
+
+/* Columns are added with the + after the last one (and removed in a column's
+   settings), so the column-layout picker icon goes. Its list stays in the page:
+   the saved layout reads the row's pattern from it. */
+#helix-ultimate .hu-row-option-list > li:has(> .hu-add-columns) {
+	display: none;
+}
+
+/* Add a column: on demand. A small round + on the row's right edge, shown while
+   the row is hovered or has focus; it takes no space, so nothing shifts. */
+#helix-ultimate .hu-add-column {
+	position: absolute;
+	top: calc(8px + 20px);
+	right: -22px;
+	z-index: 3;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 1px solid var(--sp-divider);
+	border-radius: 50%;
+	color: var(--sp-icon);
+	background: var(--sp-panel);
+	box-shadow: 0 1px 3px rgba(17, 24, 39, 0.12);
+	cursor: pointer;
+	opacity: 0;
+	transform: translateY(-50%) scale(0.85);
+	transition: opacity 0.12s ease, transform 0.12s ease, border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+	pointer-events: none;
+}
+
+#helix-ultimate .hu-layout-section:is(:hover, :focus-within) .hu-add-column {
+	opacity: 1;
+	transform: translateY(-50%) scale(1);
+	pointer-events: auto;
+}
+
+#helix-ultimate .hu-add-column:hover,
+#helix-ultimate .hu-add-column:focus-visible {
+	border-color: var(--sp-blue);
+	color: var(--sp-panel);
+	background: var(--sp-blue);
+}
+
+#helix-ultimate .hu-layout-section .hu-add-column:disabled {
+	display: none;
+}
+
+@media (hover: none) {
+	#helix-ultimate .hu-add-column {
+		opacity: 1;
+		transform: translateY(-50%);
+		pointer-events: auto;
+	}
+}
+
+/* Column settings: centred on the card's right edge (an older rule pinned it to the top corner). */
+#helix-ultimate .hu-layout-column .hu-column {
+	position: relative;
+}
+
+#helix-ultimate .hu-layout-column .hu-column .hu-column-options {
+	position: absolute;
+	top: 50%;
+	right: 8px;
+	margin: 0;
+	transform: translateY(-50%);
+}
+
+#helix-ultimate .hu-layout-column:is(:hover, :focus-within) .hu-column {
+	padding-right: 36px;
+}
+
+/* The settings button stands out from the filled card when hovered: white, a soft shadow. */
+#helix-ultimate .hu-layout-column .hu-column .hu-column-options:is(:hover, :focus-visible) {
+	background: var(--sp-panel);
+	box-shadow: 0 1px 3px rgba(17, 24, 39, 0.16);
+}
+
+#helix-ultimate .hu-layout-column .hu-column .hu-column-options:is(:hover, :focus-visible) svg path {
+	opacity: 1;
+}
+
+/* Row sort handle (the up / down icon), just outside the block. */
+#helix-ultimate #hu-layout-builder .hu-move-row {
+	top: 12px;
+	left: -18px;
+	width: 16px;
+	height: 16px;
+	color: var(--sp-handle-interactive);
+}
+
+#helix-ultimate #hu-layout-builder .hu-move-row:hover {
+	color: var(--sp-icon);
+}
+
+/* Room on the canvas for the sort handle outside each block. */
+#helix-ultimate #hu-layout-builder {
+	padding-right: 18px;
+	padding-left: 18px;
+}

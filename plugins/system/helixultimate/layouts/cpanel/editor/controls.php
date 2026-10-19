@@ -42,11 +42,11 @@ $exitUrl = Route::_('index.php?option=com_templates&task=style.edit&id=' . (int)
 			</div>
 
 			<div class="hu-done-msg">
-				<span class="fas fa-check-circle" aria-hidden="true"></span> <span class="hu-response-msg visually-hidden"><span class="hu-msg"><?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_DRAFTED'); ?></span></span>
+				<?php echo \HelixUltimate\Framework\Platform\Icon::get('check-circle'); ?> <span class="hu-response-msg visually-hidden"><span class="hu-msg"><?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_DRAFTED'); ?></span></span>
 			</div>
 
 			<button type="button" role="button" class="hu-btn hu-btn-reset action-reset-drafts" title="<?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_RESET_DRAFT'); ?>">
-				<span class="fas fa-history" aria-hidden="true"></span>
+				<?php echo \HelixUltimate\Framework\Platform\Icon::get('history'); ?>
 				<span class="visually-hidden"><?php echo Text::_('HELIX_ULTIMATE_TOPBAR_MSG_RESET_DRAFT'); ?></span>
 			</button>
 		</div>

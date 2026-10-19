@@ -29,14 +29,12 @@
 	background: var(--sp-input);
 }
 
-#helix-ultimate .hu-layout-settings .hu-option-group-title .fa-fw {
-	width: 16px;
+#helix-ultimate .hu-layout-settings .hu-option-group-title > .hu-icon:not(.hu-icon-chevron-right) {
 	color: var(--sp-icon);
-	font-size: 12px;
 }
 
 /* Chevron on the right, pointing down when open. */
-#helix-ultimate .hu-layout-settings .hu-option-group-title .fa-angle-right {
+#helix-ultimate .hu-layout-settings .hu-option-group-title .hu-icon-chevron-right {
 	order: 2;
 	margin-left: auto;
 	color: var(--sp-icon);
@@ -47,7 +45,7 @@
 	color: var(--sp-text);
 }
 
-#helix-ultimate .hu-layout-settings .hu-option-group.active .hu-option-group-title .fa-angle-right {
+#helix-ultimate .hu-layout-settings .hu-option-group.active .hu-option-group-title .hu-icon-chevron-right {
 	transform: rotate(90deg);
 }
 

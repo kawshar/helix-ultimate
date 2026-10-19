@@ -375,19 +375,19 @@ class JFormFieldHelixfont extends FormField
 		$html .= '<div class="hu-switcher hu-switcher-inline hu-switcher-style-tab hu-switcher-style-tab-sm">';
 		$html .= '<div class="hu-action-group">';
 		$html .= '<span data-value="none" class="hu-switcher-action ' . ($decoration === 'none' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-times" aria-hidden="true"></span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('close');
 		$html .= '</span>';
 
 		$html .= '<span data-value="underline" class="hu-switcher-action ' . ($decoration === 'underline' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-underline" aria-hidden="true"></span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('underline');
 		$html .= '</span>';
 
 		$html .= '<span data-value="line-through" class="hu-switcher-action ' . ($decoration === 'strikethrough' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-strikethrough" aria-hidden="true"></span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('strikethrough');
 		$html .= '</span>';
 
 		$html .= '<span data-value="overline" class="hu-switcher-action ' . ($decoration === 'overline' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-overline" aria-hidden="true">O</span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('overline');
 		$html .= '</span>';
 		$html .= '</div>';
 		$html .= '</div>';
@@ -409,19 +409,19 @@ class JFormFieldHelixfont extends FormField
 
 		$html .= '<div class="hu-action-group">';
 		$html .= '<span data-value="left" class="hu-switcher-action ' . ($alignment === 'left' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-align-left" aria-hidden="true"></span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('align-left');
 		$html .= '</span>';
 
 		$html .= '<span data-value="center" class="hu-switcher-action ' . ($alignment === 'center' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-align-center" aria-hidden="true"></span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('align-center');
 		$html .= '</span>';
 
 		$html .= '<span data-value="right" class="hu-switcher-action ' . ($alignment === 'right' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-align-right" aria-hidden="true"></span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('align-right');
 		$html .= '</span>';
 
 		$html .= '<span data-value="justify" class="hu-switcher-action ' . ($alignment === 'justify' ? 'active' : '') . '" role="button">';
-		$html .= '<span class="fas fa-align-justify" aria-hidden="true"></span>';
+		$html .= \HelixUltimate\Framework\Platform\Icon::get('align-justify');
 		$html .= '</span>';
 		$html .= '</div>';
 

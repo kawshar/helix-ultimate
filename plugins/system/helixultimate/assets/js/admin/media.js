@@ -10,7 +10,7 @@
    */
   document.addEventListener("DOMContentLoaded", () => {
     const { fire, delegate, readData, request, show, hide } = Joomla.utils;
-    const PRELOADER = '<div class="hu-modal-preloader"><span class="fas fa-circle-notch fa-pulse fa-spin fa-3x fa-fw" aria-hidden="true"></span></div>';
+    const PRELOADER = `<div class="hu-modal-preloader">${Joomla.utils.icon("spinner", { className: "hu-spin", size: 28 })}</div>`;
     const q = (selector) => document.querySelector(selector);
     const task = (action, data = {}) => request(window.location.href, {
       method: "POST",
@@ -52,8 +52,8 @@
         target = String(readData(picker, "target") ?? "");
       }
       Joomla.helixModal.media({ target_type: targetType, target });
-      const icon = picker.querySelector(".fa");
-      if (icon) icon.classList.add("fa-spinner", "fa-spin");
+      const icon = picker.querySelector(".hu-icon");
+      if (icon) icon.classList.add("hu-spin");
       try {
         const data = await task("view-media");
         if (data.status) {
@@ -66,7 +66,7 @@
       } catch (error) {
         alert("Somethings wrong, Try again");
       }
-      if (icon) icon.classList.remove("fa-spinner", "fa-spin");
+      if (icon) icon.classList.remove("hu-spin");
     });
     delegate(document, "dblclick", ".hu-media-folder", (event, folder) => {
       event.preventDefault();
@@ -234,7 +234,7 @@
           "beforeend",
           `<li class="hu-media-progress ${index}">
 					<div class="hu-media-thumb"><div class="hu-progress"><div class="hu-progress-bar"></div></div></div>
-					<div class="hu-media-label"><span class="fas fa-circle-notch fa-spin" aria-hidden="true"></span> <span class="hu-media-upload-percentage"></span>Uploading...</div>
+					<div class="hu-media-label">${Joomla.utils.icon("spinner", { className: "hu-spin" })} <span class="hu-media-upload-percentage"></span>Uploading...</div>
 				</li>`
         );
       }

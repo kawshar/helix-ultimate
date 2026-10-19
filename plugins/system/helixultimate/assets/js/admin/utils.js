@@ -208,11 +208,11 @@
     picker.innerHTML = `
 		<button type="button" class="hu-font-picker__toggle" aria-haspopup="listbox" aria-expanded="false" aria-controls="${id}-popover">
 			<span class="hu-font-picker__value"></span>
-			<span class="fas fa-chevron-down" aria-hidden="true"></span>
+			${icon("chevron-down")}
 		</button>
 		<div class="hu-font-picker__popover" id="${id}-popover" hidden>
 			<div class="hu-font-picker__search-wrap">
-				<span class="fas fa-search" aria-hidden="true"></span>
+				${icon("search")}
 				<input type="text" class="hu-font-picker__search" role="combobox" autocomplete="off" spellcheck="false"
 					aria-autocomplete="list" aria-expanded="true" aria-controls="${id}-list"
 					placeholder="${searchLabel}"
@@ -430,7 +430,14 @@
       }
     });
   }
+  function icon(name, { size = 16, className = "" } = {}) {
+    const paths = Joomla.getOptions("hu-icons") || {};
+    const inner = paths[name];
+    if (!inner) return "";
+    return `<svg class="hu-icon hu-icon-${name}${className ? " " + className : ""}" viewBox="0 0 16 16" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${inner}</svg>`;
+  }
   var utils = {
+    icon,
     asciiToHex,
     getCurrentTimeString,
     helixHash,

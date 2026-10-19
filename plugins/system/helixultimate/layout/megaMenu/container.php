@@ -32,7 +32,7 @@ if (!class_exists('MegaFields'))
 	<?php // Module / menu item picker: a dropdown anchored to the column's add button (megamenu.js). ?>
 	<div class="hu-megamenu-popover" role="dialog" aria-label="<?php echo htmlspecialchars(Text::_('HELIX_ULTIMATE_MENU_MODULE_LIST'), ENT_QUOTES, 'UTF-8'); ?>">
 		<div class="hu-megamenu-search-wrapper">
-			<span class="fas fa-search" aria-hidden="true"></span>
+			<?php echo \HelixUltimate\Framework\Platform\Icon::get('search'); ?>
 			<input type="search" class="hu-input hu-megamenu-module-search" placeholder="<?php echo htmlspecialchars(Text::_('HELIX_ULTIMATE_SEARCH_ITEM'), ENT_QUOTES, 'UTF-8'); ?>" autocomplete="off" aria-label="<?php echo htmlspecialchars(Text::_('HELIX_ULTIMATE_SEARCH_ITEM'), ENT_QUOTES, 'UTF-8'); ?>" />
 		</div>
 		<div class="hu-megamenu-modules-container"></div>

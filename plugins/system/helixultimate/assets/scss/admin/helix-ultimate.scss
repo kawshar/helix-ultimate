@@ -2350,7 +2350,7 @@ select:focus::-ms-value {
 	border-width: 2px;
 }
 
-.hu-sidebar .hu-done-msg .fa-check-circle {
+.hu-sidebar .hu-done-msg .hu-icon-check-circle {
 	color: #12a150;
 }
 
@@ -3142,7 +3142,7 @@ select:focus::-ms-value {
 	color: #007bff;
 }
 
-.hu-option-group-title .fa-angle-right {
+.hu-option-group-title .hu-icon-chevron-right {
 	position: absolute;
 	right: 20px;
 	top: 50%;
@@ -3151,7 +3151,7 @@ select:focus::-ms-value {
 	transition: transform 300ms ease;
 }
 
-.hu-option-group.active .hu-option-group-title .fa-angle-right {
+.hu-option-group.active .hu-option-group-title .hu-icon-chevron-right {
 	transform: translateY(-50%) rotate(90deg);
 	-webkit-transform: translateY(-50%) rotate(90deg);
 }

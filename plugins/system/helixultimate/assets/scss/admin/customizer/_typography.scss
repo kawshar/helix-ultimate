@@ -88,11 +88,11 @@
 	background: var(--sp-input);
 }
 
-#helix-ultimate .hu-typo-collapse .fas {
+#helix-ultimate .hu-typo-collapse .hu-icon {
 	transition: transform 0.15s ease;
 }
 
-#helix-ultimate .hu-typo-card.is-collapsed .hu-typo-collapse .fas {
+#helix-ultimate .hu-typo-card.is-collapsed .hu-typo-collapse .hu-icon {
 	transform: rotate(-90deg);
 }
 
@@ -152,7 +152,7 @@
 	cursor: pointer;
 }
 
-#helix-ultimate .hu-typo-remove .fas {
+#helix-ultimate .hu-typo-remove .hu-icon {
 	font-size: 11px;
 }
 
@@ -308,7 +308,7 @@
 	cursor: pointer;
 }
 
-#helix-ultimate .hu-typo-add__toggle .fas {
+#helix-ultimate .hu-typo-add__toggle .hu-icon {
 	color: var(--sp-icon);
 	font-size: 11px;
 }
@@ -425,7 +425,7 @@
 	white-space: nowrap;
 }
 
-.hu-font-picker__toggle .fa-chevron-down {
+.hu-font-picker__toggle .hu-icon-chevron-down {
 	flex: 0 0 auto;
 	color: var(--sp-muted);
 	font-size: 10px;
@@ -449,7 +449,7 @@
 	margin-bottom: 6px;
 }
 
-.hu-font-picker__search-wrap .fa-search {
+.hu-font-picker__search-wrap .hu-icon-search {
 	position: absolute;
 	top: 50%;
 	left: 10px;

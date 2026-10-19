@@ -56,7 +56,7 @@ class HelixultimateFieldColor
 
 		if (!empty($attr['desc']))
 		{
-			$output .= '<span class="hu-help-icon hu-ml-2 fas fa-info-circle"></span>';
+			$output .= '<span class="hu-help-icon hu-ml-2">' . \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]) . '</span>';
 			$output .= '<p class="hu-control-help">' . $attr['desc'] . '</p>';
 		}
 

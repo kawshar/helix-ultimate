@@ -55,7 +55,7 @@ class HelixultimateFieldSelect
 		$output  = '<div class="control-group ' . $className . ' ' . $key . '" ' . $dataShowon . '>';
 		$output .= '<label>' . $attr['title'];
 
-		$output .= !empty($attr['desc']) ? '<span class="hu-help-icon hu-ml-2 fas fa-info-circle"></span>' : '';
+		$output .= !empty($attr['desc']) ? '<span class="hu-help-icon hu-ml-2">' . \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]) . '</span>' : '';
 		$output .= '</label>';
 		$output .= !empty($attr['desc']) ? '<p class="hu-control-help">' . $attr['desc'] . '</p>' : '';
 

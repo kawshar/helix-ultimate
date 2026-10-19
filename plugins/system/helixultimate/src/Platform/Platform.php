@@ -11,6 +11,7 @@ namespace HelixUltimate\Framework\Platform;
 defined('_JEXEC') or die();
 
 use HelixUltimate\Framework\Platform\Helper;
+use HelixUltimate\Framework\Platform\Icon;
 use HelixUltimate\Framework\Platform\Request;
 use HelixUltimate\Framework\System\HelixDocument;
 use HelixUltimate\Framework\System\JoomlaBridge;
@@ -236,11 +237,14 @@ class Platform
 		}
 
 		
-		/** Framework defined assets */
+		/**
+		 * Framework defined assets. The customizer draws its icons as inline SVG
+		 * (Icon / Joomla.utils.icon), so Font Awesome is not loaded here; the icon
+		 * pickers list Font Awesome names for the site, which loads it itself.
+		 */
 		$helixDocument->registerAndUseStyle('helix.coloris', $helix_assets_url . '/css/libs/coloris.min.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('helix.ultimate', $helix_assets_url . '/css/admin/helix-ultimate.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('helix.modal', $helix_assets_url . '/css/admin/modal.css', ['version' => 'auto', 'relative' => true])
-			->registerAndUseStyle('helix.fontAwesome', Uri::root() . 'templates/' . $template->template . '/css/font-awesome.min.css')
 			->registerAndUseStyle('helix.device-field', $helix_assets_url . '/css/admin/devices-field.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('style.helix.menuBuilder', $helix_assets_url . '/css/admin/menu-builder.css', ['version' => 'auto', 'relative' => true])
 			->registerAndUseStyle('style.helix.megaMenu', $helix_assets_url . '/css/admin/megamenu.css', ['version' => 'auto', 'relative' => true])
@@ -272,6 +276,8 @@ class Platform
 		);
 
 		$doc->addScriptOptions('meta', $meta);
+		// The customizer's icon set, so the admin scripts draw the same SVGs as PHP (Joomla.utils.icon).
+		$doc->addScriptOptions('hu-icons', Icon::all());
 		$doc->setBuffer((new self)->initialize(), 'component');
 	}
 

@@ -53,7 +53,7 @@ const append = (html: string): void => {
 	document.body.insertAdjacentHTML('beforeend', html);
 };
 
-const closeButton = (className: string): string => `<a href="#" class="${className}"><span class="fas fa-times" aria-hidden="true"></span></a>`;
+const closeButton = (className: string): string => `<a href="#" class="${className}">${Joomla.utils.icon('close')}</a>`;
 
 /** Close the media / mega menu / frame modal. */
 function close(): void {
@@ -131,18 +131,18 @@ function media(options: MediaModalOptions = {}): void {
 				<input type="file" id="hu-file-input" accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" style="display:none;" multiple>
 				<div class="hu-modal-breadcrumbs"></div>
 				<div class="hu-modal-actions-left">
-					<a href="#" class="hu-btn hu-btn-primary hu-modal-action-select hu-mr-2"><span class="fas fa-check" aria-hidden="true"></span> Select</a>
-					<a href="#" class="hu-btn hu-btn-secondary hu-modal-action-cancel hu-mr-2"><span class="fas fa-times" aria-hidden="true"></span> Cancel</a>
-					<a href="#" class="hu-btn hu-btn-danger hu-btn-last hu-modal-action-delete"><span class="fas fa-minus-circle" aria-hidden="true"></span> Delete</a>
+					<a href="#" class="hu-btn hu-btn-primary hu-modal-action-select hu-mr-2">${Joomla.utils.icon('check')} Select</a>
+					<a href="#" class="hu-btn hu-btn-secondary hu-modal-action-cancel hu-mr-2">${Joomla.utils.icon('close')} Cancel</a>
+					<a href="#" class="hu-btn hu-btn-danger hu-btn-last hu-modal-action-delete">${Joomla.utils.icon('minus')} Delete</a>
 				</div>
 				<div class="hu-modal-actions-right">
-					<a href="#" class="hu-btn hu-btn-primary hu-modal-action-upload hu-mr-2"><span class="fas fa-upload" aria-hidden="true"></span> Upload</a>
-					<a href="#" class="hu-btn hu-btn-secondary hu-btn-last hu-modal-action-new-folder"><span class="fas fa-plus" aria-hidden="true"></span> New Folder</a>
+					<a href="#" class="hu-btn hu-btn-primary hu-modal-action-upload hu-mr-2">${Joomla.utils.icon('upload')} Upload</a>
+					<a href="#" class="hu-btn hu-btn-secondary hu-btn-last hu-modal-action-new-folder">${Joomla.utils.icon('plus')} New Folder</a>
 					${closeButton('action-hu-modal-close')}
 				</div>
 			</div>
 			<div class="hu-modal-inner">
-				<div class="hu-modal-preloader"><span class="fas fa-circle-notch fa-pulse fa-spin fa-3x fa-fw" aria-hidden="true"></span></div>
+				<div class="hu-modal-preloader">${Joomla.utils.icon('spinner', { className: 'hu-spin', size: 28 })}</div>
 			</div>
 		</div>`);
 
@@ -173,7 +173,7 @@ function settings(options: SettingsModalOptions = {}): void {
 				<div class="hu-options-modal-content"></div>
 			</div>
 			<div class="hu-options-modal-footer">
-				<a href="#" class="hu-btn hu-btn-primary ${escapeAttr(applyBtnClass)}" data-flag="${escapeAttr(flag)}"><span class="fas fa-check"></span> Apply</a>
+				<a href="#" class="hu-btn hu-btn-primary ${escapeAttr(applyBtnClass)}" data-flag="${escapeAttr(flag)}">${Joomla.utils.icon('check')} Apply</a>
 				${footerButtons.join('')}
 			</div>
 		</div>`);

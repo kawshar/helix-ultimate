@@ -44,17 +44,17 @@ class HelixultimateFieldAlignment
 
 		if (!empty($attr['desc']))
 		{
-			$output .= '<span class="hu-help-icon hu-ml-2 fas fa-info-circle"></span>';
+			$output .= '<span class="hu-help-icon hu-ml-2">' . \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]) . '</span>';
 			$output .= '<p class="hu-control-help">' . $attr['desc'] . '</p>';
 		}
 
 		$output .= '<div class="controls">';
 		$output .= '<div class="hu-switcher hu-switcher-inline hu-switcher-style-tab hu-switcher-style-tab-sm">';
 		$output 	.= '<div class="hu-action-group">';
-		$output 		.= '<span data-value="left" class="hu-switcher-action ' . ($value === 'left' ? 'active' : '') . '" role="button"><span class="fas fa-align-left" aria-hidden="true"></span></span>';
-		$output 		.= '<span data-value="center" class="hu-switcher-action ' . ($value === 'center' ? 'active' : '') . '" role="button"><span class="fas fa-align-center" aria-hidden="true"></span></span>';
-		$output 		.= '<span data-value="right" class="hu-switcher-action ' . ($value === 'right' ? 'active' : '') . '" role="button"><span class="fas fa-align-right" aria-hidden="true"></span></span>';
-		$output 		.= '<span data-value="justify" class="hu-switcher-action ' . ($value === 'justify' ? 'active' : '') . '" role="button"><span class="fas fa-align-justify" aria-hidden="true"></span></span>';
+		$output 		.= '<span data-value="left" class="hu-switcher-action ' . ($value === 'left' ? 'active' : '') . '" role="button">' . \HelixUltimate\Framework\Platform\Icon::get('align-left') . '</span>';
+		$output 		.= '<span data-value="center" class="hu-switcher-action ' . ($value === 'center' ? 'active' : '') . '" role="button">' . \HelixUltimate\Framework\Platform\Icon::get('align-center') . '</span>';
+		$output 		.= '<span data-value="right" class="hu-switcher-action ' . ($value === 'right' ? 'active' : '') . '" role="button">' . \HelixUltimate\Framework\Platform\Icon::get('align-right') . '</span>';
+		$output 		.= '<span data-value="justify" class="hu-switcher-action ' . ($value === 'justify' ? 'active' : '') . '" role="button">' . \HelixUltimate\Framework\Platform\Icon::get('align-justify') . '</span>';
 		$output 	.= '</div>';
 		$output .= '</div>';
 		$output .= '</div>';

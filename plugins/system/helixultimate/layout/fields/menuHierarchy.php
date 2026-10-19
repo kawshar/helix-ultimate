@@ -66,7 +66,7 @@ class HelixultimateFieldMenuHierarchy
 
 		if (!empty($attr['desc']))
 		{
-			$html[] = '<label class="hu-help-icon hu-ml-2 fas fa-info-circle"></label>';
+			$html[] = '<label class="hu-help-icon hu-ml-2">' . \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]) . '</label>';
 			$html[] = '<p class="hu-control-help">' . $attr['desc'] . '</p>';
 		}
 

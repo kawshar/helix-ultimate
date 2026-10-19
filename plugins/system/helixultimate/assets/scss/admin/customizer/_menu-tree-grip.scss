@@ -34,3 +34,16 @@
 		opacity: 1;
 	}
 }
+
+/* The sort icon (up / down) fits the gap at 12px. */
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon {
+	left: -13px;
+	padding: 1px;
+	color: var(--sp-handle-interactive);
+}
+
+#helix-ultimate #hu-menu-tree .hu-menu-tree-contents .hu-branch-icon .hu-icon {
+	display: block;
+	width: 12px;
+	height: 12px;
+}

@@ -38,7 +38,7 @@ extract($displayData);
 				<div class="control-label">
 					<label for=""><?php echo $masterLabel; ?></label>
 					<?php if (!empty($masterDescription)): ?>
-						<span class="hu-help-icon hu-ml-2 fas fa-info-circle"></span>
+						<span class="hu-help-icon hu-ml-2"><?php echo \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]); ?></span>
 						<p class="hu-control-help"><?php echo $masterDescription; ?></p>
 					<?php endif ?>
 				</div>

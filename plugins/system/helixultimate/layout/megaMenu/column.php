@@ -28,7 +28,7 @@ if (!empty($column->items))
 <div class="hu-megamenu-col col-<?php echo $column->colGrid; ?>" data-rowid="<?php echo $rowId; ?>" data-columnid="<?php echo $columnId; ?>">
 	<div class="hu-megamenu-column-contents-wrapper">
 		<div class="hu-megamenu-column-toolbar hu-megamenu-column-drag-handler">
-			<svg xmlns="http://www.w3.org/2000/svg" width="15" height="8"><path fill-rule="evenodd" d="M1.5 3a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm0 5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM9 1.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM7.5 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM15 1.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM13.5 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"></path></svg>
+			<?php echo \HelixUltimate\Framework\Platform\Icon::get('sort-horizontal'); ?>
 			<span>Column</span>
 		</div>
 		<div class="hu-megamenu-column-contents">
@@ -48,7 +48,7 @@ if (!empty($column->items))
 		
 		<div class="hu-megamenu-add-item-wrapper">
 			<button class="hu-megamenu-add-new-item" title="Add Module">
-				<span class="fas fa-plus-circle" aria-hidden="true"></span>
+				<?php echo \HelixUltimate\Framework\Platform\Icon::get('plus'); ?>
 			</button>
 			<ul class="hu-megamenu-cell-options" style="display: none;">
 				<li><a href="#" class="hu-megamenu-cell-options-item" data-type="menu"><?php echo Text::_('Menu Item'); ?></a></li>

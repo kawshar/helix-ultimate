@@ -93,7 +93,7 @@
         toggle.className = "hu-typo-collapse";
         toggle.title = t("HELIX_ULTIMATE_TYPO_TOGGLE", "Show or hide settings");
         toggle.setAttribute("aria-label", `${toggle.title}: ${card.label}`);
-        toggle.innerHTML = '<span class="fas fa-chevron-down" aria-hidden="true"></span>';
+        toggle.innerHTML = `${Joomla.utils.icon("chevron-down")}`;
         controls.appendChild(toggle);
         card.collapseButton = toggle;
         header.addEventListener("click", (event) => {
@@ -111,7 +111,7 @@
         tagFieldLayout(card);
         const footer = document.createElement("div");
         footer.className = "hu-typo-footer";
-        footer.innerHTML = `<button type="button" class="hu-typo-remove"><span class="fas fa-trash-alt" aria-hidden="true"></span><span></span></button>`;
+        footer.innerHTML = `<button type="button" class="hu-typo-remove">${Joomla.utils.icon("trash")}<span></span></button>`;
         const remove = footer.querySelector(".hu-typo-remove");
         remove.lastElementChild.textContent = t("HELIX_ULTIMATE_TYPO_REMOVE", "Remove font");
         remove.setAttribute("aria-label", `${t("HELIX_ULTIMATE_TYPO_REMOVE", "Remove font")}: ${card.label}`);
@@ -134,7 +134,7 @@
       adder.className = "hu-typo-add";
       adder.innerHTML = `
 			<button type="button" class="hu-typo-add__toggle" aria-haspopup="menu" aria-expanded="false" aria-controls="${menuId}">
-				<span class="fas fa-plus" aria-hidden="true"></span>
+				${Joomla.utils.icon("plus")}
 				<span>${t("HELIX_ULTIMATE_TYPO_ADD_TITLE", "Add a font")}</span>
 			</button>
 			<ul class="hu-typo-add__list" id="${menuId}" role="menu" hidden></ul>`;

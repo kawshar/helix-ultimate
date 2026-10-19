@@ -40,6 +40,7 @@
     Joomla.helixLayout = helixLayout;
     function updateLayoutField() {
       const input = document.getElementById("layout");
+      builder.querySelectorAll(".hu-layout-section").forEach(renderFlags);
       if (input) {
         input.value = JSON.stringify(serialize());
         fire(input);
@@ -47,6 +48,7 @@
     }
     const setData = (element, key, value) => element.setAttribute(`data-${key}`, value === null || value === void 0 ? "" : String(value));
     const sortables = /* @__PURE__ */ new WeakSet();
+    let lastDragEnd = 0;
     function makeSortable(container, options, message) {
       if (!container || sortables.has(container) || !window.Sortable) return;
       sortables.add(container);
@@ -61,6 +63,7 @@
         preventOnFilter: false,
         ...options,
         onEnd(event) {
+          lastDragEnd = Date.now();
           if (event.oldIndex !== event.newIndex) {
             updateLayoutField();
             Joomla.HelixToaster.success(message, "Layout Settings");
@@ -119,6 +122,13 @@
         overlay.appendChild(handle);
       }
       while (overlay.children.length > Math.max(columns.length - 1, 0)) overlay.lastElementChild.remove();
+      columns.forEach((column) => {
+        const card = column.querySelector(":scope > .hu-column");
+        if (!card) return;
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+        card.setAttribute("aria-label", `Column settings: ${column.querySelector(".hu-column-title")?.textContent?.trim() || "column"}`);
+      });
       const widths = columns.map(widthOf);
       [...overlay.children].forEach((child, index) => {
         const handle = child;
@@ -127,12 +137,110 @@
         handle.setAttribute("aria-valuemax", String(widths[index] + widths[index + 1] - 1));
         handle.setAttribute("aria-label", `Width of ${columns[index].dataset.name || "column " + (index + 1)}, ${widths[index]} of 12`);
       });
+      renderAddColumn(row);
       positionRowHandles(row);
+      renderFlags(row);
       if (window.ResizeObserver && !container.dataset.huObserved) {
         container.dataset.huObserved = "1";
         new ResizeObserver(() => positionRowHandles(row)).observe(container);
       }
     }
+    const HIDE_KEYS = ["hide_on_phone", "hide_on_large_phone", "hide_on_tablet", "hide_on_small_desktop", "hide_on_desktop", "hide_on_ex_large_desktop"];
+    const isOn = (element, key) => looseEq(element.dataset[key], 1);
+    const flagIcons = {
+      hidden: '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M2 2l12 12M6.3 4.2A6.7 6.7 0 0 1 8 4c3.5 0 5.6 3.2 6 4-.2.4-.8 1.4-1.8 2.3M9.9 11.6A6.2 6.2 0 0 1 8 12c-3.5 0-5.6-3.2-6-4 .3-.5 1-1.6 2.2-2.6"/></svg>',
+      sticky: '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M6 2h4l-.5 4 2 2H4.5l2-2zM8 8v6"/></svg>'
+    };
+    function settingLabel(templateId, key, fallback) {
+      const field = document.querySelector(`#${templateId} [data-attrname="${key}"]`);
+      const label = field?.closest(".control-group")?.querySelector("label");
+      const text = label?.textContent?.trim();
+      return text || fallback;
+    }
+    function renderFlags(row) {
+      const title = row.querySelector(".hu-section-title");
+      if (title) {
+        let flags = row.querySelector(".hu-row-flags");
+        if (!flags) {
+          flags = document.createElement("span");
+          flags.className = "hu-row-flags";
+          title.after(flags);
+        }
+        const parts = [];
+        if (isOn(row, "fluidrow")) {
+          const text = settingLabel("hu-row-settings", "fluidrow", "Full width").replace(/[<>&"]/g, "");
+          parts.push(`<span class="hu-flag hu-flag-text">${text}</span>`);
+        }
+        const background = row.dataset.background_color;
+        if (background) {
+          parts.push(`<span class="hu-flag hu-flag-swatch" title="Background ${background}" style="--hu-flag-color: ${background.replace(/[^#\w(),.%\s-]/g, "")}"></span>`);
+        }
+        if (HIDE_KEYS.some((key) => isOn(row, key))) parts.push(`<span class="hu-flag hu-flag-icon" title="Hidden on some devices">${flagIcons.hidden}</span>`);
+        flags.innerHTML = parts.join("");
+      }
+      columnsOfRow(row).forEach((column) => {
+        const card = column.querySelector(":scope > .hu-column");
+        if (!card) return;
+        let flags = card.querySelector(".hu-column-flags");
+        if (!flags) {
+          flags = document.createElement("span");
+          flags.className = "hu-column-flags";
+          card.querySelector(".hu-column-title")?.after(flags);
+        }
+        const parts = [];
+        if (isOn(column, "sticky_position")) {
+          const text = settingLabel("hu-column-settings", "sticky_position", "Sticky").replace(/[<>&"]/g, "");
+          parts.push(`<span class="hu-flag hu-flag-icon" title="${text}">${flagIcons.sticky}</span>`);
+        }
+        if (HIDE_KEYS.some((key) => isOn(column, key))) parts.push(`<span class="hu-flag hu-flag-icon" title="Hidden on some devices">${flagIcons.hidden}</span>`);
+        flags.innerHTML = parts.join("");
+      });
+    }
+    const layoutText = (key, fallback) => {
+      const value = Joomla.Text ? Joomla.Text._(key) : "";
+      return value && value !== key ? value : fallback;
+    };
+    function newColumn(width) {
+      const column = document.createElement("div");
+      column.className = `hu-layout-column col-${width}`;
+      column.innerHTML = `<div class="hu-column"><span class="hu-column-title">none</span>${COLUMN_OPTIONS_ICON}</div>`;
+      setData(column, "column_type", 0);
+      setData(column, "name", "none");
+      setData(column, "grid_size", width);
+      return column;
+    }
+    function addColumn(row) {
+      const columns = columnsOfRow(row);
+      const widths = columns.map(widthOf);
+      const widest = Math.max(...widths);
+      if (widest < 2) return;
+      const index = widths.lastIndexOf(widest);
+      setColumnWidth(columns[index], Math.ceil(widest / 2));
+      columns[index].after(newColumn(Math.floor(widest / 2)));
+      layoutRowHandles(row);
+      setRowPattern(row, columnsOfRow(row).map(widthOf).join("+"));
+      updateLayoutField();
+    }
+    function renderAddColumn(row) {
+      const container = row.querySelector(".hu-row-container");
+      if (!container) return;
+      let button = container.querySelector(":scope > .hu-add-column");
+      if (!button) {
+        button = document.createElement("button");
+        button.type = "button";
+        button.className = "hu-add-column";
+        button.title = layoutText("HELIX_ULTIMATE_MEGAMENU_ADD_COLUMN", "Add column");
+        button.setAttribute("aria-label", button.title);
+        button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M8 3.5v9M3.5 8h9"/></svg>';
+        container.appendChild(button);
+      }
+      button.disabled = Math.max(...columnsOfRow(row).map(widthOf), 0) < 2;
+    }
+    delegate(document, "click", "#hu-layout-builder .hu-add-column", (event, button) => {
+      event.preventDefault();
+      const row = button.closest(".hu-layout-section");
+      if (row) addColumn(row);
+    });
     function positionRowHandles(row) {
       const container = row.querySelector(".hu-row-container");
       const overlay = container?.querySelector(":scope > .hu-col-resizers");
@@ -140,14 +248,20 @@
       if (!container || !overlay || !grid) return;
       const box = container.getBoundingClientRect();
       const gridBox = grid.getBoundingClientRect();
-      const columns = columnsOfRow(row);
+      const widths = columnsOfRow(row).map(widthOf);
+      let end = 0;
       overlay.style.top = `${gridBox.top - box.top}px`;
+      overlay.style.left = `${gridBox.left - box.left}px`;
+      overlay.style.width = `${gridBox.width}px`;
       overlay.style.height = `${gridBox.height}px`;
       [...overlay.children].forEach((child, index) => {
-        const column = columns[index];
-        if (column) child.style.left = `${column.getBoundingClientRect().right - box.left}px`;
+        end += widths[index] || 0;
+        child.style.left = `${end / GRID * 100}%`;
       });
     }
+    delegate(document, "pointerover", "#hu-layout-builder .hu-layout-section", (event, row) => {
+      if (!row.classList.contains("is-resizing")) positionRowHandles(row);
+    });
     function setPair(row, index, left) {
       const columns = columnsOfRow(row);
       const widths = columns.map(widthOf);
@@ -249,7 +363,7 @@
       const content = document.getElementById(templateId).cloneNode(true);
       content.removeAttribute("id");
       content.classList.add("hu-options-modal-content", "hu-layout-settings");
-      const apply = `<button type="button" class="hu-btn hu-btn-primary hu-settings-apply" data-flag="${flag}"><span class="fas fa-check" aria-hidden="true"></span> Apply</button>`;
+      const apply = `<button type="button" class="hu-btn hu-btn-primary hu-settings-apply" data-flag="${flag}">${Joomla.utils.icon("check")} Apply</button>`;
       if (host) {
         const step = Joomla.helixSubpanel.open({
           host,
@@ -286,19 +400,31 @@
         title: `Row: ${row.querySelector(".hu-section-title")?.textContent?.trim() || "Row Options"}`,
         target: row,
         activeClass: "row-active",
-        footerButtons: ['<button type="button" class="hu-btn hu-btn-link hu-settings-delete-row"><span class="fas fa-trash-alt" aria-hidden="true"></span> Delete row</button>']
+        footerButtons: [`<button type="button" class="hu-btn hu-btn-link hu-settings-delete-row">${Joomla.utils.icon("trash")} Delete row</button>`]
       });
+    });
+    delegate(document, "click", "#hu-layout-builder .hu-layout-column > .hu-column", (event, card) => {
+      if (event.target instanceof Element && event.target.closest(".hu-column-options")) return;
+      if (Date.now() - lastDragEnd < 300) return;
+      card.querySelector(".hu-column-options")?.click();
+    });
+    delegate(document, "keydown", "#hu-layout-builder .hu-layout-column > .hu-column", (event, card) => {
+      if (event.target !== card || event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      card.querySelector(".hu-column-options")?.click();
     });
     delegate(document, "click", ".hu-column-options", (event, button) => {
       event.preventDefault();
       const column = button.closest(".hu-layout-column");
       if (!column) return;
+      const removable = columnsOfRow(column.closest(".hu-layout-section") ?? column).length > 1;
       const content = openSettings({
         templateId: "hu-column-settings",
         flag: "column-setting",
         title: `Column: ${column.querySelector(".hu-column-title")?.textContent?.trim() || "Column Options"}`,
         target: column,
-        activeClass: "column-active"
+        activeClass: "column-active",
+        footerButtons: removable ? [`<button type="button" class="hu-btn hu-btn-link hu-settings-delete-column">${Joomla.utils.icon("trash")} ${layoutText("HELIX_ULTIMATE_MEGAMENU_REMOVE_COLUMN", "Remove column")}</button>`] : []
       });
       const nameSelect = content.querySelector('select[data-attrname="name"]');
       const sticky = content.querySelector(".hu-input-sticky_position");
@@ -466,6 +592,22 @@
       layoutRowHandles(row);
       initSortables();
       Joomla.HelixToaster.success("New row added!", "Layout Settings");
+      updateLayoutField();
+    });
+    delegate(document, "click", ".hu-settings-delete-column", (event) => {
+      event.preventDefault();
+      const column = builder.querySelector(".hu-layout-column.column-active");
+      const row = column?.closest(".hu-layout-section");
+      if (!column || !row) return;
+      const columns = columnsOfRow(row);
+      const index = columns.indexOf(column);
+      if (columns.length < 2 || index < 0) return;
+      const neighbour = columns[index > 0 ? index - 1 : 1];
+      setColumnWidth(neighbour, widthOf(neighbour) + widthOf(column));
+      column.remove();
+      closeSettings();
+      layoutRowHandles(row);
+      setRowPattern(row, columnsOfRow(row).map(widthOf).join("+"));
       updateLayoutField();
     });
     delegate(document, "click", ".hu-settings-delete-row", (event) => {

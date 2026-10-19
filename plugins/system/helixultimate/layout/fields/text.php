@@ -56,7 +56,7 @@ class HelixultimateFieldText
 		$output .= '<div class="control-group-inner">';
 		$output .= '<div class="control-label">';
 		$output .= '<label>' . $attr['title'];
-		$output .= !empty($attr['desc']) ? '<span class="hu-help-icon hu-ml-2 fas fa-info-circle"></span>' : '';
+		$output .= !empty($attr['desc']) ? '<span class="hu-help-icon hu-ml-2">' . \HelixUltimate\Framework\Platform\Icon::get('info', ['size' => 14]) . '</span>' : '';
 		$output .= '</label>';
 
 		$output .= '</div>';

@@ -29,7 +29,7 @@ $slotLayout = new FileLayout('megaMenu.slots', HELIX_LAYOUT_PATH);
 <div class="hu-megamenu-row-wrapper" data-rowid="<?php echo $rowId; ?>">
 	<div class="hu-megamenu-row-toolbar">
 		<div class="hu-megamenu-row-toolbar-left hu-megamenu-row-drag-handlers">
-			<svg xmlns="http://www.w3.org/2000/svg" width="15" height="8"><path fill-rule="evenodd" d="M1.5 3a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm0 5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM9 1.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM7.5 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM15 1.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM13.5 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"></path></svg>
+			<?php echo \HelixUltimate\Framework\Platform\Icon::get('sort'); ?>
 			<span>Row</span>
 		</div>
 		<div class="hu-megamenu-row-toolbar-right">

@@ -33,12 +33,12 @@
 }
 
 #helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar) svg {
-	fill: var(--sp-handle-interactive);
+	color: var(--sp-handle-interactive);
 	opacity: 1;
 }
 
 #helix-ultimate .hu-megamenu-step :is(.hu-megamenu-row-toolbar-left, .hu-megamenu-column-toolbar):hover svg {
-	fill: var(--sp-icon);
+	color: var(--sp-icon);
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-row-toolbar-left span {
@@ -162,7 +162,7 @@
 	font-size: 12px;
 }
 
-#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item span {
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item .hu-icon {
 	color: var(--sp-icon);
 }
 
@@ -171,7 +171,7 @@
 	background: var(--sp-chip);
 }
 
-#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item:hover span {
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item:hover .hu-icon {
 	color: var(--sp-blue);
 }
 
@@ -208,14 +208,10 @@
 	hyphens: auto;
 }
 
-/* A plain plus instead of the filled circle. */
-#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item .fa-plus-circle::before {
-	content: "\f067";
-}
-
-#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item span {
+#helix-ultimate .hu-megamenu-step .hu-megamenu-add-new-item .hu-icon {
+	width: 14px;
+	height: 14px;
 	color: var(--sp-handle-interactive);
-	font-size: 11px;
 }
 
 #helix-ultimate .hu-megamenu-step .hu-megamenu-cell > span:first-child {

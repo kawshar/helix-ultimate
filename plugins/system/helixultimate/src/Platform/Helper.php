@@ -1730,13 +1730,13 @@ class Helper
         $html .= '<input type="hidden"' . $attributes($input + ['value' => $value]) . '>';
         $html .= '<button type="button" class="hu-media-picker"' . $attributes($picker)
             . ' title="' . $esc(Text::_($empty ? 'HELIX_ULTIMATE_MEDIA_CHOOSE' : 'HELIX_ULTIMATE_MEDIA_REPLACE')) . '">';
-        $html .= '<span class="hu-media-picker__empty"><span class="fas fa-image" aria-hidden="true"></span> '
+        $html .= '<span class="hu-media-picker__empty">' . \HelixUltimate\Framework\Platform\Icon::get('image') . ' '
             . $esc(Text::_('HELIX_ULTIMATE_MEDIA_CHOOSE'))
             . ' <span class="hu-media-picker__hint">' . $esc(Text::_('HELIX_ULTIMATE_MEDIA_DROP_HINT')) . '</span></span>';
         $html .= '<span class="hu-media-picker__name">' . $esc($name) . '</span>';
         $html .= '</button>';
         $html .= '<button type="button" class="hu-media-clear' . ($empty ? ' hide' : '') . '" title="' . $esc(Text::_('HELIX_ULTIMATE_MEDIA_REMOVE')) . '" aria-label="' . $esc(Text::_('HELIX_ULTIMATE_MEDIA_REMOVE')) . '">'
-            . '<span class="fas fa-times" aria-hidden="true"></span></button>';
+            . \HelixUltimate\Framework\Platform\Icon::get('close') . '</button>';
         $html .= '<span class="hu-media-progress-bar" aria-hidden="true"></span>';
         $html .= '</div>';
 

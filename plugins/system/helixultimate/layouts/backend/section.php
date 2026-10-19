@@ -82,7 +82,7 @@ $output .= '<div '.((isset($row->sectionID) && $row->sectionID)?'id="hu-layout-s
 $output .= '<div class="hu-layout-section-inner">';
 $output .= '<div class="hu-section-settings hu-d-flex hu-justify-content-between hu-align-items-center">';
 $output .= '<div>';
-$output .= '<a class="hu-move-row hu-layout-builder-action" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><circle cx="1.5" cy="1.5" r="1.5"/><circle cx="6.5" cy="1.5" r="1.5"/><circle cx="1.5" cy="7" r="1.5"/><circle cx="6.5" cy="7" r="1.5"/><circle cx="1.5" cy="12.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/></svg></a>';
+$output .= '<a class="hu-move-row hu-layout-builder-action" href="#">' . \HelixUltimate\Framework\Platform\Icon::get('sort') . '</a>';
 $output .= '<strong class="hu-section-title">' . $name . '</strong>';
 $output .= '</div>';
 $output .= '<div>';
@@ -154,7 +154,7 @@ else
 
 $output .= '</div>';
 $output .= '</div>';
-$output .= '<a class="hu-add-row hu-btn hu-btn-primary" href="#"><i class="fas fa-plus" aria-hidden="true"></i></a>';
+$output .= '<a class="hu-add-row hu-btn hu-btn-primary" href="#">' . \HelixUltimate\Framework\Platform\Icon::get('plus') . '</a>';
 $output .= '</div>';
 $output .= '</div>';
 
