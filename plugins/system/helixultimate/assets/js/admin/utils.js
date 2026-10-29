@@ -99,7 +99,61 @@
     }
     const text = await response.text();
     if (responseType === "text") return text;
-    return text ? JSON.parse(text) : {};
+    if (!text) return {};
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch (error) {
+      throw unexpectedReply(response, text);
+    }
+    if (parsed && typeof parsed === "object" && parsed.reason === "invalid_token") {
+      throw sessionExpired();
+    }
+    return parsed;
+  }
+  var SessionExpiredError = class extends Error {
+    constructor() {
+      super(...arguments);
+      this.sessionExpired = true;
+    }
+  };
+  function unexpectedReply(response, text) {
+    const isLogin = /[?&]helixreturn=|option=com_login/.test(response.url) || /name=["']?(username|passwd)["']?|com_login|id=["']?form-login/i.test(text.slice(0, 2e4));
+    if (isLogin) return sessionExpired();
+    console.error("Helix: the server sent a reply that is not JSON.", text.slice(0, 2e3));
+    return new Error(text2("HELIX_ULTIMATE_UNEXPECTED_REPLY", "The server sent an unexpected reply. Please try again."));
+  }
+  function sessionExpired() {
+    watchSession();
+    return new SessionExpiredError(
+      text2("HELIX_ULTIMATE_SESSION_EXPIRED", "Your session has expired. Log in again in another tab; this one reconnects by itself.")
+    );
+  }
+  var sessionWatch = null;
+  function watchSession() {
+    if (sessionWatch) return;
+    const check = async () => {
+      try {
+        const reply = await fetch(ajaxUrl("session-check"), {
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+          credentials: "same-origin",
+          cache: "no-store"
+        });
+        const data = JSON.parse(await reply.text());
+        if (!data.status || !data.token) return;
+        if (sessionWatch) clearInterval(sessionWatch);
+        sessionWatch = null;
+        Joomla.loadOptions?.({ "csrf.token": data.token });
+        document.dispatchEvent(new CustomEvent("helix:session-restored"));
+        Joomla.HelixToaster?.success(text2("HELIX_ULTIMATE_SESSION_RESTORED", "You're logged in again. Your changes can be saved now."));
+      } catch (error) {
+      }
+    };
+    sessionWatch = setInterval(check, 5e3);
+  }
+  function text2(key, fallback) {
+    const value = Joomla.Text ? Joomla.Text._(key) : "";
+    return value && value !== key ? value : fallback;
   }
   var ajaxUrl = (action, extra = "") => {
     const id = window.helixUltimateStyleId;

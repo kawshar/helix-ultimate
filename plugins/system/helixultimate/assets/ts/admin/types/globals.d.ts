@@ -27,6 +27,7 @@ declare global {
 
 	interface JoomlaApi {
 		getOptions<T = any>(key: string, fallback?: T): T;
+		loadOptions?: (options: Record<string, unknown>) => void;
 		Text: JoomlaText;
 		submitbutton?(task: string): void;
 

@@ -353,6 +353,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	const formData = () => serialize(form, '.internal-use-only');
 
+	/** A failed request in words; a timed-out session stays up longer (it needs a login). */
+	function showRequestError(error) {
+		const message = error && error.message ? error.message : 'Something went wrong.';
+
+		Joomla.HelixToaster.error(message, 'Error', error && error.sessionExpired ? { timeout: 20000 } : undefined);
+	}
+
 	/* ------------------------------------------------------------------ */
 	/* Drafts                                                              */
 	/* ------------------------------------------------------------------ */
@@ -394,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				if (!draftAgain) await reloadPreview();
 			} catch (error) {
 				console.error('error: Something went wrong!', error);
-				Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
+				showRequestError(error);
 			}
 		})();
 
@@ -419,6 +426,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	Joomla.helixDraftChanges = draftChanges;
+
+	/*
+	 * Back after the session expired (logged in again in another tab, which also
+	 * dropped the server's draft): draft this tab's unsaved changes again, so the
+	 * preview shows them and Save works.
+	 */
+	document.addEventListener('helix:session-restored', () => {
+		if (hasDraft || form.querySelector('.controls.helix-input-touched')) draftChanges();
+	});
 
 	/**
 	 * Draft a change only when the value really changed.
@@ -606,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		} catch (error) {
 			console.error('error', error);
-			Joomla.HelixToaster.error('Error: ' + error.message, 'Error');
+			showRequestError(error);
 		}
 
 		saving = false;

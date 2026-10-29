@@ -1182,11 +1182,15 @@ class Helper
             'status'  => false,
             'message' => Text::_('JINVALID_TOKEN'),
             'output'  => Text::_('JINVALID_TOKEN'),
+            // Lets the customizer tell a stale token (new login elsewhere) from other failures.
+            'reason'  => 'invalid_token',
         ];
 
         if (! Session::checkToken()) {
             die(json_encode($report));
         }
+
+        unset($report['reason']);
 
         $report['message'] = Text::_('JERROR_ALERTNOAUTHOR');
         $report['output']  = Text::_('JERROR_ALERTNOAUTHOR');

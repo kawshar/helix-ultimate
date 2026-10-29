@@ -114,6 +114,14 @@ class Request
 			return;
 		}
 
+		// Asked by a customizer tab whose session expired: is the user logged in again?
+		if ($this->action === 'session-check')
+		{
+			$this->sessionCheck();
+
+			return;
+		}
+
 		Helper::guardAjaxRequest($this->action);
 
 		// Actions on a template style: only a Helix site style (not another template's).
@@ -417,6 +425,26 @@ class Request
 			$this->report['message'] = $e->getMessage();
 			$this->report['isDrafted'] = Helper::isDrafted();
 		}
+	}
+
+	/**
+	 * Tell a customizer tab whether its user is logged in (again), with the current
+	 * form token, so the tab can carry on after its session expired and the user
+	 * logged in again elsewhere. Reads only; nothing changes. The token goes only
+	 * to a logged-in template editor, and only same-origin pages can read the reply.
+	 *
+	 * @return	void
+	 * @since	2.2.11
+	 */
+	private function sessionCheck()
+	{
+		$user = $this->app->getIdentity();
+		$ok   = $user && $user->id && !$user->block
+			&& ($user->authorise('core.edit', 'com_templates') || $user->authorise('core.admin'));
+
+		$this->app->setHeader('Cache-Control', 'no-store', true);
+
+		echo json_encode($ok ? ['status' => true, 'token' => Session::getFormToken()] : ['status' => false]);
 	}
 
 	/**

@@ -190,8 +190,94 @@ async function request(url: string, { method = 'GET', data = null, responseType 
 	const text = await response.text();
 
 	if (responseType === 'text') return text;
+	if (!text) return {};
 
-	return text ? JSON.parse(text) : {};
+	let parsed: unknown;
+
+	try {
+		parsed = JSON.parse(text);
+	} catch (error) {
+		throw unexpectedReply(response, text);
+	}
+
+	// The form token no longer matches the session (e.g. a new login in another tab).
+	if (parsed && typeof parsed === 'object' && (parsed as { reason?: string }).reason === 'invalid_token') {
+		throw sessionExpired();
+	}
+
+	return parsed;
+}
+
+/** Thrown when the admin session has expired: the server answered with the login page. */
+export class SessionExpiredError extends Error {
+	readonly sessionExpired = true;
+}
+
+/**
+ * A reply that isn't JSON. Usually the login page (the session timed out, e.g. after
+ * the computer slept); otherwise a PHP error page. Either way, say so in words
+ * instead of showing a JSON parser message.
+ */
+function unexpectedReply(response: Response, text: string): Error {
+	const isLogin =
+		/[?&]helixreturn=|option=com_login/.test(response.url) ||
+		/name=["']?(username|passwd)["']?|com_login|id=["']?form-login/i.test(text.slice(0, 20000));
+
+	if (isLogin) return sessionExpired();
+
+	console.error('Helix: the server sent a reply that is not JSON.', text.slice(0, 2000));
+
+	return new Error(text2('HELIX_ULTIMATE_UNEXPECTED_REPLY', 'The server sent an unexpected reply. Please try again.'));
+}
+
+/**
+ * The session is gone (or its token is stale). Starts watching for the user to log
+ * in again, in another tab: then this tab takes the new form token and fires
+ * `helix:session-restored`, so its unsaved changes can be drafted and saved.
+ */
+function sessionExpired(): SessionExpiredError {
+	watchSession();
+
+	return new SessionExpiredError(
+		text2('HELIX_ULTIMATE_SESSION_EXPIRED', 'Your session has expired. Log in again in another tab; this one reconnects by itself.')
+	);
+}
+
+let sessionWatch: ReturnType<typeof setInterval> | null = null;
+
+function watchSession(): void {
+	if (sessionWatch) return;
+
+	const check = async () => {
+		try {
+			// Plain fetch (not request()): a login page here just means "not yet".
+			const reply = await fetch(ajaxUrl('session-check'), {
+				headers: { 'X-Requested-With': 'XMLHttpRequest' },
+				credentials: 'same-origin',
+				cache: 'no-store',
+			});
+			const data = JSON.parse(await reply.text()) as { status?: boolean; token?: string };
+
+			if (!data.status || !data.token) return;
+
+			if (sessionWatch) clearInterval(sessionWatch);
+			sessionWatch = null;
+
+			Joomla.loadOptions?.({ 'csrf.token': data.token });
+			document.dispatchEvent(new CustomEvent('helix:session-restored'));
+			Joomla.HelixToaster?.success(text2('HELIX_ULTIMATE_SESSION_RESTORED', "You're logged in again. Your changes can be saved now."));
+		} catch (error) {
+			// Still logged out (the reply was the login page), or offline: try again later.
+		}
+	};
+
+	sessionWatch = setInterval(check, 5000);
+}
+
+/** A translated string, or the English fallback when the language has none. */
+function text2(key: string, fallback: string): string {
+	const value = Joomla.Text ? Joomla.Text._(key) : '';
+	return value && value !== key ? value : fallback;
 }
 
 /** Build the Helix ajax URL for an action on the current style. */
